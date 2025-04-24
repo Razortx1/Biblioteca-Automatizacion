@@ -66,7 +66,7 @@ class Window(QMainWindow):
         self.stack.addWidget(self.page_1)
         self.stack.addWidget(self.page_2)
         self.stack.addWidget(self.page_3)
-        self.stack.setCurrentIndex(0)
+        self.stack.setCurrentIndex(1)
 
 
 

@@ -10,11 +10,6 @@ class AgregarLibros(QWidget):
         super().__init__()
 
         #Definicion de los estilos para boton y lineEdit
-        style_sheet_button = "background-color: #C7FF9C; " \
-        "border-radius:25px; " \
-        "width: 50; " \
-        "height: 50;" \
-        "border: 1px solid black;"
         style_sheet_lineedit = "border-radius: 10; border:1px solid black;" \
         "background-color: #FFFFFFFF; height: 40;"
 
@@ -45,9 +40,7 @@ class AgregarLibros(QWidget):
         self.stock_libro.setPlaceholderText("Ingrese el Stock disponible")
         #Botones
         self.button_agregar = QPushButton("Agregar nuevo Libro")
-        self.button_agregar.setStyleSheet(style_sheet_button)
         self.volver_atras = QPushButton("Volver a Inicio")
-        self.volver_atras.setStyleSheet(style_sheet_button)
         #Labels
         self.nombre = QLabel()
         self.codigo_barras = QLabel()
