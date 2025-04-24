@@ -3,11 +3,14 @@ from PyQt5.QtWidgets import (QSizePolicy, QWidget,
                              QPushButton, QTableWidgetItem, QTableWidget,
                              QVBoxLayout, QHBoxLayout)
 from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication)
+                          QCoreApplication, pyqtSignal)
 
 
 class PaginaPrincipal(QWidget):
+    #Definicion de señales
+    ir_a_agregar_libros = pyqtSignal()
     def __init__(self):
+
         super().__init__()
         
         #Definicion de Layout
@@ -33,3 +36,6 @@ class PaginaPrincipal(QWidget):
 
         #Agregar los layouts en la respectiva vista
         self.setLayout(horizontal_layout)
+
+        #Funciones del Boton
+        self.registro_libros.clicked.connect(self.ir_a_agregar_libros.emit)

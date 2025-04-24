@@ -26,6 +26,14 @@ icon = resource_path("images/biblioteca.ico")
 
 class Window(QMainWindow):
     def __init__(self):
+
+        #Definicion de las Paginas a usar
+        self.pages = {
+            "pagina_principal": PaginaPrincipal(),
+            "agregar_libros": AgregarLibros(),
+            "historia_libros": HistorialLibros()
+        }
+
         #Definicion de los parametros para la Ventana
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca")
@@ -59,15 +67,24 @@ class Window(QMainWindow):
         
         #Definicion para el layout entre otros
         self.setCentralWidget(main_widget)
-        self.page_1 = PaginaPrincipal()
-        self.page_2 = AgregarLibros()
-        self.page_3 = HistorialLibros()
-        #Definicion de las ventanas "hijas"
-        self.stack.addWidget(self.page_1)
-        self.stack.addWidget(self.page_2)
-        self.stack.addWidget(self.page_3)
-        self.stack.setCurrentIndex(1)
 
+        #Definicion de las ventanas "hijas"
+        self.page_indice = {}
+        for i,(nombre,widget) in enumerate(self.pages.items()):
+            self.stack.addWidget(widget)
+            self.page_indice[nombre] = i
+        #Definir primera pagina a mostrar
+        self.stack.setCurrentIndex(0)
+
+        self.pages["pagina_principal"].ir_a_agregar_libros.connect(lambda: self.cambiar_pagina("agregar_libros"))
+
+    #Funcion para cambiar entre paginas
+    def cambiar_pagina(self, nombre_pagina):
+        if nombre_pagina in self.page_indice:
+            self.stack.setCurrentIndex(self.page_indice[nombre_pagina])
+
+        else:
+            print(f"Pagina {nombre_pagina} no encontrada")
 
 
 if __name__ == "__main__":
