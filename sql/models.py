@@ -121,7 +121,7 @@ class Libro(Base):
     id_libro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     nombre_libro: Mapped[str]
     cod_barras: Mapped[str] = mapped_column(unique=True)
-    autor: Mapped[str]
+    autor: Mapped[Optional[str]]
     fecha_publicacion: Mapped[date]
     stock: Mapped[int]
     estado_libro_id: Mapped[int] = mapped_column(ForeignKey("estado_libro.id_estadolibro"))

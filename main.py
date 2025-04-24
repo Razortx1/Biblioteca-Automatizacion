@@ -10,6 +10,8 @@ from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
 from PyQt5.QtGui import QIcon, QPixmap
 
 from UI.pagina_principal import PaginaPrincipal
+from UI.agregar_libros import AgregarLibros
+from UI.historia_libros import HistorialLibros
 
 def resource_path(relative_path):
     if getattr(sys, 'frozen', False):
@@ -58,9 +60,15 @@ class Window(QMainWindow):
         #Definicion para el layout entre otros
         self.setCentralWidget(main_widget)
         self.page_1 = PaginaPrincipal()
+        self.page_2 = AgregarLibros()
+        self.page_3 = HistorialLibros()
         #Definicion de las ventanas "hijas"
         self.stack.addWidget(self.page_1)
-        self.stack.setCurrentWidget(self.page_1)
+        self.stack.addWidget(self.page_2)
+        self.stack.addWidget(self.page_3)
+        self.stack.setCurrentIndex(2)
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

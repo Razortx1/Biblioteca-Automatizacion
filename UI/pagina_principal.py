@@ -1,8 +1,7 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
+from PyQt5.QtWidgets import (QSizePolicy, QWidget,
                              QPushButton, QTableWidgetItem, QTableWidget,
-                             QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
-                             QMainWindow, QApplication)
+                             QVBoxLayout, QHBoxLayout)
 from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
                           QCoreApplication)
 
@@ -15,7 +14,7 @@ class PaginaPrincipal(QWidget):
         "border-radius:25px; " \
         "width: 50; " \
         "height: 50;" \
-        "border: 1px solid black;" \
+        "border: 1px solid black;"
         
 
         #Definicion de Layout
