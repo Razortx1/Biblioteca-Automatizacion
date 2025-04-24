@@ -32,8 +32,8 @@ class Window(QMainWindow):
         self.setLocale(QLocale(QLocale.Spanish, QLocale.Chile))
         self.showMaximized()
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowMaximizeButtonHint)
-        self.setStyleSheet("background-color: #B4E7FF;")
         self.setWindowIcon(QIcon(icon))
+        self.setStyleSheet(open(resource_path("css/style.css")).read())
         #Definicion para agregar el logo
         main_widget = QWidget()
         main_layout = QVBoxLayout()
@@ -66,7 +66,7 @@ class Window(QMainWindow):
         self.stack.addWidget(self.page_1)
         self.stack.addWidget(self.page_2)
         self.stack.addWidget(self.page_3)
-        self.stack.setCurrentIndex(2)
+        self.stack.setCurrentIndex(0)
 
 
 
