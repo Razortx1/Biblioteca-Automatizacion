@@ -129,10 +129,10 @@ class Libro(Base):
     estado_libro: Mapped["Estado_Libro"] = relationship()
     prestamos: Mapped[List["Prestamos"]] = relationship()
 
-    def __repr__(self):
-        return f"Libro(id_libro={self.id_libro}, nombre_libro={self.nombre_libro},\
-            cod_barras={self.cod_barras}, editorial={self.autor}, \
-            stock={self.stock}, fecha_publicacion={self.fecha_publicacion})"
+    def __repr__(self) -> str:
+        return f"Libro(id_libro={self.id_libro!r}, nombre_libro={self.nombre_libro!r},\
+            cod_barras={self.cod_barras!r}, editorial={self.autor!r}, \
+            stock={self.stock!r}, fecha_publicacion={self.fecha_publicacion!r})"
 
 """
     Class Estado_Libro
@@ -149,11 +149,8 @@ class Estado_Libro(Base):
     id_estadolibro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     estado_libro: Mapped[str]
 
-
-
-
-    def __repr__(self):
-        return f"Estado_Libro(id_estadolibro={self.id_estadolibro}, estado_libro={self.estado_libro})"
+    def __repr__(self)-> str:
+        return f"Estado_Libro(id_estadolibro={self.id_estadolibro!r}, estado_libro={self.estado_libro!r})"
     
 """
     Class Impresiones

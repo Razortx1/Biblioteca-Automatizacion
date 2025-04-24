@@ -9,14 +9,7 @@ from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
 class PaginaPrincipal(QWidget):
     def __init__(self):
         super().__init__()
-        #Definicion de variable para cambios en los botones
-        style_sheet = "background-color: #C7FF9C; " \
-        "border-radius:25px; " \
-        "width: 50; " \
-        "height: 50;" \
-        "border: 1px solid black;"
         
-
         #Definicion de Layout
         vertical_layout_left = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
@@ -24,15 +17,10 @@ class PaginaPrincipal(QWidget):
 
         #Creacion de los botones
         self.registro_libros = QPushButton("Registro de Libros")
-        self.registro_libros.setStyleSheet(style_sheet)
         self.prestamos_libro = QPushButton("Prestamo del Libro")
-        self.prestamos_libro.setStyleSheet(style_sheet)
         self.inventario_libros = QPushButton("Inventario de Libros")
-        self.inventario_libros.setStyleSheet(style_sheet)
         self.impresion = QPushButton("Menu de Impresiones")
-        self.impresion.setStyleSheet(style_sheet)
         self.historial_prestamos = QPushButton("Historial de Prestamos")
-        self.historial_prestamos.setStyleSheet(style_sheet)
 
         #Agregando los botones al layout
         vertical_layout_left.addWidget(self.registro_libros)

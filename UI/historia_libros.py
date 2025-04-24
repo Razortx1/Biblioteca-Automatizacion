@@ -4,18 +4,12 @@ from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
                              QMainWindow, QApplication, QHeaderView)
 from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
                           QCoreApplication)
+from connection.session import select_libros_all
 
 class HistorialLibros(QWidget):
     def __init__(self):
-        super().__init__()
-
-        #Definicion de variable para cambios en los botones
-        style_sheet = "background-color: #C7FF9C; " \
-        "border-radius:25px; " \
-        "width: 50; " \
-        "height: 50;" \
-        "border: 1px solid black;"
-
+        super().__init__()            
+        
         #Definicion del layout
         void_layout_1 = QVBoxLayout()
         void_layout_2 = QVBoxLayout()
@@ -54,9 +48,7 @@ class HistorialLibros(QWidget):
 
         #Creacion botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
-        self.cambiar_estado.setStyleSheet(style_sheet)
         self.volver_inicio = QPushButton("Volver a Inicio")
-        self.volver_inicio.setStyleSheet(style_sheet)
 
         #Agregar los Widget al layout principal
         vertical_layout.addWidget(self.tabla_libros)
@@ -65,5 +57,20 @@ class HistorialLibros(QWidget):
         vertical_layout.addLayout(void_layout_1)
         vertical_layout.addLayout(void_layout_2)
 
+        self.rellenar_tabla()
         #Agregar el layout a la respectiva lista
         self.setLayout(vertical_layout)
+
+
+    def rellenar_tabla(self):
+        libros = select_libros_all()
+        tablerow = 0
+        self.tabla_libros.setRowCount(50)
+        for l in libros:
+            self.tabla_libros.setItem(tablerow, 0, QTableWidgetItem(l.Libro.nombre_libro))
+            self.tabla_libros.setItem(tablerow, 1, QTableWidgetItem(l.Libro.cod_barras))
+            self.tabla_libros.setItem(tablerow, 2, QTableWidgetItem(l.Libro.autor))
+            self.tabla_libros.setItem(tablerow, 3, QTableWidgetItem(str(l.Libro.fecha_publicacion)))
+            self.tabla_libros.setItem(tablerow, 4, QTableWidgetItem(str(l.Libro.stock)))
+            self.tabla_libros.setItem(tablerow, 5, QTableWidgetItem(l.Estado_Libro.estado_libro))
+            tablerow+=1
