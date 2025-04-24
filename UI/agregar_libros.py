@@ -9,10 +9,6 @@ class AgregarLibros(QWidget):
     def __init__(self):
         super().__init__()
 
-        #Definicion de los estilos para boton y lineEdit
-        style_sheet_lineedit = "border-radius: 10; border:1px solid black;" \
-        "background-color: #FFFFFFFF; height: 40;"
-
         #Definicion de Layout
         void_layout_1 = QVBoxLayout()
         vertical_layout = QVBoxLayout()
@@ -25,18 +21,13 @@ class AgregarLibros(QWidget):
         #Creacion de los Widgets
         #LineEdit
         self.agregar_nombre = QLineEdit()
-        self.agregar_nombre.setStyleSheet(style_sheet_lineedit)
         self.agregar_nombre.setPlaceholderText("Ingrese nombre del libro")
         self.agregar_codigo = QLineEdit()
-        self.agregar_codigo.setStyleSheet(style_sheet_lineedit)
         self.agregar_codigo.setPlaceholderText("Ingrese el Codigo de Barras")
         self.agregar_autor = QLineEdit()
-        self.agregar_autor.setStyleSheet(style_sheet_lineedit)
         self.agregar_autor.setPlaceholderText("Ingrese el Autor")
         self.fecha_publicacion = QLineEdit()
-        self.fecha_publicacion.setStyleSheet(style_sheet_lineedit)
         self.stock_libro = QLineEdit()
-        self.stock_libro.setStyleSheet(style_sheet_lineedit)
         self.stock_libro.setPlaceholderText("Ingrese el Stock disponible")
         #Botones
         self.button_agregar = QPushButton("Agregar nuevo Libro")

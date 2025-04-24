@@ -13,3 +13,10 @@ QPushButton:pressed{
     background-color: greenyellow;
     color: white
 }
+
+QLineEdit{
+    background-color: white;
+    border-radius: 10;
+    height: 40;
+    border: 1px solid black;
+}
