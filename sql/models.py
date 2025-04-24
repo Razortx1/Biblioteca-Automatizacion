@@ -20,8 +20,7 @@ import sys, os
 """
 
 from typing import List, Optional
-from sqlalchemy.schema import MetaData
-from sqlalchemy import (ForeignKey, String, create_engine, Date, DateTime)
+from sqlalchemy import (ForeignKey, String, create_engine)
 from sqlalchemy.orm import (DeclarativeBase, Mapped, mapped_column,
                             relationship)
 """
@@ -132,7 +131,7 @@ class Libro(Base):
 
     def __repr__(self):
         return f"Libro(id_libro={self.id_libro}, nombre_libro={self.nombre_libro},\
-            cod_barras={self.cod_barras}, editorial={self.editorial}, \
+            cod_barras={self.cod_barras}, editorial={self.autor}, \
             stock={self.stock}, fecha_publicacion={self.fecha_publicacion})"
 
 """
