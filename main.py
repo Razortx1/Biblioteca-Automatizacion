@@ -92,6 +92,8 @@ class Window(QMainWindow):
         #Establecer el funcionamiento para volver a las anteriores ventanas
         self.pages["agregar_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["historia_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["menu_impresiones"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["historial_prestamos"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
 
 
     #Funcion para cambiar entre paginas

@@ -41,7 +41,6 @@ class HistorialLibros(QWidget):
         item = QTableWidgetItem()
         item.setText("Estado del Libro")
         self.tabla_libros.setHorizontalHeaderItem(5, item)
-        self.tabla_libros.setStyleSheet("background-color: rgb(255, 241, 184)")
 
         #Tamaño Columnas
         header = self.tabla_libros.horizontalHeader()
@@ -62,7 +61,7 @@ class HistorialLibros(QWidget):
         #Agregar el layout a la respectiva lista
         self.setLayout(vertical_layout)
 
-        #Señal para volver atras
+        #Funcionamiento Botones
         self.volver_inicio.clicked.connect(self.volver_principal.emit)
 
 

@@ -20,3 +20,6 @@ QLineEdit{
     height: 40;
     border: 1px solid black;
 }
+QTableWidget{
+    background-color: rgb(255, 241, 184);
+}
