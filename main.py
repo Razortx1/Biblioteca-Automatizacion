@@ -15,6 +15,8 @@ from UI.historia_libros import HistorialLibros
 from UI.prestamo_libros import PrestamoLibros
 from UI.menu_impresiones import MenuImpresiones
 from UI.historial_prestamos import HistorialPrestamos
+from UI.historial_impresiones import HistorialImpresiones
+from UI.agregar_impresiones import AgregarImpresiones
 
 def resource_path(relative_path):
     if getattr(sys, 'frozen', False):
@@ -38,6 +40,8 @@ class Window(QMainWindow):
             "prestamo_libros": PrestamoLibros(),
             "menu_impresiones" : MenuImpresiones(),
             "historial_prestamos": HistorialPrestamos(),
+            "historial_impresiones" : HistorialImpresiones(),
+            "agregar_impresiones": AgregarImpresiones()
         }
 
         #Definicion de los parametros para la Ventana
@@ -88,6 +92,10 @@ class Window(QMainWindow):
         self.pages["pagina_principal"].ir_prestamo_libro.connect(lambda: self.cambiar_pagina("prestamo_libros"))
         self.pages["pagina_principal"].ir_a_menu_impresiones.connect(lambda: self.cambiar_pagina("menu_impresiones"))
         self.pages["pagina_principal"].ir_a_historial_prestamo.connect(lambda: self.cambiar_pagina("historial_prestamos"))
+
+        #Establecer el funcionamiento para cambiar de paginas entre el menu de impresiones a sus "hijas"
+        self.pages["menu_impresiones"].ir_a_historial_impresiones.connect(lambda: self.cambiar_pagina("historial_impresiones"))
+        self.pages["menu_impresiones"].ir_a_agregar_impresiones.connect(lambda: self.cambiar_pagina("agregar_impresiones"))
 
         #Establecer el funcionamiento para volver a las anteriores ventanas
         self.pages["agregar_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
