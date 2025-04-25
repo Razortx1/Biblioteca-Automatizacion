@@ -23,6 +23,7 @@ class HistorialPrestamos(QWidget):
         #Creacion de la tabla
         self.tabla_historial = QTableWidget()
         self.tabla_historial.setColumnCount(7)
+
         item = QTableWidgetItem()
         item.setText("Nombre Alumno/Profesor")
         self.tabla_historial.setHorizontalHeaderItem(0, item)
@@ -39,6 +40,7 @@ class HistorialPrestamos(QWidget):
         item.setText("Nombre Libro")
         self.tabla_historial.setHorizontalHeaderItem(3, item)
 
+        item = QTableWidgetItem()
         item.setText("Fecha de pedido")
         self.tabla_historial.setHorizontalHeaderItem(4, item)
 
