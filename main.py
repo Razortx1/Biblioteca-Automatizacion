@@ -104,6 +104,7 @@ class Window(QMainWindow):
 
         #Establecer el funcionamiento para volver al menu de impresiones
         self.pages["agregar_impresiones"].volver_menu.connect(lambda: self.cambiar_pagina("menu_impresiones"))
+        self.pages["historial_impresiones"].volver_menu.connect(lambda: self.cambiar_pagina("menu_impresiones"))
 
 
     #Funcion para cambiar entre paginas
