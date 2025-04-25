@@ -95,9 +95,9 @@ class Usuario(Base):
     impresion: Mapped[List["Impresiones"]] = relationship()
     prestamo: Mapped[List["Prestamos"]] = relationship()
 
-    def __repr__(self):
-        return f"User(id_user={self.id_user}, nombre={self.nombre},\
-        curso={self.curso}, rut={self.rut})"
+    def __repr__(self) -> str:
+        return f"User(id_user={self.id_user!r}, nombre={self.nombre!r},\
+        curso={self.curso!r}, rut={self.rut!r})"
     
 """
     Class Libro
@@ -149,7 +149,7 @@ class Estado_Libro(Base):
     id_estadolibro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     estado_libro: Mapped[str]
 
-    def __repr__(self)-> str:
+def __repr__(self) -> str:
         return f"Estado_Libro(id_estadolibro={self.id_estadolibro!r}, estado_libro={self.estado_libro!r})"
     
 """
@@ -183,10 +183,10 @@ class Impresiones(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("usuario.id_user"))
 
 
-    def __repr__(self):
-        return f"Impresion(id_impresion={self.id_impresion}, descripcion={self.descripcion},\
-            cantidad_copias={self.cantidad_copias}, cantidad_paginas={self.cantidad_paginas}, \
-                fecha_impresion={self.fecha_impresion})"
+    def __repr__(self) -> str:
+        return f"Impresion(id_impresion={self.id_impresion!r}, descripcion={self.descripcion!r},\
+            cantidad_copias={self.cantidad_copias!r}, cantidad_paginas={self.cantidad_paginas!r}, \
+                fecha_impresion={self.fecha_impresion!r})"
     
 """
     Class Estado_Impresiones
@@ -203,8 +203,8 @@ class Estado_Impresion(Base):
     id_estadoimpresiones: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     estado_impresion: Mapped[str]
 
-    def __repr__(self):
-        return f"Estado_Impresion(id_estadoimpresiones={self.id_estadoimpresiones}, estado_impresion={self.estado_impresion})"
+    def __repr__(self) -> str:
+        return f"Estado_Impresion(id_estadoimpresiones={self.id_estadoimpresiones!r}, estado_impresion={self.estado_impresion!r})"
     
 """
     Class Prestamos
@@ -234,9 +234,9 @@ class Prestamos(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("usuario.id_user"))
     libro_id: Mapped[int] = mapped_column(ForeignKey("libro_biblioteca.id_libro"))
 
-    def __repr__(self):
-        return f"Prestamos(id_prestamos={self.id_prestamos}, fecha_inicio={self.fecha_inicio},\
-            fecha_inicio={self.fecha_termino})"
+    def __repr__(self) -> str:
+        return f"Prestamos(id_prestamos={self.id_prestamos!r}, fecha_inicio={self.fecha_inicio!r},\
+            fecha_inicio={self.fecha_termino!r})"
     
 """
     Class Estado_Prestamo
@@ -253,8 +253,8 @@ class Estado_Prestamo(Base):
     id_estadoprestamo: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     estado_prestamo: Mapped[str]
 
-    def __repr__(self):
-        return f"Estado_Prestamo(id_estadoprestamo={self.id_estadoprestamo}, estado_prestamo={self.estado_prestamo})"
+def __repr__(self) -> str:
+        return f"Estado_Prestamo(id_estadoprestamo={self.id_estadoprestamo!r}, estado_prestamo={self.estado_prestamo!r})"
 
 """
     A traves de la clase creada al principio de este archivo, se toma todos los metadatos

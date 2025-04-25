@@ -12,6 +12,14 @@ with Session(engine) as session:
             libros = session.execute(select(Libro, Estado_Libro)
                                      .join(Libro.estado_libro))
             return libros
+        def select_prestamos_all():
+            prestamos = session.execute(select(Prestamos, Estado_Prestamo,
+                                               Usuario, Libro)
+                                               .join(Prestamos.estado_prestamo)
+                                               .join_from(Prestamos, Usuario, Prestamos.user_id == Usuario.id_user)
+                                               .join_from(Prestamos, Libro, Prestamos.libro_id == Libro.id_libro)
+                                               .order_by(Prestamos.id_prestamos.asc()))
+            return prestamos
     except Exception as e:
         print(f"Errores {e}")
 
