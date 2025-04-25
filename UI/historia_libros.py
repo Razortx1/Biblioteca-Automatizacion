@@ -3,10 +3,11 @@ from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
                              QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
                              QMainWindow, QApplication, QHeaderView)
 from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication)
+                          QCoreApplication, pyqtSignal)
 from connection.session import select_libros_all
 
 class HistorialLibros(QWidget):
+    volver_principal = pyqtSignal()
     def __init__(self):
         super().__init__()            
         
@@ -60,6 +61,9 @@ class HistorialLibros(QWidget):
         self.rellenar_tabla()
         #Agregar el layout a la respectiva lista
         self.setLayout(vertical_layout)
+
+        #Señal para volver atras
+        self.volver_inicio.clicked.connect(self.volver_principal.emit)
 
 
     def rellenar_tabla(self):

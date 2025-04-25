@@ -3,9 +3,10 @@ from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
                              QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
                              QMainWindow, QApplication)
 from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication)
+                          QCoreApplication, pyqtSignal)
 
 class AgregarLibros(QWidget):
+    volver_principal = pyqtSignal()
     def __init__(self):
         super().__init__()
 
@@ -21,6 +22,7 @@ class AgregarLibros(QWidget):
         #Creacion de los Widgets
         #LineEdit
         self.agregar_nombre = QLineEdit()
+
         self.agregar_nombre.setPlaceholderText("Ingrese nombre del libro")
         self.agregar_codigo = QLineEdit()
         self.agregar_codigo.setPlaceholderText("Ingrese el Codigo de Barras")
@@ -73,3 +75,5 @@ class AgregarLibros(QWidget):
         vertical_layout.addLayout(void_layout_2)
         vertical_layout.addLayout(void_horizontal_2)
         self.setLayout(vertical_layout)
+
+        self.volver_atras.clicked.connect(self.volver_principal.emit)

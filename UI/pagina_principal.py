@@ -9,6 +9,11 @@ from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
 class PaginaPrincipal(QWidget):
     #Definicion de señales
     ir_a_agregar_libros = pyqtSignal()
+    ir_a_historia_libros = pyqtSignal()
+    ir_prestamo_libro = pyqtSignal()
+    ir_a_menu_impresiones = pyqtSignal()
+    ir_a_historial_prestamo = pyqtSignal()
+
     def __init__(self):
 
         super().__init__()
@@ -39,3 +44,7 @@ class PaginaPrincipal(QWidget):
 
         #Funciones del Boton
         self.registro_libros.clicked.connect(self.ir_a_agregar_libros.emit)
+        self.inventario_libros.clicked.connect(self.ir_a_historia_libros.emit)
+        self.prestamos_libro.clicked.connect(self.ir_prestamo_libro.emit)
+        self.impresion.clicked.connect(self.ir_a_menu_impresiones.emit)
+        self.historial_prestamos.clicked.connect(self.ir_a_historial_prestamo.emit)

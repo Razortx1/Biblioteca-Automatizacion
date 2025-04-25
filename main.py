@@ -12,6 +12,9 @@ from PyQt5.QtGui import QIcon, QPixmap
 from UI.pagina_principal import PaginaPrincipal
 from UI.agregar_libros import AgregarLibros
 from UI.historia_libros import HistorialLibros
+from UI.prestamo_libros import PrestamoLibros
+from UI.menu_impresiones import MenuImpresiones
+from UI.historial_prestamos import HistorialPrestamos
 
 def resource_path(relative_path):
     if getattr(sys, 'frozen', False):
@@ -31,7 +34,10 @@ class Window(QMainWindow):
         self.pages = {
             "pagina_principal": PaginaPrincipal(),
             "agregar_libros": AgregarLibros(),
-            "historia_libros": HistorialLibros()
+            "historia_libros": HistorialLibros(),
+            "prestamo_libros": PrestamoLibros(),
+            "menu_impresiones" : MenuImpresiones(),
+            "historial_prestamos": HistorialPrestamos(),
         }
 
         #Definicion de los parametros para la Ventana
@@ -76,7 +82,17 @@ class Window(QMainWindow):
         #Definir primera pagina a mostrar
         self.stack.setCurrentIndex(0)
 
+        #Establecer el funcionamiento para cambiar de paginas entre pagina principal a las demas
         self.pages["pagina_principal"].ir_a_agregar_libros.connect(lambda: self.cambiar_pagina("agregar_libros"))
+        self.pages["pagina_principal"].ir_a_historia_libros.connect(lambda: self.cambiar_pagina("historia_libros"))
+        self.pages["pagina_principal"].ir_prestamo_libro.connect(lambda: self.cambiar_pagina("prestamo_libros"))
+        self.pages["pagina_principal"].ir_a_menu_impresiones.connect(lambda: self.cambiar_pagina("menu_impresiones"))
+        self.pages["pagina_principal"].ir_a_historial_prestamo.connect(lambda: self.cambiar_pagina("historial_prestamos"))
+
+        #Establecer el funcionamiento para volver a las anteriores ventanas
+        self.pages["agregar_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["historia_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+
 
     #Funcion para cambiar entre paginas
     def cambiar_pagina(self, nombre_pagina):
