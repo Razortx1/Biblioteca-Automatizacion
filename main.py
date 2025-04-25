@@ -1,6 +1,4 @@
 import sys, os
-
-from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
                              QPushButton, QTableWidgetItem, QTableWidget,
                              QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
@@ -102,6 +100,10 @@ class Window(QMainWindow):
         self.pages["historia_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["menu_impresiones"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["historial_prestamos"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["prestamo_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+
+        #Establecer el funcionamiento para volver al menu de impresiones
+        self.pages["agregar_impresiones"].volver_menu.connect(lambda: self.cambiar_pagina("menu_impresiones"))
 
 
     #Funcion para cambiar entre paginas

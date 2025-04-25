@@ -22,13 +22,16 @@ class AgregarLibros(QWidget):
         #Creacion de los Widgets
         #LineEdit
         self.agregar_nombre = QLineEdit()
-
         self.agregar_nombre.setPlaceholderText("Ingrese nombre del libro")
+
         self.agregar_codigo = QLineEdit()
         self.agregar_codigo.setPlaceholderText("Ingrese el Codigo de Barras")
+
         self.agregar_autor = QLineEdit()
         self.agregar_autor.setPlaceholderText("Ingrese el Autor")
+
         self.fecha_publicacion = QLineEdit()
+        
         self.stock_libro = QLineEdit()
         self.stock_libro.setPlaceholderText("Ingrese el Stock disponible")
         #Botones
