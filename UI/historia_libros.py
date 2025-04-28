@@ -58,8 +58,13 @@ class HistorialLibros(QWidget):
         vertical_layout.addWidget(self.volver_inicio)
         vertical_layout.addLayout(void_layout_1)
         vertical_layout.addLayout(void_layout_2)
+        
+        #Vaciado de tabla
+        self.tabla_libros.setRowCount(0)
 
+        #Relleno de Tabla
         self.rellenar_tabla()
+
         #Agregar el layout a la respectiva lista
         self.setLayout(vertical_layout)
 

@@ -95,8 +95,8 @@ class HistorialImpresiones(QWidget):
 
             self.tabla_impresiones.setItem(tablerow, 0, QTableWidgetItem(i.Usuario.nombre))
             self.tabla_impresiones.setItem(tablerow, 1, QTableWidgetItem(i.Usuario.curso))
-            self.tabla_impresiones.setItem(tablerow, 2, QTableWidgetItem(i.Impresiones.cantidad_paginas))
-            self.tabla_impresiones.setItem(tablerow, 3, QTableWidgetItem(i.Impresiones.cantidad_copias))
+            self.tabla_impresiones.setItem(tablerow, 2, QTableWidgetItem(str(i.Impresiones.cantidad_paginas)))
+            self.tabla_impresiones.setItem(tablerow, 3, QTableWidgetItem(str(i.Impresiones.cantidad_copias)))
             self.tabla_impresiones.setItem(tablerow, 4, QTableWidgetItem(str(suma)))
             self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(str(i.Impresiones.fecha_impresion)))
             self.tabla_impresiones.setItem(tablerow, 6, QTableWidgetItem(i.Impresiones.descripcion))

@@ -14,6 +14,14 @@ QPushButton:pressed{
     color: white
 }
 
+QDateEdit{
+    background-color: white;
+    border-radius: 10;
+    height: 40;
+    border: 1px solid black;
+}
+
+
 QLineEdit{
     background-color: white;
     border-radius: 10;
@@ -22,4 +30,10 @@ QLineEdit{
 }
 QTableWidget{
     background-color: rgb(255, 241, 184);
+}
+
+QTextEdit{
+    background-color: white;
+    border-radius: 10;
+    border: 1px solid black;  
 }

@@ -1,9 +1,12 @@
-from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
-                             QPushButton, QTableWidgetItem, QTableWidget,
+from PyQt5.QtWidgets import (QWidget, 
+                             QPushButton,
                              QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
-                             QMainWindow, QApplication)
-from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication, pyqtSignal)
+                             QDateEdit)
+
+from datetime import date
+from PyQt5.QtCore import (pyqtSignal)
+
+from connection.connection import insertar_libros
 
 class AgregarLibros(QWidget):
     volver_principal = pyqtSignal()
@@ -30,7 +33,9 @@ class AgregarLibros(QWidget):
         self.agregar_autor = QLineEdit()
         self.agregar_autor.setPlaceholderText("Ingrese el Autor")
 
-        self.fecha_publicacion = QLineEdit()
+        self.fecha_publicacion = QDateEdit()
+        self.fecha_publicacion.setDisplayFormat("yyyy-MM-dd")
+        self.fecha_publicacion.setCalendarPopup(True)
         
         self.stock_libro = QLineEdit()
         self.stock_libro.setPlaceholderText("Ingrese el Stock disponible")
@@ -52,6 +57,11 @@ class AgregarLibros(QWidget):
         void_layout_2.addWidget(self.voidLabel_2)
         void_horizontal_1.addWidget(self.voidLabel_3)
         void_horizontal_2.addWidget(self.voidLabel_4)
+
+        #Setear Fecha
+        fecha = date.today()
+        fecha.strftime("%y-%m-/d")
+        self.fecha_publicacion.setDate(fecha)
 
         #Edit labels
         self.nombre.setText("Nombre del Libro")
@@ -79,4 +89,21 @@ class AgregarLibros(QWidget):
         vertical_layout.addLayout(void_horizontal_2)
         self.setLayout(vertical_layout)
 
+
+        #Funcionalidad botones
+        self.button_agregar.clicked.connect(self.agregar_boton)
         self.volver_atras.clicked.connect(self.volver_principal.emit)
+
+
+    def agregar_boton(self):
+        nombre = self.agregar_nombre.text()
+        codigo = self.agregar_codigo.text()
+        autor = self.agregar_autor.text()
+        fecha = self.fecha_publicacion.date()
+        fecha = fecha.toPyDate()
+        stock = self.stock_libro.text()
+        insertar_libros(nombre, codigo, autor, fecha, stock)
+        self.agregar_nombre.clear()
+        self.agregar_codigo.clear()
+        self.agregar_autor.clear()
+        self.stock_libro.clear()

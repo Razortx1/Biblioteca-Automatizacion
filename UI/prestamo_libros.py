@@ -1,5 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
-                             QPushButton, QLabel)
+                             QPushButton, QLabel, QDateEdit)
+
+from datetime import date
+
 from PyQt5.QtCore import pyqtSignal
 
 class PrestamoLibros(QWidget):
@@ -25,8 +28,10 @@ class PrestamoLibros(QWidget):
 
         self.rut_solicitante = QLineEdit()
         self.rut_solicitante.setPlaceholderText("Ingresa el rut del solicitante")
-        
-        self.fecha_maxima = QLineEdit()
+
+        self.fecha_maxima = QDateEdit()
+        self.fecha_maxima.setDisplayFormat("yyyy-MM-dd")
+        self.fecha_maxima.setCalendarPopup(True)
 
         self.codigo_barras = QLineEdit()
         self.codigo_barras.setPlaceholderText("Ingrese el codigo de barras del libro")
@@ -41,6 +46,11 @@ class PrestamoLibros(QWidget):
         self.rut = QLabel()
         self.maximo = QLabel()
         self.barras = QLabel()
+
+        #Setear fecha actual
+        fecha = date.today()
+        fecha.strftime("%y-%m-/d")
+        self.fecha_maxima.setDate(fecha)
 
         #Asignar texto a los labels
         self.nombre.setText("Nombre del Alumno")

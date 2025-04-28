@@ -36,3 +36,7 @@ with Session(engine) as session:
         except Exception as e:
             print(f"Error {e}")
 
+    def selected_user_by_rut(rut_):
+        user = session.execute(select(Usuario).where(Usuario.rut == rut_)).all()
+        return user
+

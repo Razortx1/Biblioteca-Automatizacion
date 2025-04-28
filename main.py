@@ -111,6 +111,12 @@ class Window(QMainWindow):
     def cambiar_pagina(self, nombre_pagina):
         if nombre_pagina in self.page_indice:
             self.stack.setCurrentIndex(self.page_indice[nombre_pagina])
+            if nombre_pagina == "historial_impresiones":
+                self.pages[nombre_pagina].rellenar_tabla()
+            elif nombre_pagina == "historia_libros":
+                self.pages[nombre_pagina].rellenar_tabla()
+            elif nombre_pagina == "historial_prestamos":
+                self.pages[nombre_pagina].rellenar_tabla()
 
         else:
             print(f"Pagina {nombre_pagina} no encontrada")
