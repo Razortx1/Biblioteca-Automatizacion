@@ -1,0 +1,25 @@
+QMainWindow{
+    background-color: #B4E7FF;
+}
+QPushButton{
+    background-color: #C7FF9C;
+    border-radius:25px;
+    width: 50;  
+    height: 50;
+    border: 1px solid black;
+}
+
+QPushButton:pressed{
+    background-color: greenyellow;
+    color: white
+}
+
+QLineEdit{
+    background-color: white;
+    border-radius: 10;
+    height: 40;
+    border: 1px solid black;
+}
+QTableWidget{
+    background-color: rgb(255, 241, 184);
+}
