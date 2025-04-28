@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
                              QPushButton, QLabel)
 from PyQt5.QtCore import (pyqtSignal)
+from PyQt5.QtGui import QColor
 
 from connection.session import select_prestamos_all
 
@@ -78,6 +79,13 @@ class HistorialPrestamos(QWidget):
     def rellenar_tabla(self):
         prestamos = select_prestamos_all()
         tablerow = 0
+
+        column_count = self.tabla_historial.columnCount()
+
+        extraviado = QColor(255, 90, 90)
+        devuelto = QColor(90,255,90)
+        prestado = QColor(255,215,0)
+
         for p in prestamos:
             self.tabla_historial.setItem(tablerow, 0, QTableWidgetItem(p.Usuario.nombre))
             self.tabla_historial.setItem(tablerow, 1, QTableWidgetItem(p.Usuario.curso))
@@ -86,6 +94,15 @@ class HistorialPrestamos(QWidget):
             self.tabla_historial.setItem(tablerow, 4, QTableWidgetItem(str(p.Prestamos.fecha_inicio)))
             self.tabla_historial.setItem(tablerow, 5, QTableWidgetItem(str(p.Prestamos.fecha_termino)))
             self.tabla_historial.setItem(tablerow, 6, QTableWidgetItem(p.Estado_Prestamo.estado_prestamo))
+
+            texto_tabla = self.tabla_historial.item(tablerow, column_count-1).text()
+
+            if texto_tabla == "Prestado":
+                self.tabla_historial.item(tablerow, column_count-1).setBackground(prestado)
+            elif texto_tabla == "Devuelto":
+                self.tabla_historial.item(tablerow, column_count-1).setBackground(devuelto)
+            elif texto_tabla == "Extraviado":
+                self.tabla_historial.item(tablerow, column_count-1).setBackground(extraviado)
 
             tablerow+=1
 
