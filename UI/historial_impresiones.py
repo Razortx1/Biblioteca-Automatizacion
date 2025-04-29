@@ -41,11 +41,11 @@ class HistorialImpresiones(QWidget):
         self.tabla_impresiones.setHorizontalHeaderItem(3, item)
 
         item = QTableWidgetItem()
-        item.setText("Fecha de Impresion")
+        item.setText("Hojas usadas en total")
         self.tabla_impresiones.setHorizontalHeaderItem(4, item)
 
         item = QTableWidgetItem()
-        item.setText("Hojas usadas en total")
+        item.setText("Fecha de Impresion")
         self.tabla_impresiones.setHorizontalHeaderItem(5, item)
 
         item = QTableWidgetItem()
@@ -89,25 +89,28 @@ class HistorialImpresiones(QWidget):
         ya_impreso = QColor(90,255,90)
 
 
-        for i in impresiones:
+        if impresiones:
+            for i in impresiones:
 
-            suma = int(i.Impresiones.cantidad_copias * i.Impresiones.cantidad_paginas)
+                suma = int(i.Impresiones.cantidad_copias * i.Impresiones.cantidad_paginas)
 
-            self.tabla_impresiones.setItem(tablerow, 0, QTableWidgetItem(i.Usuario.nombre))
-            self.tabla_impresiones.setItem(tablerow, 1, QTableWidgetItem(i.Usuario.curso))
-            self.tabla_impresiones.setItem(tablerow, 2, QTableWidgetItem(str(i.Impresiones.cantidad_paginas)))
-            self.tabla_impresiones.setItem(tablerow, 3, QTableWidgetItem(str(i.Impresiones.cantidad_copias)))
-            self.tabla_impresiones.setItem(tablerow, 4, QTableWidgetItem(str(suma)))
-            self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(str(i.Impresiones.fecha_impresion)))
-            self.tabla_impresiones.setItem(tablerow, 6, QTableWidgetItem(i.Impresiones.descripcion))
-            self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
+                self.tabla_impresiones.setItem(tablerow, 0, QTableWidgetItem(i.Usuario.nombre))
+                self.tabla_impresiones.setItem(tablerow, 1, QTableWidgetItem(i.Usuario.curso))
+                self.tabla_impresiones.setItem(tablerow, 2, QTableWidgetItem(str(i.Impresiones.cantidad_paginas)))
+                self.tabla_impresiones.setItem(tablerow, 3, QTableWidgetItem(str(i.Impresiones.cantidad_copias)))
+                self.tabla_impresiones.setItem(tablerow, 4, QTableWidgetItem(str(suma)))
+                self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(str(i.Impresiones.fecha_impresion)))
+                self.tabla_impresiones.setItem(tablerow, 6, QTableWidgetItem(i.Impresiones.descripcion))
+                self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
 
-            texto_tabla = self.tabla_impresiones.item(tablerow, column_count-1).text()
+                texto_tabla = self.tabla_impresiones.item(tablerow, column_count-1).text()
 
-            if texto_tabla == "Aun no Impreso":
-                self.tabla_impresiones.item(tablerow, column_count-1).setBackground(no_impreso)
-            elif texto_tabla == "Ya Impreso":
-                self.tabla_impresiones.item(tablerow, column_count-1).setBackground(ya_impreso)
+                if texto_tabla == "Aun no Impreso":
+                    self.tabla_impresiones.item(tablerow, column_count-1).setBackground(no_impreso)
+                elif texto_tabla == "Ya Impreso":
+                    self.tabla_impresiones.item(tablerow, column_count-1).setBackground(ya_impreso)
 
-            tablerow+=1
+                tablerow+=1
+        else:
+            pass
 

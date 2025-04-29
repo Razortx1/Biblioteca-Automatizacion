@@ -105,17 +105,18 @@ class AgregarImpresiones(QWidget):
             self.cursos.setText(user.curso)
         else:
             self.nombre_solicitante.setDisabled(False)
+            self.nombre_solicitante.clear()
             self.cursos.setDisabled(False)
+            self.cursos.clear()
 
     def agregar_prestamo(self):
+        nombre = self.nombre_solicitante.text()
+        curso = self.cursos.text()
         rut = self.rut_solicitante.text()
-        user = selected_user_by_rut(rut)
-        user = user[0][0]
-        id = user.id_user
         copias = self.cantidad_copias.text()
         paginas = self.cantidad_paginas.text()
         descrip = self.descripcion.toPlainText()
-        ingresar_impresiones(id ,copias, paginas, descrip)
+        ingresar_impresiones(nombre, curso, rut ,copias, paginas, descrip)
         self.rut_solicitante.clear()
         self.nombre_solicitante.clear()
         self.cursos.clear()

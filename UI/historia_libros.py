@@ -6,7 +6,6 @@ from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
                           QCoreApplication, pyqtSignal)
 
 from PyQt5.QtGui import QColor
-from connection.session import select_libros_all
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
@@ -73,35 +72,4 @@ class HistorialLibros(QWidget):
 
 
     def rellenar_tabla(self):
-        libros = select_libros_all()
-
-        column_count = self.tabla_libros.columnCount()
-
-        mal_estado = QColor(255, 205, 0)
-        buen_estado = QColor(90,255,90)
-        dado_baja = QColor(255,50,50)
-        estado_regular = QColor(255,255,0)
-
-
-        tablerow = 0
-        self.tabla_libros.setRowCount(50)
-        for l in libros:
-            self.tabla_libros.setItem(tablerow, 0, QTableWidgetItem(l.Libro.nombre_libro))
-            self.tabla_libros.setItem(tablerow, 1, QTableWidgetItem(l.Libro.cod_barras))
-            self.tabla_libros.setItem(tablerow, 2, QTableWidgetItem(l.Libro.autor))
-            self.tabla_libros.setItem(tablerow, 3, QTableWidgetItem(str(l.Libro.fecha_publicacion)))
-            self.tabla_libros.setItem(tablerow, 4, QTableWidgetItem(str(l.Libro.stock)))
-            self.tabla_libros.setItem(tablerow, 5, QTableWidgetItem(l.Estado_Libro.estado_libro))
-
-            texto_tabla = self.tabla_libros.item(tablerow, column_count-1).text()
-
-            if texto_tabla == "Buen Estado":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(buen_estado)
-            elif texto_tabla == "Estado Regular":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(estado_regular)
-            elif texto_tabla == "Mal Estado":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(mal_estado)
-            elif texto_tabla == "Dado de Baja":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(dado_baja)
-
-            tablerow+=1
+        pass

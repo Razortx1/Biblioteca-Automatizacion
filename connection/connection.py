@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QMessageBox, QErrorMessage
-from connection.session import session
+from connection.session import session, selected_user_by_rut
 
 from datetime import date, datetime
 
-from sql.models import Libro, Impresiones
+from sql.models import Libro, Impresiones, Usuario
 
 def insertar_libros(nombre, codigo, autor_, fecha:date, stock):
     try:
@@ -42,16 +42,27 @@ def insertar_libros(nombre, codigo, autor_, fecha:date, stock):
     finally:
         session.close()
 
-def ingresar_impresiones(id_ ,cant_copias, cant_paginas, descripcion):
+def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descripcion_):
     fecha = datetime.now()
     try:
+        user_rut = selected_user_by_rut(rut_)
+        if user_rut:
+            user = user_rut[0][0]
+        else:
+            user = Usuario(
+                nombre = nombre_,
+                curso = curso_,
+                rut = rut_
+            )
+            session.add(user)
+            session.commit()
         impresion = Impresiones(
-            descripcion = descripcion,
+            descripcion = descripcion_,
             cantidad_copias = cant_copias,
             cantidad_paginas = cant_paginas,
             fecha_impresion = fecha,
             estado_impresion_id = 1,
-            user_id = id_
+            user_id = user.id_user
         )
         msg = QMessageBox()
         msg.setWindowTitle("Guardar Impresion")
@@ -71,10 +82,15 @@ def ingresar_impresiones(id_ ,cant_copias, cant_paginas, descripcion):
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
     except Exception as e:
-        error_mensaje = QErrorMessage()
-        error_mensaje.setWindowTitle("Error ingresado")
-        error_mensaje.showMessage(f"A ocurrido un error al momento de hacer ingreso de la impresion.\
-                                  Favor de volver a intentarlo. {e}")
-        session.rollback()
+        import traceback
+        traceback.print_exc()
+        try:
+            error_mensaje = QErrorMessage()
+            error_mensaje.setWindowTitle("Error ingresado")
+            error_mensaje.showMessage(f"A ocurrido un error al momento de hacer ingreso de la impresion.\
+                                      Favor de volver a intentarlo. {e}")
+            session.rollback()
+        except:
+            print("No se pudo obtener el error")
     finally:
         session.close()

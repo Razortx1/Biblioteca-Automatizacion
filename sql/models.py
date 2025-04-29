@@ -124,15 +124,24 @@ class Libro(Base):
     autor: Mapped[Optional[str]]
     fecha_publicacion: Mapped[date]
     stock: Mapped[int]
-    estado_libro_id: Mapped[int] = mapped_column(ForeignKey("estado_libro.id_estadolibro"))
 
-    estado_libro: Mapped["Estado_Libro"] = relationship()
-    prestamos: Mapped[List["Prestamos"]] = relationship()
+    copias: Mapped[List["CopiasLibros"]] = relationship(back_populates="libro")
 
     def __repr__(self) -> str:
         return f"Libro(id_libro={self.id_libro!r}, nombre_libro={self.nombre_libro!r},\
             cod_barras={self.cod_barras!r}, editorial={self.autor!r}, \
             stock={self.stock!r}, fecha_publicacion={self.fecha_publicacion!r})"
+    
+class CopiasLibros(Base):
+    __tablename__ = "copia_libro"
+
+    id_copia: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    libro_id: Mapped[int] = mapped_column(ForeignKey("libro_biblioteca.id_libro"))
+    estado_id: Mapped[int] = mapped_column(ForeignKey("estado_libro.id_estadolibro"))
+
+    libro: Mapped["Libro"] = relationship(back_populates="copias")
+    estado: Mapped["Estado_Libro"] = relationship()
+    prestamos: Mapped[List["Prestamos"]] = relationship(back_populates="copia")
 
 """
     Class Estado_Libro
@@ -149,7 +158,7 @@ class Estado_Libro(Base):
     id_estadolibro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     estado_libro: Mapped[str]
 
-def __repr__(self) -> str:
+    def __repr__(self) -> str:
         return f"Estado_Libro(id_estadolibro={self.id_estadolibro!r}, estado_libro={self.estado_libro!r})"
     
 """
@@ -232,7 +241,9 @@ class Prestamos(Base):
     estado_prestamo: Mapped["Estado_Prestamo"] = relationship()
 
     user_id: Mapped[int] = mapped_column(ForeignKey("usuario.id_user"))
-    libro_id: Mapped[int] = mapped_column(ForeignKey("libro_biblioteca.id_libro"))
+    copia_id: Mapped[int] = mapped_column(ForeignKey("copia_libro.id_copia"))
+
+    copia: Mapped["CopiasLibros"] = relationship(back_populates="prestamos")
 
     def __repr__(self) -> str:
         return f"Prestamos(id_prestamos={self.id_prestamos!r}, fecha_inicio={self.fecha_inicio!r},\
@@ -253,7 +264,7 @@ class Estado_Prestamo(Base):
     id_estadoprestamo: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     estado_prestamo: Mapped[str]
 
-def __repr__(self) -> str:
+    def __repr__(self) -> str:
         return f"Estado_Prestamo(id_estadoprestamo={self.id_estadoprestamo!r}, estado_prestamo={self.estado_prestamo!r})"
 
 """
