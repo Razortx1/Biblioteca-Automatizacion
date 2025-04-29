@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 
+from connection.session import select_prestamos_all
+
 class HistorialPrestamos(QWidget):
     volver_principal = pyqtSignal()
     def __init__(self):
@@ -54,7 +56,7 @@ class HistorialPrestamos(QWidget):
         #Tamaño Columnas
         header = self.tabla_historial.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.tabla_historial.setRowCount(50)
+        self.tabla_historial.setRowCount(0)
 
         #Creacion botones
         self.volver_atras = QPushButton("Volver Atras")
@@ -75,5 +77,35 @@ class HistorialPrestamos(QWidget):
 
     #Funcion para rellenar la tabla
     def rellenar_tabla(self):
-        print("rellenando tabla")
+        prestamos = select_prestamos_all()
+        tablerow = 0
+        self.tabla_historial.setRowCount(50)
+
+        column_count = self.tabla_historial.columnCount()
+
+        extraviado = QColor(255, 90, 90)
+        devuelto = QColor(90,255,90)
+        prestado = QColor(255,215,0)
+        if prestamos:
+            for p in prestamos:
+                self.tabla_historial.setItem(tablerow, 0, QTableWidgetItem(p.nombre))
+                self.tabla_historial.setItem(tablerow, 1, QTableWidgetItem(p.curso))
+                self.tabla_historial.setItem(tablerow, 2, QTableWidgetItem(p.rut))
+                self.tabla_historial.setItem(tablerow, 3, QTableWidgetItem(p.nombre_libro))
+                self.tabla_historial.setItem(tablerow, 4, QTableWidgetItem(str(p.fecha_inicio)))
+                self.tabla_historial.setItem(tablerow, 5, QTableWidgetItem(str(p.fecha_termino)))
+                self.tabla_historial.setItem(tablerow, 6, QTableWidgetItem(p.estado_prestamo))
+
+                texto_tabla = self.tabla_historial.item(tablerow, column_count-1).text()
+
+                if texto_tabla == "Prestado":
+                    self.tabla_historial.item(tablerow, column_count-1).setBackground(prestado)
+                elif texto_tabla == "Devuelto":
+                    self.tabla_historial.item(tablerow, column_count-1).setBackground(devuelto)
+                elif texto_tabla == "Extraviado":
+                    self.tabla_historial.item(tablerow, column_count-1).setBackground(extraviado)
+
+                tablerow+=1
+        else:
+            pass
 

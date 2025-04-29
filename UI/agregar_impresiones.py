@@ -92,7 +92,7 @@ class AgregarImpresiones(QWidget):
 
         #Agregar funcionalidades al boton
         self.boton_buscar_usuario.clicked.connect(self.buscar_rut)
-        self.boton_agregar.clicked.connect(self.agregar_prestamo)
+        self.boton_agregar.clicked.connect(self.agregar_impresiones)
         self.boton_volver.clicked.connect(self.volver_menu.emit)
 
     #Funcionalidades que tendran los botones
@@ -109,7 +109,7 @@ class AgregarImpresiones(QWidget):
             self.cursos.setDisabled(False)
             self.cursos.clear()
 
-    def agregar_prestamo(self):
+    def agregar_impresiones(self):
         nombre = self.nombre_solicitante.text()
         curso = self.cursos.text()
         rut = self.rut_solicitante.text()

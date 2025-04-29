@@ -44,7 +44,7 @@ class Window(QMainWindow):
 
         #Definicion de los parametros para la Ventana
         super().__init__()
-        self.setWindowTitle("Sistema Biblioteca")
+        self.setWindowTitle("Sistema Biblioteca | PAGINA PRINCIPAL")
         self.setLocale(QLocale(QLocale.Spanish, QLocale.Chile))
         self.showMaximized()
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowMaximizeButtonHint)
@@ -111,6 +111,9 @@ class Window(QMainWindow):
     def cambiar_pagina(self, nombre_pagina):
         if nombre_pagina in self.page_indice:
             self.stack.setCurrentIndex(self.page_indice[nombre_pagina])
+            nombre = nombre_pagina.replace("_", " ")
+            nombre = nombre.upper()
+            self.setWindowTitle(f"Sistema Biblioteca | {nombre}")
             if nombre_pagina == "historial_impresiones":
                 self.pages[nombre_pagina].rellenar_tabla()
             elif nombre_pagina == "historia_libros":

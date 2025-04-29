@@ -3,7 +3,7 @@ from connection.session import session, selected_user_by_rut
 
 from datetime import date, datetime
 
-from sql.models import Libro, Impresiones, Usuario
+from sql.models import Libro, Impresiones, Usuario, CopiasLibros
 
 def insertar_libros(nombre, codigo, autor_, fecha:date, stock):
     try:

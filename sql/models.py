@@ -93,7 +93,7 @@ class Usuario(Base):
     rut: Mapped[str] = mapped_column(unique=True)
 
     impresion: Mapped[List["Impresiones"]] = relationship()
-    prestamo: Mapped[List["Prestamos"]] = relationship()
+    prestamo: Mapped[List["Prestamos"]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         return f"User(id_user={self.id_user!r}, nombre={self.nombre!r},\
@@ -123,14 +123,13 @@ class Libro(Base):
     cod_barras: Mapped[str] = mapped_column(unique=True)
     autor: Mapped[Optional[str]]
     fecha_publicacion: Mapped[date]
-    stock: Mapped[int]
 
     copias: Mapped[List["CopiasLibros"]] = relationship(back_populates="libro")
 
     def __repr__(self) -> str:
         return f"Libro(id_libro={self.id_libro!r}, nombre_libro={self.nombre_libro!r},\
             cod_barras={self.cod_barras!r}, editorial={self.autor!r}, \
-            stock={self.stock!r}, fecha_publicacion={self.fecha_publicacion!r})"
+            fecha_publicacion={self.fecha_publicacion!r})"
     
 class CopiasLibros(Base):
     __tablename__ = "copia_libro"
@@ -142,6 +141,9 @@ class CopiasLibros(Base):
     libro: Mapped["Libro"] = relationship(back_populates="copias")
     estado: Mapped["Estado_Libro"] = relationship()
     prestamos: Mapped[List["Prestamos"]] = relationship(back_populates="copia")
+
+    def __repr__(self):
+        return f"CopiasLibros(id_copia={self.id_copia}, libro={self.libro}, estado={self.estado}, prestamo={self.prestamos})"
 
 """
     Class Estado_Libro
@@ -244,6 +246,7 @@ class Prestamos(Base):
     copia_id: Mapped[int] = mapped_column(ForeignKey("copia_libro.id_copia"))
 
     copia: Mapped["CopiasLibros"] = relationship(back_populates="prestamos")
+    user: Mapped["Usuario"] = relationship(back_populates="prestamo")
 
     def __repr__(self) -> str:
         return f"Prestamos(id_prestamos={self.id_prestamos!r}, fecha_inicio={self.fecha_inicio!r},\
