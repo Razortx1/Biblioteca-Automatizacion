@@ -7,6 +7,7 @@ from datetime import date
 from PyQt5.QtCore import (pyqtSignal)
 
 from connection.session import selected_libro_by_cod
+from connection.connection import insertar_libros
 
 class AgregarLibros(QWidget):
     volver_principal = pyqtSignal()
@@ -118,6 +119,13 @@ class AgregarLibros(QWidget):
             self.fecha_publicacion.setDisabled(True)
 
     def agregar_boton(self):
+        nombre = self.agregar_nombre.text()
+        cod_barras = self.agregar_codigo.text()
+        autor = self.agregar_autor.text()
+        fecha = self.fecha_publicacion.text()
+        stock = self.stock_libro.text()
+        insertar_libros(nombre, cod_barras, autor,
+                        fecha, stock)
         self.agregar_nombre.clear()
         self.agregar_codigo.clear()
         self.agregar_autor.clear()

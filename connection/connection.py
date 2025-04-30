@@ -1,20 +1,32 @@
+import traceback
 from PyQt5.QtWidgets import QMessageBox, QErrorMessage
-from connection.session import session, selected_user_by_rut
+from connection.session import session, selected_user_by_rut, selected_libro_by_cod
 
 from datetime import date, datetime
 
 from sql.models import Libro, Impresiones, Usuario, CopiasLibros
 
-def insertar_libros(nombre, codigo, autor_, fecha:date, stock):
+def insertar_libros(nombre_, codigo_, autor_, fecha_:date, stock_):
     try:
-        libro = Libro(
-            nombre_libro = nombre,
-            cod_barras = codigo,
-            autor = autor_,
-            fecha_publicacion = fecha,
-            stock = stock,
-            estado_libro_id = 1
-        )
+        libro_cod = selected_libro_by_cod(codigo_)
+        if libro_cod:
+            libro = libro_cod[0][0]
+        else:
+            libro = Libro(
+                nombre_libro = nombre_,
+                cod_barras = codigo_,
+                autor = autor_,
+                fecha_publicacion = fecha_
+            )
+            session.add(libro)
+            session.commit()
+        for _ in range(int(stock_)):
+            copia = CopiasLibros(
+                libro_id = libro.id_libro,
+                estado_id = 1
+            )
+            session.add(copia)
+        session.commit()
         msg = QMessageBox()
         msg.setWindowTitle("Guardar Libro")
         msg.setText("¿Deseas guardar este libro?")
@@ -22,8 +34,9 @@ def insertar_libros(nombre, codigo, autor_, fecha:date, stock):
         msg.setIcon(QMessageBox.Question)
         msg.exec()
         if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
-            session.add(libro)
-            session.commit()
+            #session.add(libro)
+            #session.commit()
+            pass
 
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
@@ -34,6 +47,7 @@ def insertar_libros(nombre, codigo, autor_, fecha:date, stock):
             cancelAction.exec()
 
     except Exception as e:
+        traceback.print_exc()
         error_mensaje = QErrorMessage()
         error_mensaje.setWindowTitle("Error de agregado")
         error_mensaje.showMessage(f"A ocurrido un error al momento de insertar el libro.\
