@@ -1,3 +1,10 @@
+#Ignorar archivos creados por pyinstaller
 build
 dist
-biblioteca.db
+
+#Ignorar Base de Datos
+*.db
+
+#Ignorar Cache de Python
+__pycache__/
+*.py[cod]

@@ -114,15 +114,15 @@ class AgregarLibros(QWidget):
             self.agregar_autor.setText(libro.autor)
             self.fecha_publicacion.setDate(libro.fecha_publicacion)
         else:
-            self.agregar_nombre.setDisabled(True)
-            self.agregar_autor.setDisabled(True)
-            self.fecha_publicacion.setDisabled(True)
+            self.agregar_nombre.setDisabled(False)
+            self.agregar_autor.setDisabled(False)
+            self.fecha_publicacion.setDisabled(False)
 
     def agregar_boton(self):
         nombre = self.agregar_nombre.text()
         cod_barras = self.agregar_codigo.text()
         autor = self.agregar_autor.text()
-        fecha = self.fecha_publicacion.text()
+        fecha = self.fecha_publicacion.dateTime().toPyDateTime().date()
         stock = self.stock_libro.text()
         insertar_libros(nombre, cod_barras, autor,
                         fecha, stock)

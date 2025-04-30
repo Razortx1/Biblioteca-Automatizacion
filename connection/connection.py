@@ -6,7 +6,7 @@ from datetime import date, datetime
 
 from sql.models import Libro, Impresiones, Usuario, CopiasLibros
 
-def insertar_libros(nombre_, codigo_, autor_, fecha_:date, stock_):
+def insertar_libros(nombre_, codigo_, autor_, fecha_, stock_):
     try:
         libro_cod = selected_libro_by_cod(codigo_)
         if libro_cod:
