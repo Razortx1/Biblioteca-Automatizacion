@@ -103,6 +103,8 @@ class AgregarImpresiones(QWidget):
             user = user[0][0]
             self.nombre_solicitante.setText(user.nombre)
             self.cursos.setText(user.curso)
+            self.nombre_solicitante.setDisabled(True)
+            self.cursos.setDisabled(True)
         else:
             self.nombre_solicitante.setDisabled(False)
             self.nombre_solicitante.clear()
