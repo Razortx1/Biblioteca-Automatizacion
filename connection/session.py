@@ -1,6 +1,6 @@
 import traceback
 from sqlalchemy.orm import Session
-from sqlalchemy import select, insert, delete, update, func
+from sqlalchemy import select, insert, delete, update, func, or_
 from sql.models import engine
 from sql.models import (Usuario, Libro, Estado_Libro,
                         Estado_Impresion, Estado_Prestamo, Prestamos,
@@ -15,7 +15,7 @@ with Session(engine) as session:
                                      .join(CopiasLibros.libro)
                                      .join(CopiasLibros.estado)
                                      .outerjoin(CopiasLibros.prestamos)
-                                     .where(Prestamos.id_prestamos == None)
+                                     .where(or_(Prestamos.id_prestamos == None, Prestamos.id_prestamos == 2))
                                      .group_by(Libro.nombre_libro, Estado_Libro.estado_libro))
             return libros
         except Exception as e:

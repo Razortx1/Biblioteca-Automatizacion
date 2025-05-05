@@ -1,5 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
-                             QPushButton, QLabel, QDateEdit)
+                             QPushButton, QLabel, QDateEdit, QHBoxLayout,
+                             QTableWidget, QSpacerItem, QSizePolicy)
+
+from PyQt5.QtCore import Qt
 
 from datetime import date
 
@@ -10,75 +13,90 @@ class PrestamoLibros(QWidget):
     def __init__(self):
         super().__init__()
 
+        #Definicion de layouts principal
+        vertical_layout_principal = QVBoxLayout()
+
         #Definicion de Layout
-        vertical_layout = QVBoxLayout()
-        void_layout_1 = QVBoxLayout()
-        void_layout_2 = QVBoxLayout()
+        vertical_layout_1 = QVBoxLayout()
 
-        self.voidLabel_1 = QLabel()
-        self.voidLabel_2 = QLabel()
+        vertical_layout_2 = QVBoxLayout()
+        horizontal_layot_principal = QHBoxLayout()
+        horizontal_layot_1 = QHBoxLayout()
+        horizontal_layot_2 = QHBoxLayout()
 
-        #Creacion de los Widgets
-        #LineEdit
-        self.nombre_solicitante = QLineEdit()
-        self.nombre_solicitante.setPlaceholderText("Ingrese el nombre del solicitante")
+        #Definicion de los LineEdit
+        self.cod_barras = QLineEdit()
+        self.cod_barras.setPlaceholderText("Ingrese el codigo de barras")
+        self.rut_ = QLineEdit()
+        self.rut_.setPlaceholderText("Ingrese el Rut del Alumno o Profesor")
+        self.nombre_prestatario = QLineEdit()
+        self.nombre_prestatario.setPlaceholderText("Ingrese el nombre del Alumno o Profesor")
+        self.curso_prestatario = QLineEdit()
+        self.curso_prestatario.setPlaceholderText("Ingrese el curso del prestatario")
 
-        self.curso_solicitante = QLineEdit()
-        self.curso_solicitante.setPlaceholderText("Ingrese el curso o departamento que pertenezca")
+        #Creacion de los labes
+        self.codigo = QLabel("Codigo de Barras del Libro")
+        self.fecha = QLabel("Fecha Maxima a Entregar")
+        self.rut = QLabel("Rut del Alumno/Profesor")
+        self.nombre = QLabel("Nombre del Alumno/Profesor")
+        self.curso = QLabel("Curso del Alumno/Profesor")
 
-        self.rut_solicitante = QLineEdit()
-        self.rut_solicitante.setPlaceholderText("Ingresa el rut del solicitante")
+        #Definicion de los botones
+        self.boton_volver = QPushButton("Volver")
+        self.boton_buscar_libro = QPushButton("Buscar")
+        self.boton_buscar_rut = QPushButton("Buscar")
+        self.boton_agregar_prestamo = QPushButton("Agregar Prestamo")
 
+        #Definicion del LineEdit
         self.fecha_maxima = QDateEdit()
         self.fecha_maxima.setDisplayFormat("yyyy-MM-dd")
         self.fecha_maxima.setCalendarPopup(True)
 
-        self.codigo_barras = QLineEdit()
-        self.codigo_barras.setPlaceholderText("Ingrese el codigo de barras del libro")
-
-        #Botones
-        self.boton_agregar = QPushButton("Inscribir Prestamo")
-        self.boton_volver = QPushButton("Volver al Inicio")
-
-        #Labels
-        self.nombre = QLabel()
-        self.curso = QLabel()
-        self.rut = QLabel()
-        self.maximo = QLabel()
-        self.barras = QLabel()
-
-        #Setear fecha actual
         fecha = date.today()
-        fecha.strftime("%y-%m-/d")
+        fecha.strftime("%Y-%m-%d")
         self.fecha_maxima.setDate(fecha)
 
-        #Asignar texto a los labels
-        self.nombre.setText("Nombre del Alumno")
-        self.curso.setText("Curso del Solicitante")
-        self.rut.setText("Ingrese el rut del solicitante")
-        self.maximo.setText("Ingrese plazo maximo para entregar el libro")
-        self.barras.setText("Ingrese el codigo de barras")
+        #Definicion de la tabla
+        self.tabla_libros = QTableWidget()
+        self.tabla_libros.setMaximumHeight(200)
 
-        void_layout_1.addWidget(self.voidLabel_1)
-        void_layout_2.addWidget(self.voidLabel_2)
+        vertical_layout_principal.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        vertical_layout.addWidget(self.nombre)
-        vertical_layout.addWidget(self.nombre_solicitante)
-        vertical_layout.addWidget(self.curso)
-        vertical_layout.addWidget(self.curso_solicitante)
-        vertical_layout.addWidget(self.rut)
-        vertical_layout.addWidget(self.rut_solicitante)
-        vertical_layout.addWidget(self.maximo)
-        vertical_layout.addWidget(self.fecha_maxima)
-        vertical_layout.addWidget(self.barras)
-        vertical_layout.addWidget(self.codigo_barras)
-        vertical_layout.addWidget(self.boton_agregar)
-        vertical_layout.addWidget(self.boton_volver)
-        vertical_layout.addLayout(void_layout_1)
-        vertical_layout.addLayout(void_layout_2)
+        
 
-        self.setLayout(vertical_layout)
 
+        #Agregar los widgets a los layouts
+        horizontal_layot_principal.addLayout(vertical_layout_1)
+        vertical_layout_1.addWidget(self.codigo)
+        horizontal_layot_1.addWidget(self.cod_barras)
+        horizontal_layot_1.addWidget(self.boton_buscar_libro)
+        vertical_layout_1.addLayout(horizontal_layot_1)
+        vertical_layout_1.addWidget(self.fecha)
+        vertical_layout_1.addWidget(self.fecha_maxima)
+        vertical_layout_1.addWidget(self.tabla_libros)
+        horizontal_layot_principal.addLayout(vertical_layout_2)
+        vertical_layout_2.addWidget(self.rut)
+        vertical_layout_2.addLayout(horizontal_layot_2)
+        horizontal_layot_2.addWidget(self.rut_)
+        horizontal_layot_2.addWidget(self.boton_buscar_rut)
+        vertical_layout_2.addWidget(self.nombre)
+        vertical_layout_2.addWidget(self.nombre_prestatario)
+        vertical_layout_2.addWidget(self.curso)
+        vertical_layout_2.addWidget(self.curso_prestatario)
+        vertical_layout_principal.addLayout(horizontal_layot_principal)
+        vertical_layout_principal.addWidget(self.boton_agregar_prestamo)
+        vertical_layout_principal.addWidget(self.boton_volver)
+
+        vertical_layout_principal.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        vertical_layout_principal.setContentsMargins(10,10,10,10)
+        vertical_layout_principal.setSpacing(0)
+
+        self.setLayout(vertical_layout_principal)
+        
+        fecha = date.today()
+        fecha.strftime("%y-%m-/d")
         #Funcionamiento Boton
         self.boton_volver.clicked.connect(self.volver_principal.emit)
+
+        self.setFixedSize(1000, 650)
 
