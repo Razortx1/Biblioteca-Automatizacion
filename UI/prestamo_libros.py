@@ -1,8 +1,11 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QDateEdit, QHBoxLayout,
-                             QTableWidget, QSpacerItem, QSizePolicy)
+                             QTableWidget, QTableWidgetItem, QMessageBox)
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+
+from connection.session import select_copia_libros_by_id, selected_libro_by_cod
 
 from datetime import date
 
@@ -58,12 +61,27 @@ class PrestamoLibros(QWidget):
 
         #Definicion de la tabla
         self.tabla_libros = QTableWidget()
-        self.tabla_libros.setMaximumHeight(200)
 
-        vertical_layout_principal.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        
-
+        #Definicion de columnas para tabla
+        self.tabla_libros.setColumnCount(6)
+        item = QTableWidgetItem()
+        item.setText("Nombre Libro")
+        self.tabla_libros.setHorizontalHeaderItem(0, item)
+        item = QTableWidgetItem()
+        item.setText("Codigo de Barras")
+        self.tabla_libros.setHorizontalHeaderItem(1, item)
+        item = QTableWidgetItem()
+        item.setText("Autor")
+        self.tabla_libros.setHorizontalHeaderItem(2, item)
+        item = QTableWidgetItem()
+        item.setText("Fecha Publicacion")
+        self.tabla_libros.setHorizontalHeaderItem(3, item)
+        item = QTableWidgetItem()
+        item.setText("Estado del Libro")
+        self.tabla_libros.setHorizontalHeaderItem(4, item)
+        item = QTableWidgetItem()
+        item.setText("Id Interno")
+        self.tabla_libros.setHorizontalHeaderItem(5, item)
 
         #Agregar los widgets a los layouts
         horizontal_layot_principal.addLayout(vertical_layout_1)
@@ -71,9 +89,9 @@ class PrestamoLibros(QWidget):
         horizontal_layot_1.addWidget(self.cod_barras)
         horizontal_layot_1.addWidget(self.boton_buscar_libro)
         vertical_layout_1.addLayout(horizontal_layot_1)
+        vertical_layout_1.addWidget(self.tabla_libros)
         vertical_layout_1.addWidget(self.fecha)
         vertical_layout_1.addWidget(self.fecha_maxima)
-        vertical_layout_1.addWidget(self.tabla_libros)
         horizontal_layot_principal.addLayout(vertical_layout_2)
         vertical_layout_2.addWidget(self.rut)
         vertical_layout_2.addLayout(horizontal_layot_2)
@@ -87,16 +105,77 @@ class PrestamoLibros(QWidget):
         vertical_layout_principal.addWidget(self.boton_agregar_prestamo)
         vertical_layout_principal.addWidget(self.boton_volver)
 
-        vertical_layout_principal.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        vertical_layout_principal.setContentsMargins(10,10,10,10)
-        vertical_layout_principal.setSpacing(0)
+        vertical_layout_principal.addStretch()
 
         self.setLayout(vertical_layout_principal)
         
         fecha = date.today()
         fecha.strftime("%y-%m-/d")
         #Funcionamiento Boton
+        self.boton_buscar_libro.clicked.connect(self.rellenar_tabla)
         self.boton_volver.clicked.connect(self.volver_principal.emit)
 
-        self.setFixedSize(1000, 650)
+
+    def verificar_codi(self, codigo):
+        msg = QMessageBox()
+        msg.setWindowTitle("Libro no encontrado")
+        msg.setText("No se ha encontrado el libro espeficicado")
+        msg.setIcon(QMessageBox.Information)
+        libros = selected_libro_by_cod(codigo)
+        if libros:
+            return libros
+        else:
+            msg.exec()
+            return None
+
+
+    def rellenar_tabla(self):
+        try:
+            self.tabla_libros.setRowCount(0)
+            codigo = self.cod_barras.text()
+            libro = self.verificar_codi(codigo)
+            id = libro[0][0].id_libro
+            copias = select_copia_libros_by_id(id)
+
+            tablerow = 0
+            self.tabla_libros.setRowCount(50)
+
+            column_count = self.tabla_libros.columnCount()-2
+
+            mal_estado = QColor(255, 205, 0)
+            buen_estado = QColor(90,255,90)
+            dado_baja = QColor(255,50,50)
+            estado_regular = QColor(255,255,0)
+            if copias:
+                for l in copias:
+                    if l.estado_libro == "Dado de Baja":
+                        pass
+                    else:
+                        self.tabla_libros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
+                        self.tabla_libros.setItem(tablerow, 1, QTableWidgetItem(l.cod_barras))
+                        self.tabla_libros.setItem(tablerow, 2, QTableWidgetItem(l.autor))
+                        self.tabla_libros.setItem(tablerow, 3, QTableWidgetItem(str(l.fecha_publicacion)))
+                        self.tabla_libros.setItem(tablerow, 4, QTableWidgetItem(l.estado_libro))
+                        self.tabla_libros.setItem(tablerow, 5, QTableWidgetItem(str(l.id_copia)))
+
+                        texto_tabla = self.tabla_libros.item(tablerow, column_count).text()
+
+                        if texto_tabla == "Buen Estado":
+                            self.tabla_libros.item(tablerow, column_count).setBackground(buen_estado)
+                        elif texto_tabla == "Mal Estado":
+                            self.tabla_libros.item(tablerow, column_count).setBackground(mal_estado)
+                        elif texto_tabla == "Estado Regular":
+                            self.tabla_libros.item(tablerow, column_count).setBackground(estado_regular)
+                        elif texto_tabla == "Dado de Baja":
+                            self.tabla_libros.item(tablerow, column_count).setBackground(dado_baja)
+
+                        tablerow+=1
+            else:
+                pass
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"Error {e}")
+        
+
 
