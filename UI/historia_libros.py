@@ -8,6 +8,7 @@ from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
 from PyQt5.QtGui import QColor
 
 from connection.session import select_libros_available
+from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
@@ -18,6 +19,8 @@ class HistorialLibros(QWidget):
         void_layout_1 = QVBoxLayout()
         void_layout_2 = QVBoxLayout()
         vertical_layout = QVBoxLayout()
+
+        self.w = None
 
         self.voidLabel_1 = QLabel()
         self.voidLabel_2 = QLabel()
@@ -70,6 +73,7 @@ class HistorialLibros(QWidget):
         self.setLayout(vertical_layout)
 
         #Funcionamiento Botones
+        self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_inicio.clicked.connect(self.volver_principal.emit)
 
 
@@ -110,3 +114,10 @@ class HistorialLibros(QWidget):
         else:
             pass
 
+    def actualizar_estado(self):
+        if self.w is None:
+            self.w = ActualizarLibros()
+            self.w.actualizar_datos.connect(self.rellenar_tabla)
+            self.w.show()
+        else:
+            self.w = None

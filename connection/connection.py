@@ -1,6 +1,7 @@
 import traceback
 from PyQt5.QtWidgets import QMessageBox, QErrorMessage
-from connection.session import session, selected_user_by_rut, selected_libro_by_cod
+from connection.session import (session, selected_user_by_rut, selected_libro_by_cod,
+                                update)
 
 from datetime import date, datetime
 
@@ -102,6 +103,26 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             error_mensaje = QErrorMessage()
             error_mensaje.setWindowTitle("Error ingresado")
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer ingreso de la impresion.\
+                                      Favor de volver a intentarlo. {e}")
+            session.rollback()
+        except:
+            print("No se pudo obtener el error")
+    finally:
+        session.close()
+
+def update_estado_libro(id, estado):
+    try:
+        session.execute(update(CopiasLibros)
+                        .where(CopiasLibros.id_copia == id)
+                        .values(estado_id = estado))
+        session.commit()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        try:
+            error_mensaje = QErrorMessage()
+            error_mensaje.setWindowTitle("Error ingresado")
+            error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado del Libro.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
         except:
