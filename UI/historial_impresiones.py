@@ -2,8 +2,11 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidget,
                              QTableWidgetItem, QLabel, QVBoxLayout,
                              QHeaderView)
 from PyQt5.QtCore import pyqtSignal
-from connection.session import select_impresion_all
 from PyQt5.QtGui import QColor
+from datetime import datetime
+
+from connection.session import select_impresion_all
+
 
 class HistorialImpresiones(QWidget):
     volver_menu = pyqtSignal()
@@ -91,6 +94,7 @@ class HistorialImpresiones(QWidget):
 
         if impresiones:
             for i in impresiones:
+                fecha = i.Impresiones.fecha_impresion.strftime("%Y-%m-%d %H:%M:%S")
 
                 suma = int(i.Impresiones.cantidad_copias * i.Impresiones.cantidad_paginas)
 
@@ -99,7 +103,7 @@ class HistorialImpresiones(QWidget):
                 self.tabla_impresiones.setItem(tablerow, 2, QTableWidgetItem(str(i.Impresiones.cantidad_paginas)))
                 self.tabla_impresiones.setItem(tablerow, 3, QTableWidgetItem(str(i.Impresiones.cantidad_copias)))
                 self.tabla_impresiones.setItem(tablerow, 4, QTableWidgetItem(str(suma)))
-                self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(str(i.Impresiones.fecha_impresion)))
+                self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(fecha))
                 self.tabla_impresiones.setItem(tablerow, 6, QTableWidgetItem(i.Impresiones.descripcion))
                 self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
 

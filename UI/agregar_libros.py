@@ -109,6 +109,9 @@ class AgregarLibros(QWidget):
     def boton_buscar(self):
         libro = selected_libro_by_cod(self.agregar_codigo.text())
         if libro:
+            self.agregar_nombre.setDisabled(True)
+            self.agregar_autor.setDisabled(True)
+            self.fecha_publicacion.setDisabled(True)
             libro = libro[0][0]
             self.agregar_nombre.setText(libro.nombre_libro)
             self.agregar_autor.setText(libro.autor)
