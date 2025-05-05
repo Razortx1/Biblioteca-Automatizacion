@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-from connection.session import select_copia_libros_by_id, selected_libro_by_cod
+from connection.session import (select_copia_libros_by_id, selected_libro_by_cod,
+                                selected_user_by_rut)
 
 from datetime import date
 
@@ -32,10 +33,13 @@ class PrestamoLibros(QWidget):
         self.cod_barras.setPlaceholderText("Ingrese el codigo de barras")
         self.rut_ = QLineEdit()
         self.rut_.setPlaceholderText("Ingrese el Rut del Alumno o Profesor")
+        self.rut_.setInputMask("00.000.000-n;_")
         self.nombre_prestatario = QLineEdit()
         self.nombre_prestatario.setPlaceholderText("Ingrese el nombre del Alumno o Profesor")
+        self.nombre_prestatario.setDisabled(True)
         self.curso_prestatario = QLineEdit()
         self.curso_prestatario.setPlaceholderText("Ingrese el curso del prestatario")
+        self.curso_prestatario.setDisabled(True)
 
         #Creacion de los labes
         self.codigo = QLabel("Codigo de Barras del Libro")
@@ -114,6 +118,7 @@ class PrestamoLibros(QWidget):
         #Funcionamiento Boton
         self.boton_buscar_libro.clicked.connect(self.rellenar_tabla)
         self.boton_volver.clicked.connect(self.volver_principal.emit)
+        self.boton_buscar_rut.clicked.connect(self.buscar_rut)
 
 
     def verificar_codi(self, codigo):
@@ -176,6 +181,18 @@ class PrestamoLibros(QWidget):
             import traceback
             traceback.print_exc()
             print(f"Error {e}")
-        
 
-
+    def buscar_rut(self):
+        rut = self.rut_.text()
+        user = selected_user_by_rut(rut)
+        if user:
+            user = user[0][0]
+            self.nombre_prestatario.setText(user.nombre)
+            self.curso_prestatario.setText(user.curso)
+            self.nombre_prestatario.setDisabled(True)
+            self.curso_prestatario.setDisabled(True)
+        else:
+            self.nombre_prestatario.setDisabled(False)
+            self.nombre_prestatario.clear()
+            self.curso_prestatario.setDisabled(False)
+            self.curso_prestatario.clear()
