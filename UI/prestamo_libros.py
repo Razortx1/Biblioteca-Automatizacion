@@ -224,7 +224,11 @@ class PrestamoLibros(QWidget):
                 id_interno = int(self.tabla_libros.item(row.row(), 5).text())
                 if id_interno:
                     insert_prestamos(fecha,fecha_, rut, nombre, curso, id_interno)
-
+            self.nombre_prestatario.clear()
+            self.curso_prestatario.clear()
+            self.cod_barras.clear()
+            self.tabla_libros.setRowCount(0)
+            self.rut_.clear()
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
             cancelAction.setText("Se cancelo la accion")
