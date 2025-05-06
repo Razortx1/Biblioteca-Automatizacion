@@ -5,13 +5,13 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
 
-from connection.session import (select_copia_libros_by_id, selected_libro_by_cod,
-                                selected_user_by_rut)
-from connection.connection import insert_prestamos
-
 from datetime import datetime, date
 
 from PyQt5.QtCore import pyqtSignal
+
+from connection.session import (select_copia_libros_by_id, selected_libro_by_cod,
+                                selected_user_by_rut)
+from connection.connection import insert_prestamos
 
 class PrestamoLibros(QWidget):
     volver_principal = pyqtSignal()

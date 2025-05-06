@@ -5,11 +5,14 @@ from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 
 from connection.session import select_prestamos_all
+from .actualizar_ui.actualizar_prestamos import ActualizarPrestamos
 
 class HistorialPrestamos(QWidget):
     volver_principal = pyqtSignal()
     def __init__(self):
         super().__init__()
+
+        self.w = None
 
         #Definicion del layout
         void_layout_1 = QVBoxLayout()
@@ -77,6 +80,7 @@ class HistorialPrestamos(QWidget):
         self.setLayout(vertical_layout)
 
         #Funcionamiento Botones
+        self.cambiar_estado.clicked.connect(self.cambiar_state)
         self.volver_atras.clicked.connect(self.volver_principal.emit)
 
         self.rellenar_tabla()
@@ -116,3 +120,12 @@ class HistorialPrestamos(QWidget):
         else:
             pass
 
+
+    def cambiar_state(self):
+        if self.w is None:
+            self.w = ActualizarPrestamos()
+            self.w.actualizar_datos.connect(self.rellenar_tabla)
+            self.w.show()
+    
+    def cerrar_ventana(self):
+        self.w = None

@@ -120,5 +120,8 @@ class HistorialLibros(QWidget):
             self.w = ActualizarLibros()
             self.w.actualizar_datos.connect(self.rellenar_tabla)
             self.w.show()
-        else:
+            self.w.cerrar_ventana.connect(self.cerrar_ventana)
+    
+    def cerrar_ventana(self):
+        if self.w is not None:
             self.w = None

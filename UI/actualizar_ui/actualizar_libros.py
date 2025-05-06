@@ -29,6 +29,7 @@ style_sheet = "QWidget{background-color: #B4E7FF;}" "QPushButton{\
 
 class ActualizarLibros(QWidget):
     actualizar_datos = pyqtSignal()
+    cerrar_ventana = pyqtSignal()
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE LIBROS")
@@ -42,13 +43,10 @@ class ActualizarLibros(QWidget):
 
         #Creacion de los QLineEdits
         self.buscar_codbarras = QLineEdit()
-        self.buscar_codbarras.setStyleSheet(style_sheet)
 
         #Creacion de Boton
         self.buscar_libros = QPushButton("Buscar")
-        self.buscar_libros.setStyleSheet(style_sheet)
         self.cambiar_estado = QPushButton("Cambiar estado")
-        self.cambiar_estado.setStyleSheet(style_sheet)
 
         #Creacion de combobox
         self.estado = QComboBox()
@@ -59,7 +57,6 @@ class ActualizarLibros(QWidget):
 
         #Creacion de la tabla
         self.tabla_cambiarlibros = QTableWidget()
-        self.setStyleSheet(style_sheet)
         self.tabla_cambiarlibros.setColumnCount(6)
         item = QTableWidgetItem()
         item.setText("Nombre Libro")
@@ -139,7 +136,8 @@ class ActualizarLibros(QWidget):
                 update_estado_libro(copia_id, estado_id)
 
         self.actualizar_datos.emit()
-        self.destroy(True)
+        self.cerrar_ventana.emit()
+        self.close()
 
     def rellenar_tabla(self):
         try:
