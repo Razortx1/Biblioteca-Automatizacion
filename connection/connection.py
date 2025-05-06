@@ -59,6 +59,9 @@ def insertar_libros(nombre_, codigo_, autor_, fecha_, stock_):
 
 def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descripcion_):
     fecha = datetime.now()
+    fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
+    fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
+    print(fecha)
     try:
         user_rut = selected_user_by_rut(rut_)
         if user_rut:
@@ -75,7 +78,7 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             descripcion = descripcion_,
             cantidad_copias = cant_copias,
             cantidad_paginas = cant_paginas,
-            fecha_impresion = fecha,
+            fecha_impresion = (fecha),
             estado_impresion_id = 1,
             user_id = user.id_user
         )
@@ -123,6 +126,28 @@ def update_estado_libro(id, estado):
             error_mensaje = QErrorMessage()
             error_mensaje.setWindowTitle("Error ingresado")
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado del Libro.\
+                                      Favor de volver a intentarlo. {e}")
+            session.rollback()
+        except:
+            print("No se pudo obtener el error")
+    finally:
+        session.close()
+
+def update_estado_impresion(fecha, estado):
+    try:
+        print(f"Su futuro estado es: {estado}\
+              y la fecha es: {fecha}")
+        session.execute(update(Impresiones)
+                        .where(Impresiones.fecha_impresion.contains(fecha))
+                        .values(estado_impresion_id = estado))
+        session.commit()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        try:
+            error_mensaje = QErrorMessage()
+            error_mensaje.setWindowTitle("Error ingresado")
+            error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado de la Impresion.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
         except:

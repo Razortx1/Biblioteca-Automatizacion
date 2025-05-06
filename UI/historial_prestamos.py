@@ -59,10 +59,12 @@ class HistorialPrestamos(QWidget):
         self.tabla_historial.setRowCount(0)
 
         #Creacion botones
+        self.cambiar_estado = QPushButton("Cambiar Estado")
         self.volver_atras = QPushButton("Volver Atras")
 
         #Agregar los Widgets al layout
         vertical_layout.addWidget(self.tabla_historial)
+        vertical_layout.addWidget(self.cambiar_estado)
         vertical_layout.addWidget(self.volver_atras)
         vertical_layout.addLayout(void_layout_1)
         vertical_layout.addLayout(void_layout_2)
