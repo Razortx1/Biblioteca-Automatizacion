@@ -44,7 +44,7 @@ with Session(engine) as session:
                                                .join(Prestamos.user)
                                                .outerjoin(Prestamos.copia)
                                                .join_from(CopiasLibros, Libro, CopiasLibros.libro_id == Libro.id_libro)
-                                               .group_by(Usuario.nombre, Libro.nombre_libro, Estado_Prestamo.estado_prestamo)
+                                               .group_by(Usuario.nombre, Libro.nombre_libro,Prestamos.fecha_inicio, Estado_Prestamo.estado_prestamo)
                                                .order_by(Prestamos.fecha_inicio.desc()))
             return prestamos
         except Exception as e:

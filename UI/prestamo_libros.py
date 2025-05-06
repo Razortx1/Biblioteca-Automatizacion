@@ -9,7 +9,7 @@ from connection.session import (select_copia_libros_by_id, selected_libro_by_cod
                                 selected_user_by_rut)
 from connection.connection import insert_prestamos
 
-from datetime import date
+from datetime import datetime, date
 
 from PyQt5.QtCore import pyqtSignal
 
@@ -199,8 +199,11 @@ class PrestamoLibros(QWidget):
             self.curso_prestatario.clear()
     
     def insertar_prestamos(self):
+        fecha = datetime.now()
+        fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
+        fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
         selected_rows = self.tabla_libros.selectionModel().selectedRows()
-        fecha = self.fecha_maxima.dateTime().toPyDateTime().date()
+        fecha_ = self.fecha_maxima.dateTime().toPyDateTime().date()
         rut = self.rut_.text()
         nombre = self.nombre_prestatario.text()
         curso = self.curso_prestatario.text()
@@ -210,8 +213,22 @@ class PrestamoLibros(QWidget):
             msg.setText("No se ha seleccionado un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
-        
-        for row in selected_rows:
-            id_interno = int(self.tabla_libros.item(row.row(), 5).text())
-            if id_interno:
-                insert_prestamos(fecha, rut, nombre, curso, id_interno)
+        msg = QMessageBox()
+        msg.setWindowTitle("Confirmar Prestamo")
+        msg.setText(f"¿Deseas guardar el prestamo de {len(selected_rows)} libro(s)?")
+        msg.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+        msg.setIcon(QMessageBox.Question)
+        msg.exec()
+        if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
+            for row in selected_rows:
+                id_interno = int(self.tabla_libros.item(row.row(), 5).text())
+                if id_interno:
+                    insert_prestamos(fecha,fecha_, rut, nombre, curso, id_interno)
+
+        elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
+            cancelAction = QMessageBox()
+            cancelAction.setText("Se cancelo la accion")
+            cancelAction.setStandardButtons(QMessageBox.Ok)
+            cancelAction.setIcon(QMessageBox.Information)
+            cancelAction.setWindowTitle("Accion Cancelada")
+            cancelAction.exec()

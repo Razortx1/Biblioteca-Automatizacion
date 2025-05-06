@@ -27,7 +27,6 @@ def insertar_libros(nombre_, codigo_, autor_, fecha_, stock_):
                 estado_id = 1
             )
             session.add(copia)
-        session.commit()
         msg = QMessageBox()
         msg.setWindowTitle("Guardar Libro")
         msg.setText("¿Deseas guardar este libro?")
@@ -35,9 +34,7 @@ def insertar_libros(nombre_, codigo_, autor_, fecha_, stock_):
         msg.setIcon(QMessageBox.Question)
         msg.exec()
         if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
-            #session.add(libro)
-            #session.commit()
-            pass
+            session.commit()
 
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
@@ -113,10 +110,7 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
     finally:
         session.close()
 
-def insert_prestamos(fecha_termino, rut_, nombre_, curso_, copia_):
-    fecha = datetime.now()
-    fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
-    fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
+def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
     try:
         user_rut = selected_user_by_rut(rut_)
         if user_rut:
@@ -130,29 +124,14 @@ def insert_prestamos(fecha_termino, rut_, nombre_, curso_, copia_):
             session.add(user)
             session.commit()
         prestamo = Prestamos(
-            fecha_inicio = fecha,
-            fecha_termino = fecha_termino,
+            fecha_inicio = fecha_i,
+            fecha_termino = fecha_m,
             estado_prestamo_id = 1,
             user_id = user.id_user,
             copia_id = copia_
         )
-        msg = QMessageBox()
-        msg.setWindowTitle("Guardar Impresion")
-        msg.setText("¿Deseas guardar este Impresion?")
-        msg.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-        msg.setIcon(QMessageBox.Question)
-        msg.exec()
-        if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
-            session.execute(prestamo)
-            session.commit()
-
-        elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
-            cancelAction = QMessageBox()
-            cancelAction.setText("Se cancelo la accion")
-            cancelAction.setStandardButtons(QMessageBox.Ok)
-            cancelAction.setIcon(QMessageBox.Information)
-            cancelAction.setWindowTitle("Accion Cancelada")
-            cancelAction.exec()   
+        session.add(prestamo)
+        session.commit()
     except Exception as e:
         import traceback
         traceback.print_exc()
