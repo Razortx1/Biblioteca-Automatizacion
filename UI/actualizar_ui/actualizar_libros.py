@@ -130,7 +130,7 @@ class ActualizarLibros(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.exec()
             
-        estado_id = self.estado.currentIndex()-1
+        estado_id = self.estado.currentIndex() + 1
 
         for row in selected_rows:
             id_item = self.tabla_cambiarlibros.item(row.row(), 5)
