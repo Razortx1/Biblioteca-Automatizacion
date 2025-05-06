@@ -2,11 +2,12 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QDateEdit, QHBoxLayout,
                              QTableWidget, QTableWidgetItem, QMessageBox)
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
 
 from connection.session import (select_copia_libros_by_id, selected_libro_by_cod,
                                 selected_user_by_rut)
+from connection.connection import insert_prestamos
 
 from datetime import date
 
@@ -57,6 +58,7 @@ class PrestamoLibros(QWidget):
         #Definicion del LineEdit
         self.fecha_maxima = QDateEdit()
         self.fecha_maxima.setDisplayFormat("yyyy-MM-dd")
+        self.fecha_maxima.setDateRange(date.today(), QDate.currentDate().addDays(3))
         self.fecha_maxima.setCalendarPopup(True)
 
         fecha = date.today()
@@ -112,10 +114,9 @@ class PrestamoLibros(QWidget):
         vertical_layout_principal.addStretch()
 
         self.setLayout(vertical_layout_principal)
-        
-        fecha = date.today()
-        fecha.strftime("%y-%m-/d")
+
         #Funcionamiento Boton
+        self.boton_agregar_prestamo.clicked.connect(self.insertar_prestamos)
         self.boton_buscar_libro.clicked.connect(self.rellenar_tabla)
         self.boton_volver.clicked.connect(self.volver_principal.emit)
         self.boton_buscar_rut.clicked.connect(self.buscar_rut)
@@ -196,3 +197,21 @@ class PrestamoLibros(QWidget):
             self.nombre_prestatario.clear()
             self.curso_prestatario.setDisabled(False)
             self.curso_prestatario.clear()
+    
+    def insertar_prestamos(self):
+        selected_rows = self.tabla_libros.selectionModel().selectedRows()
+        fecha = self.fecha_maxima.dateTime().toPyDateTime().date()
+        rut = self.rut_.text()
+        nombre = self.nombre_prestatario.text()
+        curso = self.curso_prestatario.text()
+        if not selected_rows:
+            msg = QMessageBox()
+            msg.setWindowTitle("Seleccion erronea")
+            msg.setText("No se ha seleccionado un libro")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+        
+        for row in selected_rows:
+            id_interno = int(self.tabla_libros.item(row.row(), 5).text())
+            if id_interno:
+                insert_prestamos(fecha, rut, nombre, curso, id_interno)

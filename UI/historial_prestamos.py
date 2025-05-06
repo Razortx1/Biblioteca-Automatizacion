@@ -23,7 +23,7 @@ class HistorialPrestamos(QWidget):
 
         #Creacion de la tabla
         self.tabla_historial = QTableWidget()
-        self.tabla_historial.setColumnCount(7)
+        self.tabla_historial.setColumnCount(8)
 
         item = QTableWidgetItem()
         item.setText("Nombre Alumno/Profesor")
@@ -50,8 +50,12 @@ class HistorialPrestamos(QWidget):
         self.tabla_historial.setHorizontalHeaderItem(5, item)
 
         item = QTableWidgetItem()
-        item.setText("Estado Prestamo")
+        item.setText("Cantidad Libros Prestada")
         self.tabla_historial.setHorizontalHeaderItem(6, item)
+
+        item = QTableWidgetItem()
+        item.setText("Estado Prestamo")
+        self.tabla_historial.setHorizontalHeaderItem(7, item)
 
         #Tamaño Columnas
         header = self.tabla_historial.horizontalHeader()
@@ -96,7 +100,8 @@ class HistorialPrestamos(QWidget):
                 self.tabla_historial.setItem(tablerow, 3, QTableWidgetItem(p.nombre_libro))
                 self.tabla_historial.setItem(tablerow, 4, QTableWidgetItem(str(p.fecha_inicio)))
                 self.tabla_historial.setItem(tablerow, 5, QTableWidgetItem(str(p.fecha_termino)))
-                self.tabla_historial.setItem(tablerow, 6, QTableWidgetItem(p.estado_prestamo))
+                self.tabla_historial.setItem(tablerow, 6, QTableWidgetItem(str(p.stock)))
+                self.tabla_historial.setItem(tablerow, 7, QTableWidgetItem(p.estado_prestamo))
 
                 texto_tabla = self.tabla_historial.item(tablerow, column_count-1).text()
 

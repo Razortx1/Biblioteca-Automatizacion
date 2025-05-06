@@ -22,7 +22,7 @@ import sys, os
 from typing import List, Optional
 from sqlalchemy import (ForeignKey, String, create_engine)
 from sqlalchemy.orm import (DeclarativeBase, Mapped, mapped_column,
-                            relationship)
+                            relationship, sessionmaker)
 """
     Importacion de la libreria datetime con el fin de poder crear columnas
     para fechas ya sea con año/mes/dia o con año/mes/dia hora/minuto/segundo
@@ -276,3 +276,54 @@ class Estado_Prestamo(Base):
 """
 
 Base.metadata.create_all(bind=engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+try:
+    estados = [{
+        'id_estadolibro': 1,
+        'estado_libro': "Buen Estado"
+    },
+    {
+        'id_estadolibro': 2,
+        'estado_libro': "Estado Regular"
+    },
+    {
+        'id_estadolibro': 3,
+        'estado_libro': "Mal Estado"
+    },
+    {
+        'id_estadolibro': 4,
+        'estado_libro': "Dado de Baja"
+    }]
+    session.bulk_insert_mappings(Estado_Libro, estados)
+
+    estados = [{
+        'id_estadolibro': 1,
+        'estado_impresion': "Aun no Impreso"
+    },
+    {
+        'id_estadolibro': 2,
+        'estado_impresion': "Ya Impreso"
+    }]
+    session.bulk_insert_mappings(Estado_Impresion, estados)
+
+    estados = [{
+        'id_estadolibro': 1,
+        'estado_prestamo': "Prestado"
+    },
+    {
+        'id_estadolibro': 2,
+        'estado_prestamo': "Devuelto"
+    },
+    {
+        'id_estadolibro': 3,
+        'estado_prestamo': "Extraviado"
+    }]
+    session.bulk_insert_mappings(Estado_Prestamo, estados)
+    session.commit()
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+    print(f"Error {e}")

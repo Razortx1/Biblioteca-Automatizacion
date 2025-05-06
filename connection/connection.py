@@ -5,7 +5,7 @@ from connection.session import (session, selected_user_by_rut, selected_libro_by
 
 from datetime import date, datetime
 
-from sql.models import Libro, Impresiones, Usuario, CopiasLibros
+from sql.models import Libro, Impresiones, Usuario, CopiasLibros, Prestamos
 
 def insertar_libros(nombre_, codigo_, autor_, fecha_, stock_):
     try:
@@ -106,6 +106,60 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             error_mensaje = QErrorMessage()
             error_mensaje.setWindowTitle("Error ingresado")
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer ingreso de la impresion.\
+                                      Favor de volver a intentarlo. {e}")
+            session.rollback()
+        except:
+            print("No se pudo obtener el error")
+    finally:
+        session.close()
+
+def insert_prestamos(fecha_termino, rut_, nombre_, curso_, copia_):
+    fecha = datetime.now()
+    fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
+    fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
+    try:
+        user_rut = selected_user_by_rut(rut_)
+        if user_rut:
+            user = user_rut[0][0]
+        else:
+            user = Usuario(
+                nombre = nombre_,
+                curso = curso_,
+                rut = rut_
+            )
+            session.add(user)
+            session.commit()
+        prestamo = Prestamos(
+            fecha_inicio = fecha,
+            fecha_termino = fecha_termino,
+            estado_prestamo_id = 1,
+            user_id = user.id_user,
+            copia_id = copia_
+        )
+        msg = QMessageBox()
+        msg.setWindowTitle("Guardar Impresion")
+        msg.setText("¿Deseas guardar este Impresion?")
+        msg.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+        msg.setIcon(QMessageBox.Question)
+        msg.exec()
+        if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
+            session.execute(prestamo)
+            session.commit()
+
+        elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
+            cancelAction = QMessageBox()
+            cancelAction.setText("Se cancelo la accion")
+            cancelAction.setStandardButtons(QMessageBox.Ok)
+            cancelAction.setIcon(QMessageBox.Information)
+            cancelAction.setWindowTitle("Accion Cancelada")
+            cancelAction.exec()   
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        try:
+            error_mensaje = QErrorMessage()
+            error_mensaje.setWindowTitle("Error ingresado")
+            error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado del Libro.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
         except:

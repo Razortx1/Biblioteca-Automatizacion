@@ -15,7 +15,9 @@ with Session(engine) as session:
                                      .join(CopiasLibros.libro)
                                      .join(CopiasLibros.estado)
                                      .outerjoin(CopiasLibros.prestamos)
-                                     .where(or_(Prestamos.id_prestamos == None, Prestamos.id_prestamos == 2))
+                                     .where(or_(Prestamos.copia_id == None, 
+                                                Prestamos.estado_prestamo_id == 2,
+                                                Prestamos.estado_prestamo_id == 3))
                                      .group_by(Libro.nombre_libro, Estado_Libro.estado_libro))
             return libros
         except Exception as e:
@@ -37,12 +39,13 @@ with Session(engine) as session:
         try:
             prestamos = session.execute(select(Prestamos.fecha_inicio, Prestamos.fecha_termino, Estado_Prestamo.estado_prestamo,
                                                Usuario.nombre, Usuario.curso, Usuario.rut, Libro.nombre_libro,
-                                               func.count(Libro.nombre_libro))
+                                               func.count(Libro.nombre_libro).label("stock"))
                                                .join(Prestamos.estado_prestamo)
                                                .join(Prestamos.user)
                                                .outerjoin(Prestamos.copia)
                                                .join_from(CopiasLibros, Libro, CopiasLibros.libro_id == Libro.id_libro)
-                                               .group_by(Usuario.nombre, Libro.nombre_libro, Estado_Prestamo.estado_prestamo))
+                                               .group_by(Usuario.nombre, Libro.nombre_libro, Estado_Prestamo.estado_prestamo)
+                                               .order_by(Prestamos.fecha_inicio.desc()))
             return prestamos
         except Exception as e:
             traceback.print_exc()

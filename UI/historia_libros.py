@@ -78,6 +78,7 @@ class HistorialLibros(QWidget):
 
 
     def rellenar_tabla(self):
+        self.tabla_libros.setRowCount(0)
         libros = select_libros_available()
         tablerow = 0
         self.tabla_libros.setRowCount(50)
