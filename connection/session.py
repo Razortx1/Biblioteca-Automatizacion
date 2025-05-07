@@ -70,7 +70,6 @@ with Session(engine) as session:
     def select_estado_libro_all():
         try:
             estado_libro = session.execute(select(Estado_Libro)).all()
-            print()
             return estado_libro
 
         except Exception as e:
@@ -79,7 +78,8 @@ with Session(engine) as session:
 
     def select_copia_libros_by_id(id):
         try:
-            libros = session.execute(select(CopiasLibros.id_copia,Libro.nombre_libro, Libro.cod_barras, Libro.autor,Libro.fecha_publicacion,
+            libros = session.execute(select(CopiasLibros.id_copia,Libro.nombre_libro, Libro.cod_barras, 
+                                            Libro.autor,Libro.fecha_publicacion,
                                             Estado_Libro.estado_libro)
                                      .join(CopiasLibros.libro)
                                      .join(CopiasLibros.estado)
@@ -87,6 +87,26 @@ with Session(engine) as session:
                                      .where(CopiasLibros.libro_id == id)
                                      .where(Prestamos.id_prestamos == None))
             return libros
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
+
+    def select_prestamo_by_fecha(fecha):
+        try:
+            prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.cod_barras,
+                                                    Prestamos.fecha_inicio, Prestamos.fecha_termino,
+                                                    Estado_Libro.estado_libro, CopiasLibros.id_copia)
+                                                    .where(Prestamos.fecha_inicio.contains(fecha))
+                                                    .where(Estado_Prestamo.estado_prestamo != "Devuelto"))
+            return prestamo_fecha
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
+
+    def select_all_estado_prestamos():
+        try:
+            estado = session.execute(select(Estado_Prestamo)).all()
+            return estado
         except Exception as e:
             traceback.print_exc()
             print(f"Error {e}")

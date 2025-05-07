@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidget,
                              QTableWidgetItem, QLabel, QVBoxLayout,
-                             QHeaderView, QMessageBox)
+                             QHeaderView, QMessageBox, QAbstractItemView)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
@@ -75,6 +75,9 @@ class HistorialImpresiones(QWidget):
         vertical_layout.addWidget(self.volver_atras)
         vertical_layout.addLayout(void_layout_1)
         vertical_layout.addLayout(void_layout_2)
+
+        self.tabla_impresiones.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tabla_impresiones.setSelectionMode(QAbstractItemView.MultiSelection)
 
         #Asignar el layout
         self.setLayout(vertical_layout)
