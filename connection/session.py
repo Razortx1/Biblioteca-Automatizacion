@@ -85,7 +85,8 @@ with Session(engine) as session:
                                      .join(CopiasLibros.estado)
                                      .outerjoin(CopiasLibros.prestamos)
                                      .where(CopiasLibros.libro_id == id)
-                                     .where(Prestamos.id_prestamos == None))
+                                     .where(or_(Prestamos.id_prestamos == None,
+                                                Prestamos.estado_prestamo_id == 2)))
             return libros
         except Exception as e:
             traceback.print_exc()
