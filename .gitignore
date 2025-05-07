@@ -6,9 +6,6 @@ dist
 *.db
 
 #Ignorar Cache de Python
-# Ignorar todos los archivos de caché de Python
-__pycache__/
-*.py[cod]
 
 # Ignorar caché en subdirectorios como UI/
 UI/__pycache__/
