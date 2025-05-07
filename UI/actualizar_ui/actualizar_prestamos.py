@@ -8,7 +8,7 @@ from PyQt5.QtGui import QColor
 
 from connection.session import (select_all_estado_prestamos,
                                 select_prestamo_by_fecha)
-from connection.connection import update_estado_libro
+from connection.connection import update_estado_libro, update_estado_prestamos
 
 style_sheet = "QWidget{background-color: #B4E7FF;}" "QPushButton{\
         background-color: #C7FF9C;\
@@ -171,11 +171,12 @@ class ActualizarPrestamos(QWidget):
             msg.exec()
         estado_id = self.estados.currentIndex() + 1
         for row in selected_rows:
-            id_item = self.tabla_prestamos.item(row.row(), 6).text()
+            id_copia = self.tabla_prestamos.item(row.row(), 6).text()
+            id_prestamos = self.tabla_prestamos.item(row.row(), 7).text()
             if estado_id != 3:
-                print("Cambiando estado del prestamo")
+                update_estado_prestamos(id_prestamos, estado_id)
             else:
-                print("Cambiando estado tanto del libro como del prestamo")
-                print(id_item)
-                #update_estado_libro(id_item, 4)
+                update_estado_prestamos(id_prestamos, estado_id)
+                update_estado_libro(id_copia, 4)
         self.rellenar_tabla()
+        self.actualizar_datos.emit()

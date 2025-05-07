@@ -167,8 +167,6 @@ def update_estado_libro(id, estado):
 
 def update_estado_impresion(fecha, estado):
     try:
-        print(f"Su futuro estado es: {estado}\
-              y la fecha es: {fecha}")
         session.execute(update(Impresiones)
                         .where(Impresiones.fecha_impresion.contains(fecha))
                         .values(estado_impresion_id = estado))
@@ -187,9 +185,12 @@ def update_estado_impresion(fecha, estado):
     finally:
         session.close()
 
-def update_estado_prestamos():
+def update_estado_prestamos(id, estado):
     try:
-        pass
+        session.execute(update(Prestamos)
+                        .where(Prestamos.id_prestamos == id)
+                        .values(estado_prestamo_id = estado))
+        session.commit()
     except Exception as e:
         import traceback
         traceback.print_exc()
