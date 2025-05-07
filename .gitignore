@@ -6,9 +6,11 @@ dist
 *.db
 
 #Ignorar Cache de Python
+# Ignorar todos los archivos de caché de Python
 __pycache__/
 *.py[cod]
-UI/__pycache__/agregar_libros.cpython-312.pyc
-UI/__pycache__/pagina_principal.cpython-312.pyc
-UI/__pycache__/agregar_libros.cpython-312.pyc
-UI/__pycache__/pagina_principal.cpython-312.pyc
+
+# Ignorar caché en subdirectorios como UI/
+UI/__pycache__/
+*.pyc
+*.pyc
