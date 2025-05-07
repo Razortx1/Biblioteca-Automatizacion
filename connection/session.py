@@ -1,5 +1,5 @@
 import traceback
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy import select, insert, delete, update, func, or_
 from sql.models import engine
 from sql.models import (Usuario, Libro, Estado_Libro,
@@ -10,17 +10,52 @@ from sql.models import (Usuario, Libro, Estado_Libro,
 with Session(engine) as session:
     def select_libros_available():
         try:
-            libros = session.execute(select(Libro.nombre_libro, Libro.cod_barras, Libro.autor,Libro.fecha_publicacion,Estado_Libro.estado_libro
-                                            ,func.count(CopiasLibros.id_copia).label("stock"))
-                                     .join(CopiasLibros.libro)
-                                     .join(CopiasLibros.estado)
-                                     .outerjoin(CopiasLibros.prestamos)
-                                     .where(or_(Prestamos.copia_id == None, 
-                                                Prestamos.estado_prestamo_id == 2,
-                                                Prestamos.estado_prestamo_id == 3))
-                                     .group_by(Libro.nombre_libro, Estado_Libro.estado_libro))
+            # Subconsulta: obtener el último préstamo por copia
+            ultimo_prestamo = (
+                select(
+                    Prestamos.copia_id,
+                    func.max(Prestamos.id_prestamos).label("ultimo_prestamo_id")
+                )
+                .group_by(Prestamos.copia_id)
+                .subquery()
+            )
+
+            # Alias para el join posterior con el préstamo más reciente
+            p_alias = aliased(Prestamos)
+
+            # Consulta principal
+            libros = (
+                session.execute(
+                    select(
+                        Libro.nombre_libro,
+                        Libro.cod_barras,
+                        Libro.autor,
+                        Libro.fecha_publicacion,
+                        Estado_Libro.estado_libro,
+                        func.count(CopiasLibros.id_copia).label("stock")
+                    )
+                    .join(CopiasLibros.libro)
+                    .join(CopiasLibros.estado)
+                    .outerjoin(ultimo_prestamo, CopiasLibros.id_copia == ultimo_prestamo.c.copia_id)
+                    .outerjoin(p_alias, p_alias.id_prestamos == ultimo_prestamo.c.ultimo_prestamo_id)
+                    .where(
+                        or_(
+                            p_alias.id_prestamos == None,  # Sin préstamo
+                            p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
+                        )
+                    )
+                    .group_by(
+                        Libro.nombre_libro,
+                        Libro.cod_barras,
+                        Libro.autor,
+                        Libro.fecha_publicacion,
+                        Estado_Libro.estado_libro
+                    )
+                )
+            )
             return libros
         except Exception as e:
+            import traceback
             traceback.print_exc()
             print(f"Error {e}")
 
@@ -78,17 +113,45 @@ with Session(engine) as session:
 
     def select_copia_libros_by_id(id):
         try:
-            libros = session.execute(select(CopiasLibros.id_copia,Libro.nombre_libro, Libro.cod_barras, 
-                                            Libro.autor,Libro.fecha_publicacion,
-                                            Estado_Libro.estado_libro)
-                                     .join(CopiasLibros.libro)
-                                     .join(CopiasLibros.estado)
-                                     .outerjoin(CopiasLibros.prestamos)
-                                     .where(CopiasLibros.libro_id == id)
-                                     .where(or_(Prestamos.id_prestamos == None,
-                                                Prestamos.estado_prestamo_id == 2)))
+            # Subconsulta: último préstamo por copia
+            ultimo_prestamo = (
+                select(
+                    Prestamos.copia_id,
+                    func.max(Prestamos.id_prestamos).label("ultimo_prestamo_id")
+                )
+                .group_by(Prestamos.copia_id)
+                .subquery()
+            )
+
+            # Alias para Prestamos
+            p_alias = aliased(Prestamos)
+
+            # Consulta principal
+            libros = session.execute(
+                select(
+                    CopiasLibros.id_copia,
+                    Libro.nombre_libro,
+                    Libro.cod_barras,
+                    Libro.autor,
+                    Libro.fecha_publicacion,
+                    Estado_Libro.estado_libro
+                )
+                .join(CopiasLibros.libro)
+                .join(CopiasLibros.estado)
+                .outerjoin(ultimo_prestamo, CopiasLibros.id_copia == ultimo_prestamo.c.copia_id)
+                .outerjoin(p_alias, p_alias.id_prestamos == ultimo_prestamo.c.ultimo_prestamo_id)
+                .where(CopiasLibros.libro_id == id)
+                .where(
+                    or_(
+                        p_alias.id_prestamos == None,  # nunca ha sido prestado
+                        p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
+                    )
+                )
+            )
             return libros
+
         except Exception as e:
+            import traceback
             traceback.print_exc()
             print(f"Error {e}")
 
