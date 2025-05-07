@@ -8,3 +8,5 @@ dist
 #Ignorar Cache de Python
 __pycache__/
 *.py[cod]
+UI/__pycache__/agregar_libros.cpython-312.pyc
+UI/__pycache__/pagina_principal.cpython-312.pyc
