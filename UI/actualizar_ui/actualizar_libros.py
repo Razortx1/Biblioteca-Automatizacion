@@ -185,3 +185,6 @@ class ActualizarLibros(QWidget):
             traceback.print_exc()
             print(f"Error {e}")
         
+    def closeEvent(self, a0):
+        self.cerrar_ventana.emit()
+        a0.accept()

@@ -58,7 +58,6 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
     fecha = datetime.now()
     fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
     fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
-    print(fecha)
     try:
         user_rut = selected_user_by_rut(rut_)
         if user_rut:
@@ -174,6 +173,23 @@ def update_estado_impresion(fecha, estado):
                         .where(Impresiones.fecha_impresion.contains(fecha))
                         .values(estado_impresion_id = estado))
         session.commit()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        try:
+            error_mensaje = QErrorMessage()
+            error_mensaje.setWindowTitle("Error ingresado")
+            error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado de la Impresion.\
+                                      Favor de volver a intentarlo. {e}")
+            session.rollback()
+        except:
+            print("No se pudo obtener el error")
+    finally:
+        session.close()
+
+def update_estado_prestamos():
+    try:
+        pass
     except Exception as e:
         import traceback
         traceback.print_exc()

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
-                             QPushButton, QLabel)
+                             QPushButton, QLabel, QAbstractItemView,
+                             QMessageBox)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 
@@ -9,6 +10,7 @@ from .actualizar_ui.actualizar_prestamos import ActualizarPrestamos
 
 class HistorialPrestamos(QWidget):
     volver_principal = pyqtSignal()
+    pasar_fecha = pyqtSignal(str)
     def __init__(self):
         super().__init__()
 
@@ -79,6 +81,9 @@ class HistorialPrestamos(QWidget):
         #Asignar el layout
         self.setLayout(vertical_layout)
 
+        self.tabla_historial.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tabla_historial.setSelectionMode(QAbstractItemView.SingleSelection)
+
         #Funcionamiento Botones
         self.cambiar_estado.clicked.connect(self.cambiar_state)
         self.volver_atras.clicked.connect(self.volver_principal.emit)
@@ -122,10 +127,24 @@ class HistorialPrestamos(QWidget):
 
 
     def cambiar_state(self):
-        if self.w is None:
-            self.w = ActualizarPrestamos()
-            self.w.actualizar_datos.connect(self.rellenar_tabla)
-            self.w.show()
+        selected_rows = self.tabla_historial.selectionModel().selectedRows()
+        if not selected_rows:
+            msg = QMessageBox()
+            msg.setWindowTitle("Seleccion erronea")
+            msg.setText("No se ha seleccionado un prestamo")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+        else:
+            for row in selected_rows:
+                fecha_item = self.tabla_historial.item(row.row(), 4).text()
+            if self.w is None:
+                self.w = ActualizarPrestamos()
+                self.w.actualizar_datos.connect(self.rellenar_tabla)
+                self.pasar_fecha.connect(self.w.traer_fecha)
+                self.pasar_fecha.emit(fecha_item)
+                self.w.show()
+                self.w.cerrar_ventana.connect(self.cerrar_ventana)
     
     def cerrar_ventana(self):
-        self.w = None
+        if self.w is not None:
+            self.w = None

@@ -95,14 +95,13 @@ with Session(engine) as session:
         try:
             prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.cod_barras,
                                                     Prestamos.fecha_inicio, Prestamos.fecha_termino,
-                                                    Estado_Libro.estado_libro, CopiasLibros.id_copia)
+                                                    Estado_Libro.estado_libro, CopiasLibros.id_copia, Prestamos.id_prestamos)
                                                     .join(Prestamos.copia)
                                                     .join(Prestamos.user)
                                                     .join_from(CopiasLibros, Libro, CopiasLibros.libro_id == Libro.id_libro)
                                                     .join_from(CopiasLibros, Estado_Libro, CopiasLibros.estado_id == Estado_Libro.id_estadolibro)
                                                     .outerjoin(Prestamos.estado_prestamo)
-                                                    .where(Prestamos.fecha_inicio.contains(fecha))
-                                                    .where(Estado_Prestamo.estado_prestamo != "Devuelto"))
+                                                    .where(Prestamos.fecha_inicio.contains(fecha)))
             return prestamo_fecha
         except Exception as e:
             traceback.print_exc()
