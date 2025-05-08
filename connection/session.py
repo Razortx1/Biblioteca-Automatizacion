@@ -179,3 +179,22 @@ with Session(engine) as session:
         except Exception as e:
             traceback.print_exc()
             print(f"Error {e}")
+
+    def select_all_estado_impresion():
+        try:
+            estado = session.execute(select(Estado_Impresion)).all()
+            return estado
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Errores {e}")
+
+    def select_impresiones_filtradas(filtro):
+        try:
+            query = session.query(Impresiones, Estado_Impresion, Usuario).join(Impresiones, Usuario.id_user == Impresiones.user_id).join(Impresiones.estado_impresion)
+            print(filtro)
+            query = query.filter(Impresiones.estado_impresion_id == filtro)
+            resultado = query.all()
+            return resultado
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Errores {e}")

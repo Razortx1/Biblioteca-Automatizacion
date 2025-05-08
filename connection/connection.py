@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMessageBox, QErrorMessage
 from connection.session import (session, selected_user_by_rut, selected_libro_by_cod,
                                 update)
 
-from datetime import date, datetime
+from datetime import datetime
 
 from sql.models import Libro, Impresiones, Usuario, CopiasLibros, Prestamos
 
