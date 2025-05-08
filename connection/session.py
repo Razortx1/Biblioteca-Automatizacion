@@ -166,7 +166,8 @@ with Session(engine) as session:
                                                     .join_from(CopiasLibros, Estado_Libro, CopiasLibros.estado_id == Estado_Libro.id_estadolibro)
                                                     .outerjoin(Prestamos.estado_prestamo)
                                                     .where(Prestamos.fecha_inicio.contains(fecha))
-                                                    .where(Estado_Prestamo.estado_prestamo == "Prestado"))
+                                                    .where(or_(Estado_Prestamo.estado_prestamo == "Prestado",
+                                                               Estado_Prestamo.estado_prestamo == "Extraviado")))
             return prestamo_fecha
         except Exception as e:
             traceback.print_exc()
