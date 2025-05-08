@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QPushButton, QTableWidget, QLineEdit, QLabel,
                              QComboBox, QHBoxLayout, QMessageBox, QTableWidgetItem,
-                             QAbstractItemView)
+                             QAbstractItemView, QCheckBox)
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
@@ -52,6 +52,9 @@ class ActualizarLibros(QWidget):
         self.estado = QComboBox()
         self.estado.setStyleSheet("background-color: #FFFFFF;")
 
+        #Creacion del Checkbox
+        self.check = QCheckBox("Cerrar ventana luego de cambios")
+
         #creacion de labels
         self.cod = QLabel("Ingresa codigo de barras")
 
@@ -87,6 +90,7 @@ class ActualizarLibros(QWidget):
 
         horizontal_layout.addWidget(self.cambiar_estado)
         horizontal_layout.addWidget(self.estado)
+        horizontal_layout.addWidget(self.check)
 
         vertical_layout.addWidget(self.cod)
         vertical_layout.addLayout(horizontal_layout_1)
@@ -118,26 +122,14 @@ class ActualizarLibros(QWidget):
             return None
         
     def seleccion_datos(self):
-        from UI.historia_libros import HistorialLibros
-        selected_rows = self.tabla_cambiarlibros.selectionModel().selectedRows()
-        if not selected_rows:
-            msg = QMessageBox()
-            msg.setWindowTitle("Seleccion erronea")
-            msg.setText("No se ha seleccionado un libro")
-            msg.setIcon(QMessageBox.Information)
-            msg.exec()
-            
-        estado_id = self.estado.currentIndex() + 1
-
-        for row in selected_rows:
-            id_item = self.tabla_cambiarlibros.item(row.row(), 5)
-            if id_item:
-                copia_id = int(id_item.text())
-                update_estado_libro(copia_id, estado_id)
-
-        self.actualizar_datos.emit()
-        self.cerrar_ventana.emit()
-        self.close()
+        is_true = self.check.isChecked()
+        if is_true is not True:
+            self.act_datos()
+        else:
+            self.act_datos()
+            self.actualizar_datos.emit()
+            self.cerrar_ventana.emit()
+            self.close()
 
     def rellenar_tabla(self):
         try:
@@ -184,6 +176,23 @@ class ActualizarLibros(QWidget):
             import traceback
             traceback.print_exc()
             print(f"Error {e}")
+
+    def act_datos(self):
+        selected_rows = self.tabla_cambiarlibros.selectionModel().selectedRows()
+        if not selected_rows:
+            msg = QMessageBox()
+            msg.setWindowTitle("Seleccion erronea")
+            msg.setText("No se ha seleccionado un libro")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+            
+        estado_id = self.estado.currentIndex() + 1
+
+        for row in selected_rows:
+            id_item = self.tabla_cambiarlibros.item(row.row(), 5)
+            if id_item:
+                copia_id = int(id_item.text())
+                update_estado_libro(copia_id, estado_id)
         
     def closeEvent(self, a0):
         self.cerrar_ventana.emit()
