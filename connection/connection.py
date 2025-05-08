@@ -116,6 +116,8 @@ def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
         user_rut = selected_user_by_rut(rut_)
         if user_rut:
             user = user_rut[0][0]
+            if user.curso != curso_:
+                update_usuario(user.id_user, curso_)
         else:
             user = Usuario(
                 nombre = nombre_,

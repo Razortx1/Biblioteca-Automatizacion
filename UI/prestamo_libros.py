@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QDateEdit, QHBoxLayout,
-                             QTableWidget, QTableWidgetItem, QMessageBox)
+                             QTableWidget, QTableWidgetItem, QMessageBox,
+                             QCheckBox)
 
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
@@ -28,6 +29,7 @@ class PrestamoLibros(QWidget):
         horizontal_layot_principal = QHBoxLayout()
         horizontal_layot_1 = QHBoxLayout()
         horizontal_layot_2 = QHBoxLayout()
+        horizontal_layot_3 = QHBoxLayout()
 
         #Definicion de los LineEdit
         self.cod_barras = QLineEdit()
@@ -41,6 +43,10 @@ class PrestamoLibros(QWidget):
         self.curso_prestatario = QLineEdit()
         self.curso_prestatario.setPlaceholderText("Ingrese el curso del prestatario")
         self.curso_prestatario.setDisabled(True)
+
+        #Creacion de los Checkbox
+        self.cambiar_curso = QCheckBox("Habilitar para cambiar departamento o curso")
+        self.cambiar_curso.stateChanged.connect(self.check_event)
 
         #Creacion de los labes
         self.codigo = QLabel("Codigo de Barras del Libro")
@@ -106,7 +112,9 @@ class PrestamoLibros(QWidget):
         vertical_layout_2.addWidget(self.nombre)
         vertical_layout_2.addWidget(self.nombre_prestatario)
         vertical_layout_2.addWidget(self.curso)
-        vertical_layout_2.addWidget(self.curso_prestatario)
+        horizontal_layot_3.addWidget(self.curso_prestatario)
+        horizontal_layot_3.addWidget(self.cambiar_curso)
+        vertical_layout_2.addLayout(horizontal_layot_3)
         vertical_layout_principal.addLayout(horizontal_layot_principal)
         vertical_layout_principal.addWidget(self.boton_agregar_prestamo)
         vertical_layout_principal.addWidget(self.boton_volver)
@@ -236,3 +244,10 @@ class PrestamoLibros(QWidget):
             cancelAction.setIcon(QMessageBox.Information)
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
+
+
+    def check_event(self, event):
+        if event == Qt.Checked:
+            self.curso_prestatario.setDisabled(False)
+        if event == Qt.Unchecked:
+            self.curso_prestatario.setDisabled(True)

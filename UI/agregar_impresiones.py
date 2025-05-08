@@ -138,10 +138,8 @@ class AgregarImpresiones(QWidget):
     
     def check_event(self, event):
         if event == Qt.Checked:
-            print("Check")
             self.cursos.setDisabled(False)
         if event == Qt.Unchecked:
-            print("Uncheck")
             self.cursos.setDisabled(True)
 
     
