@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
+from PyQt5.QtWidgets import (QWidget,
                              QPushButton, QTableWidgetItem, QTableWidget,
-                             QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
-                             QMainWindow, QApplication, QHeaderView)
-from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication, pyqtSignal)
+                             QLabel, QLineEdit, QVBoxLayout, QHeaderView)
+from PyQt5.QtCore import (pyqtSignal)
 
 from PyQt5.QtGui import QColor
 
