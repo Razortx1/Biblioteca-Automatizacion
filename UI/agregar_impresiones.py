@@ -1,10 +1,12 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QHBoxLayout,
-                             QTextEdit)
+                             QTextEdit, QCheckBox)
 
-from PyQt5.QtCore import (pyqtSignal)
+from PyQt5.QtCore import (pyqtSignal, Qt)
+
 from connection.session import selected_user_by_rut
 from connection.connection import ingresar_impresiones
+
 
 class AgregarImpresiones(QWidget):
     volver_menu = pyqtSignal()
@@ -16,6 +18,7 @@ class AgregarImpresiones(QWidget):
         vertical_layout = QVBoxLayout()
         void_layout_1 = QVBoxLayout()
         void_layout_2 = QVBoxLayout()
+        horizontal_layout_1 = QHBoxLayout()
 
         self.voidLabel_1 = QLabel()
         self.voidLabel_2 = QLabel()
@@ -33,6 +36,9 @@ class AgregarImpresiones(QWidget):
         self.cursos = QLineEdit()
         self.cursos.setPlaceholderText("Ingrese Curso o Departamento")
         self.cursos.setDisabled(True)
+
+        self.cambiar_curso = QCheckBox("Habilitar para cambiar departamento o curso")
+        self.cambiar_curso.stateChanged.connect(self.check_event)
 
         self.cantidad_copias = QLineEdit()
         self.cantidad_copias.setPlaceholderText("Ingrese la cantidad de Copias")
@@ -71,12 +77,14 @@ class AgregarImpresiones(QWidget):
         self.descip.setText("Descripcion de la Impresion")
 
         #Asignar los Widgets al Layout
+        horizontal_layout_1.addWidget(self.cursos)
+        horizontal_layout_1.addWidget(self.cambiar_curso)
         vertical_layout.addWidget(self.rut)
         vertical_layout.addLayout(horizontal_layout)
         vertical_layout.addWidget(self.nombre)
         vertical_layout.addWidget(self.nombre_solicitante)
         vertical_layout.addWidget(self.curso)
-        vertical_layout.addWidget(self.cursos)        
+        vertical_layout.addLayout(horizontal_layout_1)       
         vertical_layout.addWidget(self.cantidad_c)
         vertical_layout.addWidget(self.cantidad_copias)
         vertical_layout.addWidget(self.cantidad_p)
@@ -125,6 +133,16 @@ class AgregarImpresiones(QWidget):
         self.cantidad_copias.clear()
         self.cantidad_paginas.clear()
         self.descripcion.clear()
+        self.cambiar_curso.setChecked(False)
+
+    
+    def check_event(self, event):
+        if event == Qt.Checked:
+            print("Check")
+            self.cursos.setDisabled(False)
+        if event == Qt.Unchecked:
+            print("Uncheck")
+            self.cursos.setDisabled(True)
 
     
         

@@ -62,6 +62,8 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
         user_rut = selected_user_by_rut(rut_)
         if user_rut:
             user = user_rut[0][0]
+            if user.curso != curso_:
+                update_usuario(user.id_user, curso_)
         else:
             user = Usuario(
                 nombre = nombre_,
@@ -204,3 +206,21 @@ def update_estado_prestamos(id, estado):
             print("No se pudo obtener el error")
     finally:
         session.close()
+
+def update_usuario(id, curso_):
+    try:
+        session.execute(update(Usuario)
+                        .where(Usuario.id_user == id)
+                        .values(curso = curso_))
+        session.commit()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        try:
+            error_mensaje = QErrorMessage()
+            error_mensaje.setWindowTitle("Error ingresado")
+            error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado de la Impresion.\
+                                      Favor de volver a intentarlo. {e}")
+            session.rollback()
+        except:
+            print("No se pudo obtener el error")
