@@ -1,13 +1,12 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QSizePolicy, QWidget,
-                             QPushButton, QTableWidgetItem, QTableWidget,
-                             QVBoxLayout, QHBoxLayout)
-from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication, pyqtSignal)
+from PyQt5.QtWidgets import (
+    QWidget, QPushButton, QVBoxLayout, QLabel, QSpacerItem,
+    QSizePolicy, QFrame, QHBoxLayout
+)
+from PyQt5.QtCore import Qt, pyqtSignal
 
 
 class PaginaPrincipal(QWidget):
-    #Definicion de señales
+    # Señales
     ir_a_agregar_libros = pyqtSignal()
     ir_a_historia_libros = pyqtSignal()
     ir_prestamo_libro = pyqtSignal()
@@ -15,36 +14,60 @@ class PaginaPrincipal(QWidget):
     ir_a_historial_prestamo = pyqtSignal()
 
     def __init__(self):
-
         super().__init__()
-        
-        #Definicion de Layout
-        vertical_layout_left = QVBoxLayout()
-        horizontal_layout = QHBoxLayout()
-        vertical_layout_right = QVBoxLayout()
 
-        #Creacion de los botones
-        self.registro_libros = QPushButton("Registro de Libros")
-        self.prestamos_libro = QPushButton("Prestamo del Libro")
-        self.inventario_libros = QPushButton("Inventario de Libros")
-        self.impresion = QPushButton("Menu de Impresiones")
-        self.historial_prestamos = QPushButton("Historial de Prestamos")
+        # Layout principal
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignTop)
 
-        #Agregando los botones al layout
-        vertical_layout_left.addWidget(self.registro_libros)
-        vertical_layout_left.addWidget(self.prestamos_libro)
-        horizontal_layout.addLayout(vertical_layout_left)
-        horizontal_layout.addWidget(self.inventario_libros)
-        vertical_layout_right.addWidget(self.impresion)
-        vertical_layout_right.addWidget(self.historial_prestamos)
-        horizontal_layout.addLayout(vertical_layout_right)
+        # Título
+        titulo = QLabel("Sistema de Biblioteca")
+        titulo.setAlignment(Qt.AlignCenter)
+        titulo.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+        main_layout.addWidget(titulo)
 
-        #Agregar los layouts en la respectiva vista
-        self.setLayout(horizontal_layout)
+        # Contenedor central con marco
+        frame = QFrame()
+        frame.setFrameShape(QFrame.StyledPanel)
+        frame_layout = QVBoxLayout()
+        frame_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
-        #Funciones del Boton
-        self.registro_libros.clicked.connect(self.ir_a_agregar_libros.emit)
-        self.inventario_libros.clicked.connect(self.ir_a_historia_libros.emit)
-        self.prestamos_libro.clicked.connect(self.ir_prestamo_libro.emit)
-        self.impresion.clicked.connect(self.ir_a_menu_impresiones.emit)
-        self.historial_prestamos.clicked.connect(self.ir_a_historial_prestamo.emit)
+        # Botones con espaciado
+        botones = [
+            ("Registro de Libros", self.ir_a_agregar_libros),
+            ("Inventario de Libros", self.ir_a_historia_libros),
+            ("Préstamo del Libro", self.ir_prestamo_libro),
+            ("Menú de Impresiones", self.ir_a_menu_impresiones),
+            ("Historial de Préstamos", self.ir_a_historial_prestamo)
+        ]
+
+        grid_layout = QHBoxLayout()
+
+        col1 = QVBoxLayout()
+        col2 = QVBoxLayout()
+
+        # Distribuye los botones en dos columnas
+        for i, (texto, señal) in enumerate(botones):
+            btn = QPushButton(texto)
+            btn.setMinimumWidth(200)
+            btn.setMinimumHeight(40)
+            btn.clicked.connect(señal.emit)
+
+            if i % 2 == 0:
+                col1.addWidget(btn)
+                col1.addSpacing(10)
+            else:
+                col2.addWidget(btn)
+                col2.addSpacing(10)
+
+        grid_layout.addLayout(col1)
+        grid_layout.addSpacing(40)  # separación entre columnas
+        grid_layout.addLayout(col2)
+
+        frame.setLayout(grid_layout)
+        main_layout.addWidget(frame)
+
+        # Espaciador final
+        main_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        self.setLayout(main_layout)

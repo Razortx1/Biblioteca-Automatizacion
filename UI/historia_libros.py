@@ -1,102 +1,104 @@
-from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
-                             QPushButton, QTableWidgetItem, QTableWidget,
-                             QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
-                             QMainWindow, QApplication, QHeaderView)
-from PyQt5.QtCore import (QLocale, QSize, Qt, QRect, QMetaObject,
-                          QCoreApplication, pyqtSignal)
-
+from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidget,
+                             QLabel, QVBoxLayout, QHeaderView, QHBoxLayout)
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
-from connection.session import select_libros_all
+
+from connection.session import select_libros_available
+from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
-    def __init__(self):
-        super().__init__()            
-        
-        #Definicion del layout
-        void_layout_1 = QVBoxLayout()
-        void_layout_2 = QVBoxLayout()
-        vertical_layout = QVBoxLayout()
 
-        self.voidLabel_1 = QLabel()
-        self.voidLabel_2 = QLabel()
-        void_layout_1.addWidget(self.voidLabel_1)
-        void_layout_2.addWidget(self.voidLabel_2)
-        #Creacion de la tabla
+    def __init__(self):
+        super().__init__()
+
+        self.w = None
+        # Layout principal
+        main_layout = QVBoxLayout()
+
+        # Crear la tabla de libros
         self.tabla_libros = QTableWidget()
         self.tabla_libros.setColumnCount(6)
-        item = QTableWidgetItem()
-        item.setText("Nombre Libro")
-        self.tabla_libros.setHorizontalHeaderItem(0, item)
-        item = QTableWidgetItem()
-        item.setText("Codigo de Barras")
-        self.tabla_libros.setHorizontalHeaderItem(1, item)
-        item = QTableWidgetItem()
-        item.setText("Autor")
-        self.tabla_libros.setHorizontalHeaderItem(2, item)
-        item = QTableWidgetItem()
-        item.setText("Fecha Publicacion")
-        self.tabla_libros.setHorizontalHeaderItem(3, item)
-        item = QTableWidgetItem()
-        item.setText("Stock de Libros")
-        self.tabla_libros.setHorizontalHeaderItem(4, item)
-        item = QTableWidgetItem()
-        item.setText("Estado del Libro")
-        self.tabla_libros.setHorizontalHeaderItem(5, item)
+        headers = ["Nombre Libro", "Código de Barras", "Autor", "Fecha Publicación", "Stock de Libros", "Estado del Libro"]
+        self.tabla_libros.setMinimumHeight(300)
+        self.tabla_libros.setMaximumHeight(700)
+        
+        # Asignar encabezados de las columnas
+        for i, header in enumerate(headers):
+            item = QTableWidgetItem(header)
+            self.tabla_libros.setHorizontalHeaderItem(i, item)
 
-        #Tamaño Columnas
+        # Hacer que las columnas se ajusten al tamaño de la ventana
         header = self.tabla_libros.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-        #Creacion botones
+        # Crear los botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
         self.volver_inicio = QPushButton("Volver a Inicio")
 
-        #Agregar los Widget al layout principal
-        vertical_layout.addWidget(self.tabla_libros)
-        vertical_layout.addWidget(self.cambiar_estado)
-        vertical_layout.addWidget(self.volver_inicio)
-        vertical_layout.addLayout(void_layout_1)
-        vertical_layout.addLayout(void_layout_2)
+        # Agregar los widgets al layout principal
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.cambiar_estado)
+        button_layout.addWidget(self.volver_inicio)
+        main_layout.addWidget(self.tabla_libros)
+        main_layout.addLayout(button_layout)
 
+        # Agregar espaciadores si es necesario (opcional)
+        main_layout.addStretch(1)
+
+        # Establecer el layout principal
+        self.setLayout(main_layout)
+
+        # Inicializar la tabla
+        self.tabla_libros.setRowCount(0)
         self.rellenar_tabla()
-        #Agregar el layout a la respectiva lista
-        self.setLayout(vertical_layout)
 
-        #Funcionamiento Botones
+        # Conectar los botones con las funciones
+        self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_inicio.clicked.connect(self.volver_principal.emit)
 
-
     def rellenar_tabla(self):
-        libros = select_libros_all()
+        self.tabla_libros.setRowCount(0)
+        libros = select_libros_available()
+        mal_estado = QColor("#ffd62e")  # Mal estado
+        buen_estado = QColor("#b2f7b2")  # Buen estado
+        dado_baja = QColor("#ff6b6b")  # Dado de baja
+        estado_regular = QColor("#ffe066")  # Estado regular
 
-        column_count = self.tabla_libros.columnCount()
+        if libros:
+            for l in libros:
+                row_position = self.tabla_libros.rowCount()
+                self.tabla_libros.insertRow(row_position)
 
-        mal_estado = QColor(255, 205, 0)
-        buen_estado = QColor(90,255,90)
-        dado_baja = QColor(255,50,50)
-        estado_regular = QColor(255,255,0)
+                # Insertar los datos del libro
+                self.tabla_libros.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
+                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(l.cod_barras))
+                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.autor))
+                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_publicacion)))
+                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(str(l.stock)))
+                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.estado_libro))
 
+                # Asignar colores dependiendo del estado
+                estado_libro = self.tabla_libros.item(row_position, 5).text()
 
-        tablerow = 0
-        self.tabla_libros.setRowCount(50)
-        for l in libros:
-            self.tabla_libros.setItem(tablerow, 0, QTableWidgetItem(l.Libro.nombre_libro))
-            self.tabla_libros.setItem(tablerow, 1, QTableWidgetItem(l.Libro.cod_barras))
-            self.tabla_libros.setItem(tablerow, 2, QTableWidgetItem(l.Libro.autor))
-            self.tabla_libros.setItem(tablerow, 3, QTableWidgetItem(str(l.Libro.fecha_publicacion)))
-            self.tabla_libros.setItem(tablerow, 4, QTableWidgetItem(str(l.Libro.stock)))
-            self.tabla_libros.setItem(tablerow, 5, QTableWidgetItem(l.Estado_Libro.estado_libro))
+                if estado_libro == "Buen Estado":
+                    self.tabla_libros.item(row_position, 5).setBackground(buen_estado)
+                elif estado_libro == "Mal Estado":
+                    self.tabla_libros.item(row_position, 5).setBackground(mal_estado)
+                elif estado_libro == "Estado Regular":
+                    self.tabla_libros.item(row_position, 5).setBackground(estado_regular)
+                elif estado_libro == "Dado de Baja":
+                    self.tabla_libros.item(row_position, 5).setBackground(dado_baja)
+        else:
+            print("No hay libros disponibles para mostrar.")
 
-            texto_tabla = self.tabla_libros.item(tablerow, column_count-1).text()
+    def actualizar_estado(self):
+        if self.w is None:
+            self.w = ActualizarLibros()
+            self.w.actualizar_datos.connect(self.rellenar_tabla)
+            self.w.show()
+            self.w.cerrar_ventana.connect(self.cerrar_ventana)
 
-            if texto_tabla == "Buen Estado":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(buen_estado)
-            elif texto_tabla == "Estado Regular":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(estado_regular)
-            elif texto_tabla == "Mal Estado":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(mal_estado)
-            elif texto_tabla == "Dado de Baja":
-                self.tabla_libros.item(tablerow, column_count-1).setBackground(dado_baja)
-
-            tablerow+=1
+    def cerrar_ventana(self):
+        if self.w is not None:
+            self.w = None
