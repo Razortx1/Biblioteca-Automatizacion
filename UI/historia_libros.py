@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidget,
-                             QLabel, QVBoxLayout, QHeaderView, QHBoxLayout)
+                             QMessageBox, QVBoxLayout, QHeaderView, QHBoxLayout)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
@@ -38,6 +38,7 @@ class HistorialLibros(QWidget):
 
         # Agregar los widgets al layout principal
         button_layout = QHBoxLayout()
+        button_layout.setSpacing(15)
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_inicio)
         main_layout.addWidget(self.tabla_libros)
@@ -90,7 +91,11 @@ class HistorialLibros(QWidget):
                 elif estado_libro == "Dado de Baja":
                     self.tabla_libros.item(row_position, 5).setBackground(dado_baja)
         else:
-            print("No hay libros disponibles para mostrar.")
+            msg = QMessageBox()
+            msg.setWindowTitle("No hay libros")
+            msg.setText("No hay libros disponibles para mostrar.")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
 
     def actualizar_estado(self):
         if self.w is None:

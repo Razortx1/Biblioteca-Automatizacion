@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
-    QDateEdit, QSpacerItem, QSizePolicy
+    QDateEdit, QSpacerItem, QSizePolicy, QMessageBox
 )
 
 from PyQt5.QtCore import pyqtSignal
@@ -110,6 +110,13 @@ class AgregarLibros(QWidget):
         # Validación simple para asegurarse de que los campos no están vacíos
         if not nombre or not cod_barras or not autor or not stock:
             return
+        if not stock.isdigit():
+            msg = QMessageBox()
+            msg.setWindowTitle("Error de Entrada")
+            msg.setText("Por favor, ingrese un valor numérico valido para el stock.")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec()
+            return
 
         # Llamada a la función para insertar el libro
         insertar_libros(nombre, cod_barras, autor, fecha, stock)
@@ -119,3 +126,8 @@ class AgregarLibros(QWidget):
         self.agregar_codigo.clear()
         self.agregar_autor.clear()
         self.stock_libro.clear()
+        msg = QMessageBox()
+        msg.setWindowTitle("Libro Agregado")
+        msg.setText("El libro se ha agregado correctamente.")
+        msg.setIcon(QMessageBox.Information)
+        msg.exec()

@@ -1,6 +1,8 @@
+/*BackGround total de la aplicacion*/
 QMainWindow{
     background-color: #B4E7FF;
 }
+/*Botones*/
 QPushButton {
     background-color: #C7FF9C;
     color: #222;
@@ -8,35 +10,35 @@ QPushButton {
     padding: 10px 20px;
     font-size: 14px;
     border: 1px solid #a6d97b;
+    outline: none;
 }
-
+QPushButton:hover {
+    background-color: #d9ffa7;
+}
 QPushButton:pressed {
     background-color: #b2f27c;
 }
 
+/*Combobox*/
 QComboBox {
     font-size: 14px;
     padding: 5px;
 }
-
-QLineEdit, QDateEdit {
+/*Para los inputs tanto de texto como de fecha*/
+QLineEdit, QDateEdit, QTextEdit{
     background-color: #ffffff;
     border: 1px solid #bbb;
     border-radius: 8px;
     padding: 10px;
 }
 
-QTextEdit {
-    background-color: #ffffff;
-    border: 1px solid #bbb;
-    border-radius: 8px;
-    padding: 10px;
-}
+/*Etiqueta*/
 QLabel {
     font-size: 16px;
     color: #333;
     margin-bottom: 5px;
 }
+/*Tabla*/
 QTableWidget {
     background-color: #FFF9DB;
     border: 1px solid #ccc;

@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QHBoxLayout,
-                             QTextEdit, QCheckBox, QSizePolicy)
+                             QTextEdit, QCheckBox, QMessageBox)
 
-from PyQt5.QtCore import (pyqtSignal, Qt)
+from PyQt5.QtCore import (pyqtSignal, Qt, QTimer)
 
 from connection.session import selected_user_by_rut
 from connection.connection import ingresar_impresiones
@@ -105,6 +105,10 @@ class AgregarImpresiones(QWidget):
     # Función para buscar un usuario por su rut
     def buscar_rut(self):
         rut = self.rut_solicitante.text()
+        # Espera 500 ms antes de ejecutar la búsqueda
+        QTimer.singleShot(500, lambda: self.buscar_usuario(rut))
+
+    def buscar_usuario(self, rut):
         user = selected_user_by_rut(rut)
         if user:
             user = user[0][0]
@@ -120,6 +124,14 @@ class AgregarImpresiones(QWidget):
 
     # Función para agregar una impresión
     def agregar_impresiones(self):
+
+        if not copias.isdigit() or not paginas.isdigit():
+            msg = QMessageBox()
+            msg.setWindowTitle("Error de Entrada")
+            msg.setText("Por favor, ingrese números válidos en los campos de cantidad de copias y páginas.")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec()
+            return
         nombre = self.nombre_solicitante.text()
         curso = self.cursos.text()
         rut = self.rut_solicitante.text()
@@ -127,6 +139,11 @@ class AgregarImpresiones(QWidget):
         paginas = self.cantidad_paginas.text()
         descrip = self.descripcion.toPlainText()
         ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip)
+        msg = QMessageBox()
+        msg.setWindowTitle("Impresión Agregada")
+        msg.setText("La impresión ha sido agregada con éxito.")
+        msg.setIcon(QMessageBox.Information)
+        msg.exec()
 
         # Limpiar campos después de agregar
         self.limpiar_campos()

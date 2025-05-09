@@ -10,22 +10,49 @@ from connection.session import (select_all_estado_prestamos,
                                 select_prestamo_by_fecha)
 from connection.connection import update_estado_libro, update_estado_prestamos
 
-style_sheet = "QWidget{background-color: #B4E7FF;}" "QPushButton{\
-        background-color: #C7FF9C;\
-        border-radius:5px;\
-        border: 1px solid black;\
-        }\
-        \
-        QPushButton:pressed{\
-            background-color: greenyellow;\
-            color: white\
-        }" "QLineEdit{\
-        background-color: white;\
-        border-radius: 10;\
-        border: 1px solid black;\
-    }" "QTableWidget{\
-        background-color: rgb(255, 241, 184);\
-    }"
+style_sheet = """
+QWidget#ActualizarPrestamos {
+    background-color: #B4E7FF;
+}
+
+QPushButton {
+    background-color: #C7FF9C;
+    color: #222;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 1px solid #a6d97b;
+}
+
+QPushButton:pressed {
+    background-color: #b2f27c;
+}
+
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+QTableWidget {
+    background-color: #FFF9DB;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+QHeaderView::section {
+    background-color: #FFF3B0;
+    font-weight: bold;
+    padding: 6px;
+    border: none;
+}
+
+QComboBox {
+    font-size: 14px;
+    padding: 5px;
+}
+"""
 
 class ActualizarPrestamos(QWidget):
     actualizar_datos = pyqtSignal()
@@ -33,6 +60,8 @@ class ActualizarPrestamos(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE PRESTAMOS")
+        self.setObjectName("ActualizarPrestamos")
+        self.setAutoFillBackground(True)
         self.setStyleSheet(style_sheet)
         self.setGeometry(20,200,980,700)
 
@@ -42,7 +71,6 @@ class ActualizarPrestamos(QWidget):
 
         #Creacion del Combobox
         self.estados = QComboBox()
-        self.estados.setStyleSheet("background-color: #FFFFFF;")
 
         #Creacion del checkbox
         self.validacion_usuario = QCheckBox()
@@ -108,7 +136,6 @@ class ActualizarPrestamos(QWidget):
         self.tabla_prestamos.setRowCount(0)
         prestamos = select_prestamo_by_fecha(self.fechas)
         tablerow = 0
-        self.tabla_prestamos.setRowCount(50)
 
         mal_estado = QColor(255, 205, 0)
         buen_estado = QColor(90,255,90)
@@ -119,6 +146,8 @@ class ActualizarPrestamos(QWidget):
 
         if prestamos:
             for p in prestamos:
+                row_position = self.tabla_prestamos.rowCount()
+                self.tabla_prestamos.insertRow(row_position)
                 self.tabla_prestamos.setItem(tablerow, 0, QTableWidgetItem(p.nombre))
                 self.tabla_prestamos.setItem(tablerow, 1, QTableWidgetItem(p.nombre_libro))
                 self.tabla_prestamos.setItem(tablerow, 2, QTableWidgetItem(p.cod_barras))
