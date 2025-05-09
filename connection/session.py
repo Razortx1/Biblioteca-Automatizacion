@@ -28,9 +28,8 @@ with Session(engine) as session:
                 session.execute(
                     select(
                         Libro.nombre_libro,
-                        Libro.cod_barras,
                         Libro.autor,
-                        Libro.fecha_publicacion,
+                        Libro.fecha_entrada,
                         Estado_Libro.estado_libro,
                         func.count(CopiasLibros.id_copia).label("stock")
                     )
@@ -46,9 +45,8 @@ with Session(engine) as session:
                     )
                     .group_by(
                         Libro.nombre_libro,
-                        Libro.cod_barras,
                         Libro.autor,
-                        Libro.fecha_publicacion,
+                        Libro.fecha_entrada,
                         Estado_Libro.estado_libro
                     )
                 )
@@ -96,7 +94,7 @@ with Session(engine) as session:
 
     def selected_libro_by_cod(barras):
         try:
-            libro = session.execute(select(Libro).where(Libro.cod_barras == barras)).all()
+            libro = session.execute(select(Libro).where(Libro.nombre == "barras")).all()
             return libro
         except Exception as e:
             traceback.print_exc()

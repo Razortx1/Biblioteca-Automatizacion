@@ -18,8 +18,8 @@ class HistorialLibros(QWidget):
 
         # Crear la tabla de libros
         self.tabla_libros = QTableWidget()
-        self.tabla_libros.setColumnCount(6)
-        headers = ["Nombre Libro", "Código de Barras", "Autor", "Fecha Publicación", "Stock de Libros", "Estado del Libro"]
+        self.tabla_libros.setColumnCount(8)
+        headers = ["Nombre Libro", "Autor", "Editorial", "Fecha Entrada a Biblioteca","Area de Biblioteca", "Sector Estanteria" , "Stock de Libros", "Estado del Libro"]
         self.tabla_libros.setMinimumHeight(300)
         self.tabla_libros.setMaximumHeight(700)
         
@@ -73,11 +73,13 @@ class HistorialLibros(QWidget):
 
                 # Insertar los datos del libro
                 self.tabla_libros.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
-                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(l.cod_barras))
                 self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.autor))
-                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_publicacion)))
+                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.editorial))
+                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_entrada)))
                 self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(str(l.stock)))
-                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.estado_libro))
+                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.sector_biblioteca))
+                self.tabla_libros.setItem(row_position, 6, QTableWidgetItem(l.sector_estanteria))
+                self.tabla_libros.setItem(row_position, 7, QTableWidgetItem(l.estado_libro))
 
                 # Asignar colores dependiendo del estado
                 estado_libro = self.tabla_libros.item(row_position, 5).text()
@@ -91,11 +93,7 @@ class HistorialLibros(QWidget):
                 elif estado_libro == "Dado de Baja":
                     self.tabla_libros.item(row_position, 5).setBackground(dado_baja)
         else:
-            msg = QMessageBox()
-            msg.setWindowTitle("No hay libros")
-            msg.setText("No hay libros disponibles para mostrar.")
-            msg.setIcon(QMessageBox.Information)
-            msg.exec()
+            return
 
     def actualizar_estado(self):
         if self.w is None:
