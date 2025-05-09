@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QDateEdit, QHBoxLayout,
                              QTableWidget, QTableWidgetItem, QMessageBox,
-                             QCheckBox)
+                             QCheckBox, QHeaderView)
 
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
@@ -122,6 +122,8 @@ class PrestamoLibros(QWidget):
         vertical_layout_principal.addStretch()
 
         self.setLayout(vertical_layout_principal)
+        header = self.tabla_libros.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         #Funcionamiento Boton
         self.boton_agregar_prestamo.clicked.connect(self.insertar_prestamos)
@@ -152,7 +154,6 @@ class PrestamoLibros(QWidget):
             copias = select_copia_libros_by_id(id)
 
             tablerow = 0
-            self.tabla_libros.setRowCount(50)
 
             column_count = self.tabla_libros.columnCount()-2
 
@@ -165,6 +166,8 @@ class PrestamoLibros(QWidget):
                     if l.estado_libro == "Dado de Baja":
                         pass
                     else:
+                        row_position = self.tabla_libros.rowCount()
+                        self.tabla_libros.insertRow(row_position)
                         self.tabla_libros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
                         self.tabla_libros.setItem(tablerow, 1, QTableWidgetItem(l.cod_barras))
                         self.tabla_libros.setItem(tablerow, 2, QTableWidgetItem(l.autor))

@@ -32,7 +32,7 @@ class HistorialImpresiones(QWidget):
         self.tabla_impresiones.setMaximumHeight(400)
         headers = ["Nombre Alumno/Profesor", "Curso/Departamento", "Cantidad de Páginas",
                    "Cantidad de Copias", "Hojas Usadas en Total", "Fecha de Impresión",
-                   "Descripción", "Estado Impresión"]
+                   "Descripción", "Estado de la Impresión"]
         for i, header in enumerate(headers):
             item = QTableWidgetItem(header)
             self.tabla_impresiones.setHorizontalHeaderItem(i, item)
@@ -103,6 +103,12 @@ class HistorialImpresiones(QWidget):
                     estado = 1
                 if item:
                     update_estado_impresion(item, estado)
+            msg = QMessageBox()
+            msg.setWindowTitle("Estado Actualizado")
+            msg.setText("El estado de la impresión ha sido actualizado correctamente.")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+
             self.rellenar_tabla()
 
     def filtrar_tabla(self):
@@ -117,8 +123,8 @@ class HistorialImpresiones(QWidget):
     def tabla(self, impresiones):
         column_count = self.tabla_impresiones.columnCount()
         tablerow = 0
-        no_impreso = QColor(255, 90, 90)
-        ya_impreso = QColor(90, 255, 90)
+        no_impreso = QColor("#ff6b6b")
+        ya_impreso = QColor("#b2f7b2")
 
         if impresiones:
             for i in impresiones:

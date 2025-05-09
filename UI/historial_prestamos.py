@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QMessageBox, QHBoxLayout, QSizePolicy)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt
 
 from connection.session import select_prestamos_all
 from .actualizar_ui.actualizar_prestamos import ActualizarPrestamos
@@ -73,6 +74,7 @@ class HistorialPrestamos(QWidget):
         #Agregar los Widgets al layout
         vertical_layout.addWidget(self.tabla_historial)
         button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
         self.cambiar_estado.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.volver_atras.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         button_layout.addWidget(self.cambiar_estado)
@@ -98,6 +100,7 @@ class HistorialPrestamos(QWidget):
         self.tabla_historial.setRowCount(0)
         prestamos = select_prestamos_all()
         tablerow = 0
+        columna = 0
         column_count = self.tabla_historial.columnCount()
 
         extraviado = QColor("#ff6b6b")  # rojo suave
@@ -124,8 +127,8 @@ class HistorialPrestamos(QWidget):
                     self.tabla_historial.item(tablerow, column_count-1).setBackground(devuelto)
                 elif texto_tabla == "Extraviado":
                     self.tabla_historial.item(tablerow, column_count-1).setBackground(extraviado)
-
                 tablerow+=1
+                columna+=1
         else:
             pass
 

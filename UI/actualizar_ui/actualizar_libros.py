@@ -10,22 +10,49 @@ from connection.session import (select_estado_libro_all, selected_libro_by_cod,
                                 select_copia_libros_by_id)
 from connection.connection import update_estado_libro
 
-style_sheet = "QWidget{background-color: #B4E7FF;}" "QPushButton{\
-        background-color: #C7FF9C;\
-        border-radius:5px;\
-        border: 1px solid black;\
-        }\
-        \
-        QPushButton:pressed{\
-            background-color: greenyellow;\
-            color: white\
-        }" "QLineEdit{\
-        background-color: white;\
-        border-radius: 10;\
-        border: 1px solid black;\
-    }" "QTableWidget{\
-        background-color: rgb(255, 241, 184);\
-    }"
+style_sheet = """
+QWidget#ActualizarLibros {
+    background-color: #B4E7FF;
+}
+
+QPushButton {
+    background-color: #C7FF9C;
+    color: #222;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 1px solid #a6d97b;
+}
+
+QPushButton:pressed {
+    background-color: #b2f27c;
+}
+
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+QTableWidget {
+    background-color: #FFF9DB;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+QHeaderView::section {
+    background-color: #FFF3B0;
+    font-weight: bold;
+    padding: 6px;
+    border: none;
+}
+
+QComboBox {
+    font-size: 14px;
+    padding: 5px;
+}
+"""
 
 class ActualizarLibros(QWidget):
     actualizar_datos = pyqtSignal()
@@ -33,6 +60,7 @@ class ActualizarLibros(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE LIBROS")
+        self.setObjectName("ActualizarLibros")
         self.setStyleSheet(style_sheet)
         self.setGeometry(200,200,700,700)
 
@@ -131,6 +159,15 @@ class ActualizarLibros(QWidget):
             self.cerrar_ventana.emit()
             self.close()
 
+    def color_por_estado(self, estado: str) -> QColor:
+        colores = {
+            "Buen Estado": QColor(90,255,90),
+            "Mal Estado": QColor(255, 205, 0),
+            "Estado Regular": QColor(255,255,0),
+            "Dado de Baja": QColor(255,50,50)
+        }
+        return colores.get(estado, QColor(255, 255, 255))
+
     def rellenar_tabla(self):
         try:
             self.tabla_cambiarlibros.setRowCount(0)
@@ -144,10 +181,6 @@ class ActualizarLibros(QWidget):
 
             column_count = self.tabla_cambiarlibros.columnCount()-2
 
-            mal_estado = QColor(255, 205, 0)
-            buen_estado = QColor(90,255,90)
-            dado_baja = QColor(255,50,50)
-            estado_regular = QColor(255,255,0)
             if copias:
                 for l in copias:
                     self.tabla_cambiarlibros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
@@ -157,16 +190,9 @@ class ActualizarLibros(QWidget):
                     self.tabla_cambiarlibros.setItem(tablerow, 4, QTableWidgetItem(l.estado_libro))
                     self.tabla_cambiarlibros.setItem(tablerow, 5, QTableWidgetItem(str(l.id_copia)))
 
-                    texto_tabla = self.tabla_cambiarlibros.item(tablerow, column_count).text()
 
-                    if texto_tabla == "Buen Estado":
-                        self.tabla_cambiarlibros.item(tablerow, column_count).setBackground(buen_estado)
-                    elif texto_tabla == "Mal Estado":
-                        self.tabla_cambiarlibros.item(tablerow, column_count).setBackground(mal_estado)
-                    elif texto_tabla == "Estado Regular":
-                        self.tabla_cambiarlibros.item(tablerow, column_count).setBackground(estado_regular)
-                    elif texto_tabla == "Dado de Baja":
-                        self.tabla_cambiarlibros.item(tablerow, column_count).setBackground(dado_baja)
+                    estado = self.tabla_cambiarlibros.item(tablerow, column_count).text()
+                    self.tabla_cambiarlibros.item(tablerow, column_count).setBackground(self.color_por_estado(estado))
 
                     tablerow+=1
 
