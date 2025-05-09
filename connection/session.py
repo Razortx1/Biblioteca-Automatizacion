@@ -29,7 +29,10 @@ with Session(engine) as session:
                     select(
                         Libro.nombre_libro,
                         Libro.autor,
+                        Libro.editorial,
                         Libro.fecha_entrada,
+                        Libro.sector_biblioteca,
+                        Libro.sector_estanteria,
                         Estado_Libro.estado_libro,
                         func.count(CopiasLibros.id_copia).label("stock")
                     )

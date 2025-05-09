@@ -73,25 +73,25 @@ class HistorialLibros(QWidget):
 
                 # Insertar los datos del libro
                 self.tabla_libros.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
-                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.autor))
+                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(l.autor))
                 self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.editorial))
                 self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_entrada)))
-                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(str(l.stock)))
-                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.sector_biblioteca))
-                self.tabla_libros.setItem(row_position, 6, QTableWidgetItem(l.sector_estanteria))
+                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(l.sector_biblioteca))
+                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.sector_estanteria))
+                self.tabla_libros.setItem(row_position, 6, QTableWidgetItem(str(l.stock)))
                 self.tabla_libros.setItem(row_position, 7, QTableWidgetItem(l.estado_libro))
 
                 # Asignar colores dependiendo del estado
-                estado_libro = self.tabla_libros.item(row_position, 5).text()
+                estado_libro = self.tabla_libros.item(row_position, 7).text()
 
                 if estado_libro == "Buen Estado":
-                    self.tabla_libros.item(row_position, 5).setBackground(buen_estado)
+                    self.tabla_libros.item(row_position, 7).setBackground(buen_estado)
                 elif estado_libro == "Mal Estado":
-                    self.tabla_libros.item(row_position, 5).setBackground(mal_estado)
+                    self.tabla_libros.item(row_position, 7).setBackground(mal_estado)
                 elif estado_libro == "Estado Regular":
-                    self.tabla_libros.item(row_position, 5).setBackground(estado_regular)
+                    self.tabla_libros.item(row_position, 7).setBackground(estado_regular)
                 elif estado_libro == "Dado de Baja":
-                    self.tabla_libros.item(row_position, 5).setBackground(dado_baja)
+                    self.tabla_libros.item(row_position, 7).setBackground(dado_baja)
         else:
             return
 
