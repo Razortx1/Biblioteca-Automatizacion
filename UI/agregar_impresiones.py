@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QHBoxLayout,
-                             QTextEdit, QCheckBox)
+                             QTextEdit, QCheckBox, QSizePolicy)
 
 from PyQt5.QtCore import (pyqtSignal, Qt)
 
@@ -10,100 +10,99 @@ from connection.connection import ingresar_impresiones
 
 class AgregarImpresiones(QWidget):
     volver_menu = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
-        #Definicion de Layout
+        # Definición de Layouts
+        main_layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
-        vertical_layout = QVBoxLayout()
-        void_layout_1 = QVBoxLayout()
-        void_layout_2 = QVBoxLayout()
-        horizontal_layout_1 = QHBoxLayout()
+        button_layout = QHBoxLayout()
 
-        self.voidLabel_1 = QLabel()
-        self.voidLabel_2 = QLabel()
+        # Ajustar márgenes y espaciado para tener menos espacio entre los widgets
+        main_layout.setContentsMargins(10, 10, 10, 10)  # Márgenes del layout principal
+        main_layout.setSpacing(5)  # Espaciado entre los widgets
 
-        #Creacion de los Widgets
-        #LineEdit
-        self.nombre_solicitante = QLineEdit()
-        self.nombre_solicitante.setPlaceholderText("Ingrese el nombre del Alumno/Profesor")
-        self.nombre_solicitante.setDisabled(True)
+        horizontal_layout.setContentsMargins(5, 5, 5, 5)  # Márgenes de horizontal_layout
+        horizontal_layout.setSpacing(5)  # Espaciado dentro de horizontal_layout
 
-        self.rut_solicitante = QLineEdit()
-        self.rut_solicitante.setPlaceholderText("Ingrese el rut Alumno/Profesor")
-        self.rut_solicitante.setInputMask("00.000.000-n;_")
+        self.setFixedHeight(600)
 
-        self.cursos = QLineEdit()
-        self.cursos.setPlaceholderText("Ingrese Curso o Departamento")
-        self.cursos.setDisabled(True)
+        # Creación de los Widgets
+        self.nombre_solicitante = self.crear_line_edit("Ingrese el nombre del Alumno/Profesor", True)
+        self.rut_solicitante = self.crear_line_edit("Ingrese el rut Alumno/Profesor", False, "00.000.000-n;_")
+        self.cursos = self.crear_line_edit("Ingrese Curso o Departamento", True)
 
         self.cambiar_curso = QCheckBox("Habilitar para cambiar departamento o curso")
         self.cambiar_curso.stateChanged.connect(self.check_event)
 
-        self.cantidad_copias = QLineEdit()
-        self.cantidad_copias.setPlaceholderText("Ingrese la cantidad de Copias")
-
-        self.cantidad_paginas = QLineEdit()
-        self.cantidad_paginas.setPlaceholderText("Ingrese la cantidad de Paginas del documento")
+        self.cantidad_copias = self.crear_line_edit("Ingrese la cantidad de Copias", False)
+        self.cantidad_paginas = self.crear_line_edit("Ingrese la cantidad de Paginas del documento", False)
 
         self.descripcion = QTextEdit()
         self.descripcion.setPlaceholderText("Ingrese la descripcion de la impresion")
+        self.descripcion.setMaximumHeight(100)  # Limitar altura de la caja de texto
 
-        #Creacion de los botones
+        # Botones
         self.boton_agregar = QPushButton("Agregar Impresion")
         self.boton_volver = QPushButton("Volver al menu de Impresiones")
         self.boton_buscar_usuario = QPushButton("Buscar")
 
+        # Organizar en Layouts
         horizontal_layout.addWidget(self.rut_solicitante)
         horizontal_layout.addWidget(self.boton_buscar_usuario)
 
-        #Lables
-        self.nombre = QLabel()
-        self.rut = QLabel()
-        self.cantidad_c = QLabel()
-        self.cantidad_p = QLabel()
-        self.curso = QLabel()
-        self.descip = QLabel()
+        self.nombre = self.crear_label("Nombre Alumno/Profesor")
+        self.rut = self.crear_label("Rut del alumno/profesor")
+        self.cantidad_c = self.crear_label("Cantidad de Copias a necesitar")
+        self.cantidad_p = self.crear_label("Cantidad de paginas que tiene el documento en total")
+        self.curso = self.crear_label("Curso/Departamento")
+        self.descip = self.crear_label("Descripcion de la Impresion")
 
-        void_layout_1.addWidget(self.voidLabel_1)
-        void_layout_2.addWidget(self.voidLabel_2)
+        # Configurar el Layout principal
+        main_layout.addWidget(self.rut)
+        main_layout.addLayout(horizontal_layout)
+        main_layout.addWidget(self.nombre)
+        main_layout.addWidget(self.nombre_solicitante)
+        main_layout.addWidget(self.curso)
+        main_layout.addWidget(self.cursos)
+        main_layout.addWidget(self.cantidad_c)
+        main_layout.addWidget(self.cantidad_copias)
+        main_layout.addWidget(self.cantidad_p)
+        main_layout.addWidget(self.cantidad_paginas)
+        main_layout.addWidget(self.descip)
+        main_layout.addWidget(self.descripcion)
+        
+        button_layout.addWidget(self.boton_agregar)
+        button_layout.addWidget(self.boton_volver)
 
-        #Asignar text a los labels
-        self.nombre.setText("Nombre Alumno/Profesor")
-        self.rut.setText("Rut del alumno/profesor")
-        self.cantidad_c.setText("Cantidad de Copias a necesitar")
-        self.cantidad_p.setText("Cantidad de paginas que tiene el documento en total")
-        self.curso.setText("Curso/Departamento")
-        self.descip.setText("Descripcion de la Impresion")
+        
+        # Agregar botones
+        main_layout.addLayout(button_layout)
 
-        #Asignar los Widgets al Layout
-        horizontal_layout_1.addWidget(self.cursos)
-        horizontal_layout_1.addWidget(self.cambiar_curso)
-        vertical_layout.addWidget(self.rut)
-        vertical_layout.addLayout(horizontal_layout)
-        vertical_layout.addWidget(self.nombre)
-        vertical_layout.addWidget(self.nombre_solicitante)
-        vertical_layout.addWidget(self.curso)
-        vertical_layout.addLayout(horizontal_layout_1)       
-        vertical_layout.addWidget(self.cantidad_c)
-        vertical_layout.addWidget(self.cantidad_copias)
-        vertical_layout.addWidget(self.cantidad_p)
-        vertical_layout.addWidget(self.cantidad_paginas)
-        vertical_layout.addWidget(self.descip)
-        vertical_layout.addWidget(self.descripcion)
-        vertical_layout.addWidget(self.boton_agregar)
-        vertical_layout.addWidget(self.boton_volver)
-        vertical_layout.addLayout(void_layout_1)
-        vertical_layout.addLayout(void_layout_2)
+        # Asignar el Layout
+        self.setLayout(main_layout)
 
-        self.setLayout(vertical_layout)
-
-        #Agregar funcionalidades al boton
+        # Conexiones de botones
         self.boton_buscar_usuario.clicked.connect(self.buscar_rut)
         self.boton_agregar.clicked.connect(self.agregar_impresiones)
         self.boton_volver.clicked.connect(self.volver_menu.emit)
 
-    #Funcionalidades que tendran los botones
+    def crear_line_edit(self, placeholder, disabled, input_mask=""):
+        line_edit = QLineEdit()
+        line_edit.setPlaceholderText(placeholder)
+        if disabled:
+            line_edit.setDisabled(True)
+        if input_mask:
+            line_edit.setInputMask(input_mask)
+        return line_edit
+
+    def crear_label(self, text):
+        label = QLabel()
+        label.setText(text)
+        return label
+
+    # Función para buscar un usuario por su rut
     def buscar_rut(self):
         rut = self.rut_solicitante.text()
         user = selected_user_by_rut(rut)
@@ -119,6 +118,7 @@ class AgregarImpresiones(QWidget):
             self.cursos.setDisabled(False)
             self.cursos.clear()
 
+    # Función para agregar una impresión
     def agregar_impresiones(self):
         nombre = self.nombre_solicitante.text()
         curso = self.cursos.text()
@@ -126,7 +126,12 @@ class AgregarImpresiones(QWidget):
         copias = self.cantidad_copias.text()
         paginas = self.cantidad_paginas.text()
         descrip = self.descripcion.toPlainText()
-        ingresar_impresiones(nombre, curso, rut ,copias, paginas, descrip)
+        ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip)
+
+        # Limpiar campos después de agregar
+        self.limpiar_campos()
+
+    def limpiar_campos(self):
         self.rut_solicitante.clear()
         self.nombre_solicitante.clear()
         self.cursos.clear()
@@ -135,12 +140,9 @@ class AgregarImpresiones(QWidget):
         self.descripcion.clear()
         self.cambiar_curso.setChecked(False)
 
-    
+    # Función para habilitar o deshabilitar el campo de curso
     def check_event(self, event):
         if event == Qt.Checked:
             self.cursos.setDisabled(False)
         if event == Qt.Unchecked:
             self.cursos.setDisabled(True)
-
-    
-        

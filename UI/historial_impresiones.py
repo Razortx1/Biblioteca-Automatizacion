@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidget,
                              QTableWidgetItem, QLabel, QVBoxLayout,
                              QHeaderView, QMessageBox, QAbstractItemView,
-                             QComboBox, QHBoxLayout)
+                             QComboBox, QHBoxLayout, QSizePolicy)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
@@ -12,102 +12,73 @@ from connection.connection import update_estado_impresion
 
 class HistorialImpresiones(QWidget):
     volver_menu = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
-        #Definicion del layout
-        void_layout_1 = QVBoxLayout()
-        void_layout_2 = QVBoxLayout()
-        vertical_layout = QVBoxLayout()
-        horizontal_layout = QHBoxLayout()
+        # Definición de Layout
+        main_layout = QVBoxLayout()
+        filter_layout = QHBoxLayout()
+        button_layout = QHBoxLayout()
 
-        self.voidLabel_1 = QLabel()
-        self.voidLabel_2 = QLabel()
-        void_layout_1.addWidget(self.voidLabel_1)
-        void_layout_2.addWidget(self.voidLabel_2)
-
-        #Filtros para la tabla
-        #Creacion del boton
+        # Widgets para Filtros
         self.filtrar = QPushButton("Filtrar Estado")
         self.borrar_filtro = QPushButton("Quitar Filtro")
-        #Creacion del combobox
         self.filtro_estado = QComboBox()
-        
-        #Creacion de la tabla
+
+        # Crear la tabla de impresiones
         self.tabla_impresiones = QTableWidget()
         self.tabla_impresiones.setColumnCount(8)
+        self.tabla_impresiones.setMaximumHeight(400)
+        headers = ["Nombre Alumno/Profesor", "Curso/Departamento", "Cantidad de Páginas",
+                   "Cantidad de Copias", "Hojas Usadas en Total", "Fecha de Impresión",
+                   "Descripción", "Estado Impresión"]
+        for i, header in enumerate(headers):
+            item = QTableWidgetItem(header)
+            self.tabla_impresiones.setHorizontalHeaderItem(i, item)
 
-        item = QTableWidgetItem()
-        item.setText("Nombre Alumno/Profesor")
-        self.tabla_impresiones.setHorizontalHeaderItem(0, item)
-
-        item = QTableWidgetItem()
-        item.setText("Curso/Departamento")
-        self.tabla_impresiones.setHorizontalHeaderItem(1, item)
-
-        item = QTableWidgetItem()
-        item.setText("Cantidad de Paginas")
-        self.tabla_impresiones.setHorizontalHeaderItem(2, item)
-
-        item = QTableWidgetItem()
-        item.setText("Cantidad de Copias")
-        self.tabla_impresiones.setHorizontalHeaderItem(3, item)
-
-        item = QTableWidgetItem()
-        item.setText("Hojas usadas en total")
-        self.tabla_impresiones.setHorizontalHeaderItem(4, item)
-
-        item = QTableWidgetItem()
-        item.setText("Fecha de Impresion")
-        self.tabla_impresiones.setHorizontalHeaderItem(5, item)
-
-        item = QTableWidgetItem()
-        item.setText("Descripción")
-        self.tabla_impresiones.setHorizontalHeaderItem(6, item)
-
-        item = QTableWidgetItem()
-        item.setText("Estado Impresion")
-        self.tabla_impresiones.setHorizontalHeaderItem(7, item)
-
-        #Tamaño Columnas
+        # Tamaño de las columnas
         header = self.tabla_impresiones.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-
-        #Creacion botones
-        self.cambiar_estado = QPushButton("Cambiar Estado")
-        self.volver_atras = QPushButton("Volver Atras")
-
-        #Agregar los Widgets al layout
-        horizontal_layout.addWidget(self.filtro_estado)
-        horizontal_layout.addWidget(self.filtrar)
-        horizontal_layout.addWidget(self.borrar_filtro)
-        vertical_layout.addLayout(horizontal_layout)
-        vertical_layout.addWidget(self.tabla_impresiones)
-        vertical_layout.addWidget(self.cambiar_estado)
-        vertical_layout.addWidget(self.volver_atras)
-        vertical_layout.addLayout(void_layout_1)
-        vertical_layout.addLayout(void_layout_2)
+        self.tabla_impresiones.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.tabla_impresiones.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_impresiones.setSelectionMode(QAbstractItemView.MultiSelection)
 
-        #Asignar el layout
-        self.setLayout(vertical_layout)
 
-        #Funcionamiento Botones
+        # Crear botones
+        self.cambiar_estado = QPushButton("Cambiar Estado")
+        self.volver_atras = QPushButton("Volver Atras")
+
+        # Layout para los filtros
+        filter_layout.addWidget(self.filtro_estado)
+        filter_layout.addWidget(self.filtrar)
+        filter_layout.addWidget(self.borrar_filtro)
+
+        # Layout principal
+        main_layout.addLayout(filter_layout)
+        main_layout.addWidget(self.tabla_impresiones)
+        button_layout.addWidget(self.cambiar_estado)
+        button_layout.addWidget(self.volver_atras)
+        main_layout.addLayout(button_layout)
+
+        # Establecer el layout principal
+        self.setLayout(main_layout)
+
+        # Conexiones de botones
         self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_atras.clicked.connect(self.volver_menu.emit)
         self.filtrar.clicked.connect(self.filtrar_tabla)
         self.borrar_filtro.clicked.connect(self.rellenar_tabla)
 
-        #Relleno de tabla
+        # Rellenar la tabla al inicio
         self.rellenar_tabla()
 
-        #Rellenar Combobox
+        # Rellenar ComboBox con los estados de impresión
         estados = select_all_estado_impresion()
-        self.filtro_estado.insertItem(0, "Selecciona un estado")
+        self.filtro_estado.addItem("Selecciona un estado")
         for es in estados:
-            self.filtro_estado.insertItem(es[0].id_estadoimpresiones+1, es[0].estado_impresion)
+            self.filtro_estado.insertItem(es[0].id_estadoimpresiones, es[0].estado_impresion)
 
     def rellenar_tabla(self):
         self.tabla_impresiones.setRowCount(0)
@@ -118,37 +89,41 @@ class HistorialImpresiones(QWidget):
         selected_row = self.tabla_impresiones.selectionModel().selectedRows()
         if not selected_row:
             msg = QMessageBox()
-            msg.setWindowTitle("Error de seleccion")
+            msg.setWindowTitle("Error de selección")
             msg.setText("No se ha seleccionado una fila")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
-        for row in selected_row:
-            item = self.tabla_impresiones.item(row.row(), 5).text()
-            estado = self.tabla_impresiones.item(row.row(), 7).text()
-            if estado == "Aun no Impreso":
-                estado = 2
-            elif estado == "Ya Impreso":
-                estado = 1
-            if item:
-                update_estado_impresion(item, estado)
-        self.rellenar_tabla()
+        else:
+            for row in selected_row:
+                item = self.tabla_impresiones.item(row.row(), 5).text()
+                estado = self.tabla_impresiones.item(row.row(), 7).text()
+                if estado == "Aun no Impreso":
+                    estado = 2
+                elif estado == "Ya Impreso":
+                    estado = 1
+                if item:
+                    update_estado_impresion(item, estado)
+            self.rellenar_tabla()
 
     def filtrar_tabla(self):
         self.tabla_impresiones.setRowCount(0)
-        filtrado_combobox = self.filtro_estado.currentIndex() if self.filtro_estado.currentIndex() != 0 else self.rellenar_tabla()
-        datos_tabla = select_impresiones_filtradas(filtrado_combobox)
-        self.tabla(datos_tabla)
+        estado_seleccionado = self.filtro_estado.currentIndex()
+        if estado_seleccionado != 0:
+            datos_tabla = select_impresiones_filtradas(estado_seleccionado)
+            self.tabla(datos_tabla)
+        else:
+            self.rellenar_tabla()
 
     def tabla(self, impresiones):
-        self.tabla_impresiones.setRowCount(50)
         column_count = self.tabla_impresiones.columnCount()
         tablerow = 0
         no_impreso = QColor(255, 90, 90)
-        ya_impreso = QColor(90,255,90)
-
+        ya_impreso = QColor(90, 255, 90)
 
         if impresiones:
             for i in impresiones:
+                row_position = self.tabla_impresiones.rowCount()
+                self.tabla_impresiones.insertRow(row_position)
                 suma = int(i.Impresiones.cantidad_copias * i.Impresiones.cantidad_paginas)
 
                 self.tabla_impresiones.setItem(tablerow, 0, QTableWidgetItem(i.Usuario.nombre))
@@ -162,11 +137,12 @@ class HistorialImpresiones(QWidget):
 
                 texto_tabla = self.tabla_impresiones.item(tablerow, column_count-1).text()
 
+                # Colorear las celdas según el estado
                 if texto_tabla == "Aun no Impreso":
                     self.tabla_impresiones.item(tablerow, column_count-1).setBackground(no_impreso)
                 elif texto_tabla == "Ya Impreso":
                     self.tabla_impresiones.item(tablerow, column_count-1).setBackground(ya_impreso)
 
-                tablerow+=1
+                tablerow += 1
         else:
             pass

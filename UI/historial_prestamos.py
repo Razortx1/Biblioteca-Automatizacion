@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
                              QPushButton, QLabel, QAbstractItemView,
-                             QMessageBox)
+                             QMessageBox, QHBoxLayout, QSizePolicy)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 
@@ -17,14 +17,13 @@ class HistorialPrestamos(QWidget):
         self.w = None
 
         #Definicion del layout
-        void_layout_1 = QVBoxLayout()
-        void_layout_2 = QVBoxLayout()
         vertical_layout = QVBoxLayout()
 
         self.voidLabel_1 = QLabel()
         self.voidLabel_2 = QLabel()
-        void_layout_1.addWidget(self.voidLabel_1)
-        void_layout_2.addWidget(self.voidLabel_2)
+
+        vertical_layout.setContentsMargins(15, 15, 15, 15)
+        vertical_layout.setSpacing(5)
 
         #Creacion de la tabla
         self.tabla_historial = QTableWidget()
@@ -73,16 +72,20 @@ class HistorialPrestamos(QWidget):
 
         #Agregar los Widgets al layout
         vertical_layout.addWidget(self.tabla_historial)
-        vertical_layout.addWidget(self.cambiar_estado)
-        vertical_layout.addWidget(self.volver_atras)
-        vertical_layout.addLayout(void_layout_1)
-        vertical_layout.addLayout(void_layout_2)
+        button_layout = QHBoxLayout()
+        self.cambiar_estado.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.volver_atras.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        button_layout.addWidget(self.cambiar_estado)
+        button_layout.addWidget(self.volver_atras)
+        vertical_layout.addLayout(button_layout)
 
         #Asignar el layout
         self.setLayout(vertical_layout)
 
         self.tabla_historial.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_historial.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tabla_historial.setMinimumHeight(300)
+        self.tabla_historial.setMaximumHeight(500)
 
         #Funcionamiento Botones
         self.cambiar_estado.clicked.connect(self.cambiar_state)
@@ -92,17 +95,18 @@ class HistorialPrestamos(QWidget):
 
     #Funcion para rellenar la tabla
     def rellenar_tabla(self):
+        self.tabla_historial.setRowCount(0)
         prestamos = select_prestamos_all()
         tablerow = 0
-        self.tabla_historial.setRowCount(50)
-
         column_count = self.tabla_historial.columnCount()
 
-        extraviado = QColor(255, 90, 90)
-        devuelto = QColor(90,255,90)
-        prestado = QColor(255,215,0)
+        extraviado = QColor("#ff6b6b")  # rojo suave
+        devuelto = QColor("#b2f7b2")    # verde claro
+        prestado = QColor("#ffe066")    # amarillo pastel
         if prestamos:
             for p in prestamos:
+                row_position = self.tabla_historial.rowCount()
+                self.tabla_historial.insertRow(row_position)
                 self.tabla_historial.setItem(tablerow, 0, QTableWidgetItem(p.nombre))
                 self.tabla_historial.setItem(tablerow, 1, QTableWidgetItem(p.curso))
                 self.tabla_historial.setItem(tablerow, 2, QTableWidgetItem(p.rut))
@@ -130,20 +134,20 @@ class HistorialPrestamos(QWidget):
         selected_rows = self.tabla_historial.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
-            msg.setWindowTitle("Seleccion erronea")
-            msg.setText("No se ha seleccionado un prestamo")
+            msg.setWindowTitle("Seleccion invalida")
+            msg.setText("Por favor, selecciona un préstamo para continuar.")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
-        else:
-            for row in selected_rows:
-                fecha_item = self.tabla_historial.item(row.row(), 4).text()
-            if self.w is None:
-                self.w = ActualizarPrestamos()
-                self.w.actualizar_datos.connect(self.rellenar_tabla)
-                self.pasar_fecha.connect(self.w.traer_fecha)
-                self.pasar_fecha.emit(fecha_item)
-                self.w.show()
-                self.w.cerrar_ventana.connect(self.cerrar_ventana)
+            return
+        
+        fecha_item = self.tabla_historial.item(selected_rows[0].row(), 4).text()
+        if self.w is None:
+            self.w = ActualizarPrestamos()
+            self.w.actualizar_datos.connect(self.rellenar_tabla)
+            self.pasar_fecha.connect(self.w.traer_fecha)
+            self.pasar_fecha.emit(fecha_item)
+            self.w.show()
+            self.w.cerrar_ventana.connect(self.cerrar_ventana)
     
     def cerrar_ventana(self):
         if self.w is not None:
