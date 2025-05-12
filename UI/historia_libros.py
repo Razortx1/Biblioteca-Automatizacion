@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidget,
-                             QMessageBox, QVBoxLayout, QHeaderView, QHBoxLayout)
+                             QAbstractItemView, QVBoxLayout, QHeaderView, QHBoxLayout,
+                             QMessageBox)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
@@ -8,6 +9,7 @@ from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
+    ir_prestamo_libro = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -35,6 +37,7 @@ class HistorialLibros(QWidget):
         # Crear los botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
         self.volver_inicio = QPushButton("Volver a Inicio")
+        self.agregar_prestamo = QPushButton("Agregar prestamo del libro")
 
         # Agregar los widgets al layout principal
         button_layout = QHBoxLayout()
@@ -42,7 +45,11 @@ class HistorialLibros(QWidget):
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_inicio)
         main_layout.addWidget(self.tabla_libros)
+        main_layout.addWidget(self.agregar_prestamo)
         main_layout.addLayout(button_layout)
+
+        self.tabla_libros.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tabla_libros.setSelectionMode(QAbstractItemView.SingleSelection)
 
         # Agregar espaciadores si es necesario (opcional)
         main_layout.addStretch(1)
@@ -57,6 +64,7 @@ class HistorialLibros(QWidget):
         # Conectar los botones con las funciones
         self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_inicio.clicked.connect(self.volver_principal.emit)
+        self.agregar_prestamo.clicked.connect(self.prestamo_ir)
 
     def rellenar_tabla(self):
         self.tabla_libros.setRowCount(0)
@@ -94,6 +102,9 @@ class HistorialLibros(QWidget):
                     self.tabla_libros.item(row_position, 7).setBackground(dado_baja)
         else:
             return
+        
+    def prestamo_ir(self):
+        pass
 
     def actualizar_estado(self):
         if self.w is None:

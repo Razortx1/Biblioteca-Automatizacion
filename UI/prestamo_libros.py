@@ -10,7 +10,7 @@ from datetime import datetime, date
 
 from PyQt5.QtCore import pyqtSignal
 
-from connection.session import (select_copia_libros_by_id, selected_libro_by_cod,
+from connection.session import (select_copia_libros_by_id,
                                 selected_user_by_rut)
 from connection.connection import insert_prestamos
 
@@ -132,17 +132,11 @@ class PrestamoLibros(QWidget):
         self.boton_buscar_rut.clicked.connect(self.buscar_rut)
 
 
-    def verificar_codi(self, codigo):
+    def verificar_codi(self):
         msg = QMessageBox()
         msg.setWindowTitle("Libro no encontrado")
         msg.setText("No se ha encontrado el libro espeficicado")
         msg.setIcon(QMessageBox.Information)
-        libros = selected_libro_by_cod(codigo)
-        if libros:
-            return libros
-        else:
-            msg.exec()
-            return None
 
 
     def rellenar_tabla(self):

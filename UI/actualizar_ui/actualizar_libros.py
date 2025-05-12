@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QPushButton, QTableWidget, QLineEdit, QLabel,
                              QComboBox, QHBoxLayout, QMessageBox, QTableWidgetItem,
-                             QAbstractItemView, QCheckBox)
+                             QAbstractItemView, QCheckBox, QHeaderView)
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
 
-from connection.session import (select_estado_libro_all, selected_libro_by_cod,
+from connection.session import (select_estado_libro_all,
                                 select_copia_libros_by_id)
 from connection.connection import update_estado_libro
 
@@ -93,13 +93,13 @@ class ActualizarLibros(QWidget):
         item.setText("Nombre Libro")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(0, item)
         item = QTableWidgetItem()
-        item.setText("Codigo de Barras")
+        item.setText("Autor")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(1, item)
         item = QTableWidgetItem()
-        item.setText("Autor")
+        item.setText("Editorial")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(2, item)
         item = QTableWidgetItem()
-        item.setText("Fecha Publicacion")
+        item.setText("Fecha Ingreso Biblioteca")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(3, item)
         item = QTableWidgetItem()
         item.setText("Estado del Libro")
@@ -109,6 +109,8 @@ class ActualizarLibros(QWidget):
         self.tabla_cambiarlibros.setHorizontalHeaderItem(5, item)
 
         #Asignar tablas
+        header = self.tabla_cambiarlibros.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.tabla_cambiarlibros.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_cambiarlibros.setSelectionMode(QAbstractItemView.MultiSelection)
 
@@ -137,17 +139,11 @@ class ActualizarLibros(QWidget):
         for es in estado_libro:
             self.estado.insertItem(es[0].id_estadolibro, es[0].estado_libro)
 
-    def verificar_codi(self, codigo):
+    def verificar_codi(self):
         msg = QMessageBox()
         msg.setWindowTitle("Libro no encontrado")
         msg.setText("No se ha encontrado el libro espeficicado")
         msg.setIcon(QMessageBox.Information)
-        libros = selected_libro_by_cod(codigo)
-        if libros:
-            return libros
-        else:
-            msg.exec()
-            return None
         
     def seleccion_datos(self):
         is_true = self.check.isChecked()

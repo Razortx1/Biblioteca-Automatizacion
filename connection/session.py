@@ -95,14 +95,6 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
-    def selected_libro_by_cod(barras):
-        try:
-            libro = session.execute(select(Libro).where(Libro.nombre == "barras")).all()
-            return libro
-        except Exception as e:
-            traceback.print_exc()
-            print(f"Errores {e}")
-
     def select_estado_libro_all():
         try:
             estado_libro = session.execute(select(Estado_Libro)).all()

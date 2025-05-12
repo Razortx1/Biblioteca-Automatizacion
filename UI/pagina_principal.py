@@ -9,7 +9,6 @@ class PaginaPrincipal(QWidget):
     # Señales
     ir_a_agregar_libros = pyqtSignal()
     ir_a_historia_libros = pyqtSignal()
-    ir_prestamo_libro = pyqtSignal()
     ir_a_menu_impresiones = pyqtSignal()
     ir_a_historial_prestamo = pyqtSignal()
 
@@ -36,7 +35,6 @@ class PaginaPrincipal(QWidget):
         botones = [
             ("Registro de Libros", self.ir_a_agregar_libros),
             ("Inventario de Libros", self.ir_a_historia_libros),
-            ("Préstamo del Libro", self.ir_prestamo_libro),
             ("Menú de Impresiones", self.ir_a_menu_impresiones),
             ("Historial de Préstamos", self.ir_a_historial_prestamo)
         ]

@@ -1,6 +1,6 @@
 import traceback
 from PyQt5.QtWidgets import QMessageBox, QErrorMessage
-from connection.session import (session, selected_user_by_rut, selected_libro_by_cod,
+from connection.session import (session, selected_user_by_rut,
                                 update)
 
 from datetime import datetime

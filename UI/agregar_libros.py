@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (
 from datetime import date
 
 from PyQt5.QtCore import pyqtSignal
-from connection.session import selected_libro_by_cod
 from connection.connection import insertar_libros
 
 class AgregarLibros(QWidget):
@@ -102,7 +101,7 @@ class AgregarLibros(QWidget):
         stock = self.stock_libro.text()
 
         # Validación simple para asegurarse de que los campos no están vacíos
-        if not nombre or not stock or not editorial or not sector_biblioteca or not sector_estanteria:
+        if not nombre or not stock or not sector_biblioteca or not sector_estanteria:
             return
         if not stock.isdigit():
             msg = QMessageBox()
@@ -113,6 +112,8 @@ class AgregarLibros(QWidget):
             return
         if not autor:
             autor = "Desconocido"
+        if not editorial:
+            editorial = "Desconocido"
 
         # Llamada a la función para insertar el libro
         insertar_libros(nombre, autor, editorial, fecha, sector_biblioteca, sector_estanteria, stock)
