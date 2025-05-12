@@ -69,7 +69,7 @@ class HistorialPrestamos(QWidget):
 
         #Creacion botones
         self.cambiar_estado = QPushButton("Cambiar Estado")
-        self.volver_atras = QPushButton("Volver Atras")
+        self.volver_atras = QPushButton("Volver al Menu Principal")
 
         #Agregar los Widgets al layout
         vertical_layout.addWidget(self.tabla_historial)

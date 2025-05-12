@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QDateEdit, QHBoxLayout,
                              QTableWidget, QTableWidgetItem, QMessageBox,
-                             QCheckBox, QHeaderView)
+                             QCheckBox, QHeaderView, QAbstractItemView)
 
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
@@ -10,13 +10,13 @@ from datetime import datetime, date
 
 from PyQt5.QtCore import pyqtSignal
 
-from connection.session import (selected_user_by_rut)
+from connection.session import (selected_user_by_rut, select_prestamo_libro)
 from connection.connection import insert_prestamos
 
 class PrestamoLibros(QWidget):
     volver_principal = pyqtSignal()
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent = None):
+        super().__init__(parent)
 
         #Definicion de layouts principal
         vertical_layout_principal = QVBoxLayout()
@@ -52,7 +52,7 @@ class PrestamoLibros(QWidget):
         self.curso = QLabel("Curso del Alumno/Profesor")
 
         #Definicion de los botones
-        self.boton_volver = QPushButton("Volver")
+        self.boton_volver = QPushButton("Ir al Menu Principal")
         self.boton_buscar_rut = QPushButton("Buscar")
         self.boton_agregar_prestamo = QPushButton("Agregar Prestamo")
 
@@ -67,33 +67,34 @@ class PrestamoLibros(QWidget):
         self.fecha_maxima.setDate(fecha)
 
         #Definicion de la tabla
-        self.tabla_libros = QTableWidget()
+        self.tabla_libro_prestamo = QTableWidget()
 
         #Definicion de columnas para tabla
-        self.tabla_libros.setColumnCount(6)
+        self.tabla_libro_prestamo.setColumnCount(6)
         item = QTableWidgetItem()
         item.setText("Nombre Libro")
-        self.tabla_libros.setHorizontalHeaderItem(0, item)
+        self.tabla_libro_prestamo.setHorizontalHeaderItem(0, item)
         item = QTableWidgetItem()
         item.setText("Autor")
-        self.tabla_libros.setHorizontalHeaderItem(1, item)
+        self.tabla_libro_prestamo.setHorizontalHeaderItem(1, item)
         item = QTableWidgetItem()
         item.setText("Editorial")
-        self.tabla_libros.setHorizontalHeaderItem(2, item)
+        self.tabla_libro_prestamo.setHorizontalHeaderItem(2, item)
         item = QTableWidgetItem()
         item.setText("Fecha Entrada Biblioteca")
-        self.tabla_libros.setHorizontalHeaderItem(3, item)
+        self.tabla_libro_prestamo.setHorizontalHeaderItem(3, item)
         item = QTableWidgetItem()
         item.setText("Estado del Libro")
-        self.tabla_libros.setHorizontalHeaderItem(4, item)
+        self.tabla_libro_prestamo.setHorizontalHeaderItem(4, item)
         item = QTableWidgetItem()
         item.setText("Id Interno")
-        self.tabla_libros.setHorizontalHeaderItem(5, item)
+        self.tabla_libro_prestamo.setHorizontalHeaderItem(5, item)
+
 
         #Agregar los widgets a los layouts
         horizontal_layot_principal.addLayout(vertical_layout_1)
         vertical_layout_1.addLayout(horizontal_layot_1)
-        vertical_layout_1.addWidget(self.tabla_libros)
+        vertical_layout_1.addWidget(self.tabla_libro_prestamo)
         vertical_layout_1.addWidget(self.fecha)
         vertical_layout_1.addWidget(self.fecha_maxima)
         horizontal_layot_principal.addLayout(vertical_layout_2)
@@ -114,26 +115,52 @@ class PrestamoLibros(QWidget):
         vertical_layout_principal.addStretch()
 
         self.setLayout(vertical_layout_principal)
-        header = self.tabla_libros.horizontalHeader()
+        header = self.tabla_libro_prestamo.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+
+        self.tabla_libro_prestamo.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tabla_libro_prestamo.setSelectionMode(QAbstractItemView.MultiSelection)
 
         #Funcionamiento Boton
         self.boton_agregar_prestamo.clicked.connect(self.insertar_prestamos)
         self.boton_volver.clicked.connect(self.volver_principal.emit)
         self.boton_buscar_rut.clicked.connect(self.buscar_rut)
 
-    def rellenar_tabla(self):
+    def rellenar_tablas(self):
         try:
-            self.tabla_libros.setRowCount(0)
+            self.tabla_libro_prestamo.setRowCount(0)
+            libros = select_prestamo_libro(self.nombre_libro, self.autor_libro, self.editorial_libro, self.fecha_libro)
 
-            tablerow = 0
-
-            column_count = self.tabla_libros.columnCount()-2
+            column_count = self.tabla_libro_prestamo.columnCount()-2
 
             mal_estado = QColor(255, 205, 0)
             buen_estado = QColor(90,255,90)
             dado_baja = QColor(255,50,50)
             estado_regular = QColor(255,255,0)
+
+            if libros:
+                for l in libros:
+                    row_position = self.tabla_libro_prestamo.rowCount()
+                    self.tabla_libro_prestamo.insertRow(row_position)
+                    print(l)
+
+                    self.tabla_libro_prestamo.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
+                    self.tabla_libro_prestamo.setItem(row_position, 1, QTableWidgetItem(l.autor))
+                    self.tabla_libro_prestamo.setItem(row_position, 2, QTableWidgetItem(l.editorial))
+                    self.tabla_libro_prestamo.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_entrada)))
+                    self.tabla_libro_prestamo.setItem(row_position, 4, QTableWidgetItem(l.estado_libro))
+                    self.tabla_libro_prestamo.setItem(row_position, 5, QTableWidgetItem(str(l.id_copia)))
+
+                    texto_tabla = self.tabla_libro_prestamo.item(row_position, column_count).text()
+
+                    if texto_tabla == "Buen Estado":
+                        self.tabla_libro_prestamo.item(row_position, column_count).setBackground(buen_estado)
+                    elif texto_tabla == "Mal Estado":
+                        self.tabla_libro_prestamo.item(row_position, column_count).setBackground(mal_estado)
+                    elif texto_tabla == "Estado Regular":
+                        self.tabla_libro_prestamo.item(row_position, column_count).setBackground(estado_regular)
+                    elif texto_tabla == "Dado de Baja":
+                        self.tabla_libro_prestamo.item(row_position, column_count).setBackground(dado_baja)
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -200,7 +227,7 @@ class PrestamoLibros(QWidget):
         self.autor_libro = autor
         self.editorial_libro = editorial
         self.fecha_libro = fecha
-        self.rellenar_tabla()
+        self.rellenar_tablas()
         return self.nombre_libro, self.autor_libro, self.editorial_libro, self.fecha_libro
 
 

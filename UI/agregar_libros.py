@@ -43,7 +43,7 @@ class AgregarLibros(QWidget):
 
         # Botones
         self.button_agregar = QPushButton("Agregar nuevo Libro")
-        self.volver_atras = QPushButton("Volver Atras")
+        self.volver_atras = QPushButton("Volver al Menu Principal")
         
         # Etiquetas
         self.nombre = QLabel("Nombre del Libro")

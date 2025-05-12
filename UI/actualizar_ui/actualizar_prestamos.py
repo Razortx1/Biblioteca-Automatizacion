@@ -77,7 +77,7 @@ class ActualizarPrestamos(QWidget):
         self.validacion_usuario.setText("Cerrar ventana luego de cambios")
 
         #Creacion de los botones
-        self.boton_cambiar = QPushButton("Cambiar estados")
+        self.boton_cambiar = QPushButton("Cambiar el estado del prestamo(s)")
 
         #Creacion de la tabla
         self.tabla_prestamos = QTableWidget()

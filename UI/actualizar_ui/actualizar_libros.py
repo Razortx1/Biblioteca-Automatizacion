@@ -74,7 +74,7 @@ class ActualizarLibros(QWidget):
 
         #Creacion de Boton
         self.buscar_libros = QPushButton("Buscar")
-        self.cambiar_estado = QPushButton("Cambiar estado")
+        self.cambiar_estado = QPushButton("Cambiar estado del libro(s)")
 
         #Creacion de combobox
         self.estado = QComboBox()

@@ -6,13 +6,14 @@ from PyQt5.QtGui import QColor
 
 from connection.session import select_libros_available
 from .actualizar_ui.actualizar_libros import ActualizarLibros
+from .prestamo_libros import PrestamoLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
     ir_prestamo_libro = pyqtSignal(str, str, str, str)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent = None):
+        super().__init__(parent)
 
         self.w = None
         # Layout principal
@@ -36,7 +37,7 @@ class HistorialLibros(QWidget):
 
         # Crear los botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
-        self.volver_inicio = QPushButton("Volver a Inicio")
+        self.volver_inicio = QPushButton("Volver al Menu Principal")
         self.agregar_prestamo = QPushButton("Agregar prestamo del libro")
 
         # Agregar los widgets al layout principal
@@ -104,7 +105,6 @@ class HistorialLibros(QWidget):
             return
         
     def prestamo_ir(self):
-        from UI.prestamo_libros import PrestamoLibros
         selected_rows = self.tabla_libros.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
@@ -118,8 +118,8 @@ class HistorialLibros(QWidget):
             autor = self.tabla_libros.item(row.row(), 1).text()
             editorial = self.tabla_libros.item(row.row(), 2).text()
             fecha = self.tabla_libros.item(row.row(), 3).text()
-        self.prestamos = PrestamoLibros()
-        self.ir_prestamo_libro.connect(self.prestamos.traer_objeto)
+        prestamos = PrestamoLibros()
+        self.ir_prestamo_libro.connect(prestamos.traer_objeto)
         self.ir_prestamo_libro.emit(nombre, autor, editorial, fecha)
 
     def actualizar_estado(self):

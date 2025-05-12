@@ -166,6 +166,21 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
+    def select_prestamo_libro(nombre, autor, editorial, fecha):
+        try:
+            prestamos = session.execute(select(Libro.nombre_libro, Libro.autor, Libro.editorial,
+                                               Libro.fecha_entrada, Estado_Libro.estado_libro, CopiasLibros.id_copia)
+                                               .join(Libro.copias)
+                                               .join_from(CopiasLibros, Estado_Libro, CopiasLibros.estado_id == Estado_Libro.id_estadolibro)
+                                               .where(Libro.nombre_libro == nombre)
+                                               .where(Libro.autor == autor)
+                                               .where(Libro.editorial == editorial)
+                                               .where(Libro.fecha_entrada == fecha))
+            return prestamos
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
+
     def select_all_estado_prestamos():
         try:
             estado = session.execute(select(Estado_Prestamo)).all()
