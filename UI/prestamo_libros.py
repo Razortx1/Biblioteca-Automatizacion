@@ -10,8 +10,7 @@ from datetime import datetime, date
 
 from PyQt5.QtCore import pyqtSignal
 
-from connection.session import (select_copia_libros_by_id,
-                                selected_user_by_rut)
+from connection.session import (selected_user_by_rut)
 from connection.connection import insert_prestamos
 
 class PrestamoLibros(QWidget):
@@ -32,8 +31,6 @@ class PrestamoLibros(QWidget):
         horizontal_layot_3 = QHBoxLayout()
 
         #Definicion de los LineEdit
-        self.cod_barras = QLineEdit()
-        self.cod_barras.setPlaceholderText("Ingrese el codigo de barras")
         self.rut_ = QLineEdit()
         self.rut_.setPlaceholderText("Ingrese el Rut del Alumno o Profesor")
         self.rut_.setInputMask("00.000.000-n;_")
@@ -49,7 +46,6 @@ class PrestamoLibros(QWidget):
         self.cambiar_curso.stateChanged.connect(self.check_event)
 
         #Creacion de los labes
-        self.codigo = QLabel("Codigo de Barras del Libro")
         self.fecha = QLabel("Fecha Maxima a Entregar")
         self.rut = QLabel("Rut del Alumno/Profesor")
         self.nombre = QLabel("Nombre del Alumno/Profesor")
@@ -57,7 +53,6 @@ class PrestamoLibros(QWidget):
 
         #Definicion de los botones
         self.boton_volver = QPushButton("Volver")
-        self.boton_buscar_libro = QPushButton("Buscar")
         self.boton_buscar_rut = QPushButton("Buscar")
         self.boton_agregar_prestamo = QPushButton("Agregar Prestamo")
 
@@ -80,13 +75,13 @@ class PrestamoLibros(QWidget):
         item.setText("Nombre Libro")
         self.tabla_libros.setHorizontalHeaderItem(0, item)
         item = QTableWidgetItem()
-        item.setText("Codigo de Barras")
+        item.setText("Autor")
         self.tabla_libros.setHorizontalHeaderItem(1, item)
         item = QTableWidgetItem()
-        item.setText("Autor")
+        item.setText("Editorial")
         self.tabla_libros.setHorizontalHeaderItem(2, item)
         item = QTableWidgetItem()
-        item.setText("Fecha Publicacion")
+        item.setText("Fecha Entrada Biblioteca")
         self.tabla_libros.setHorizontalHeaderItem(3, item)
         item = QTableWidgetItem()
         item.setText("Estado del Libro")
@@ -97,9 +92,6 @@ class PrestamoLibros(QWidget):
 
         #Agregar los widgets a los layouts
         horizontal_layot_principal.addLayout(vertical_layout_1)
-        vertical_layout_1.addWidget(self.codigo)
-        horizontal_layot_1.addWidget(self.cod_barras)
-        horizontal_layot_1.addWidget(self.boton_buscar_libro)
         vertical_layout_1.addLayout(horizontal_layot_1)
         vertical_layout_1.addWidget(self.tabla_libros)
         vertical_layout_1.addWidget(self.fecha)
@@ -123,29 +115,16 @@ class PrestamoLibros(QWidget):
 
         self.setLayout(vertical_layout_principal)
         header = self.tabla_libros.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         #Funcionamiento Boton
         self.boton_agregar_prestamo.clicked.connect(self.insertar_prestamos)
-        self.boton_buscar_libro.clicked.connect(self.rellenar_tabla)
         self.boton_volver.clicked.connect(self.volver_principal.emit)
         self.boton_buscar_rut.clicked.connect(self.buscar_rut)
-
-
-    def verificar_codi(self):
-        msg = QMessageBox()
-        msg.setWindowTitle("Libro no encontrado")
-        msg.setText("No se ha encontrado el libro espeficicado")
-        msg.setIcon(QMessageBox.Information)
-
 
     def rellenar_tabla(self):
         try:
             self.tabla_libros.setRowCount(0)
-            codigo = self.cod_barras.text()
-            libro = self.verificar_codi(codigo)
-            id = libro[0][0].id_libro
-            copias = select_copia_libros_by_id(id)
 
             tablerow = 0
 
@@ -155,34 +134,6 @@ class PrestamoLibros(QWidget):
             buen_estado = QColor(90,255,90)
             dado_baja = QColor(255,50,50)
             estado_regular = QColor(255,255,0)
-            if copias:
-                for l in copias:
-                    if l.estado_libro == "Dado de Baja":
-                        pass
-                    else:
-                        row_position = self.tabla_libros.rowCount()
-                        self.tabla_libros.insertRow(row_position)
-                        self.tabla_libros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
-                        self.tabla_libros.setItem(tablerow, 1, QTableWidgetItem(l.cod_barras))
-                        self.tabla_libros.setItem(tablerow, 2, QTableWidgetItem(l.autor))
-                        self.tabla_libros.setItem(tablerow, 3, QTableWidgetItem(str(l.fecha_publicacion)))
-                        self.tabla_libros.setItem(tablerow, 4, QTableWidgetItem(l.estado_libro))
-                        self.tabla_libros.setItem(tablerow, 5, QTableWidgetItem(str(l.id_copia)))
-
-                        texto_tabla = self.tabla_libros.item(tablerow, column_count).text()
-
-                        if texto_tabla == "Buen Estado":
-                            self.tabla_libros.item(tablerow, column_count).setBackground(buen_estado)
-                        elif texto_tabla == "Mal Estado":
-                            self.tabla_libros.item(tablerow, column_count).setBackground(mal_estado)
-                        elif texto_tabla == "Estado Regular":
-                            self.tabla_libros.item(tablerow, column_count).setBackground(estado_regular)
-                        elif texto_tabla == "Dado de Baja":
-                            self.tabla_libros.item(tablerow, column_count).setBackground(dado_baja)
-
-                        tablerow+=1
-            else:
-                pass
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -241,6 +192,16 @@ class PrestamoLibros(QWidget):
             cancelAction.setIcon(QMessageBox.Information)
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
+
+    def traer_objeto(self, nombre, autor, editorial, fecha):
+        if not nombre or not autor or not editorial or not fecha:
+            return
+        self.nombre_libro = nombre
+        self.autor_libro = autor
+        self.editorial_libro = editorial
+        self.fecha_libro = fecha
+        self.rellenar_tabla()
+        return self.nombre_libro, self.autor_libro, self.editorial_libro, self.fecha_libro
 
 
     def check_event(self, event):

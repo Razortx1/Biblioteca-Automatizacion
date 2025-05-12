@@ -137,7 +137,7 @@ class HistorialPrestamos(QWidget):
         selected_rows = self.tabla_historial.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
-            msg.setWindowTitle("Seleccion invalida")
+            msg.setWindowTitle("Seleccion Invalida")
             msg.setText("Por favor, selecciona un préstamo para continuar.")
             msg.setIcon(QMessageBox.Information)
             msg.exec()

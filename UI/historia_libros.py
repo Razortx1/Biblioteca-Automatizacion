@@ -9,7 +9,7 @@ from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
-    ir_prestamo_libro = pyqtSignal()
+    ir_prestamo_libro = pyqtSignal(str, str, str, str)
 
     def __init__(self):
         super().__init__()
@@ -104,7 +104,23 @@ class HistorialLibros(QWidget):
             return
         
     def prestamo_ir(self):
-        pass
+        from UI.prestamo_libros import PrestamoLibros
+        selected_rows = self.tabla_libros.selectionModel().selectedRows()
+        if not selected_rows:
+            msg = QMessageBox()
+            msg.setWindowTitle("Seleccion Invalida")
+            msg.setText("Por favor, selecciona un libro antes de continuar")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+            return
+        for row in selected_rows:
+            nombre = self.tabla_libros.item(row.row(), 0).text()
+            autor = self.tabla_libros.item(row.row(), 1).text()
+            editorial = self.tabla_libros.item(row.row(), 2).text()
+            fecha = self.tabla_libros.item(row.row(), 3).text()
+        self.prestamos = PrestamoLibros()
+        self.ir_prestamo_libro.connect(self.prestamos.traer_objeto)
+        self.ir_prestamo_libro.emit(nombre, autor, editorial, fecha)
 
     def actualizar_estado(self):
         if self.w is None:
