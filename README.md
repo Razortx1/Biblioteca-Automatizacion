@@ -1,12 +1,15 @@
 # Biblioteca-Automatizacion
 
-Sistema de Automatizacion para biblioteca especializada para Colegio
+Sistema desarrollado para una biblioteca escolar específica, con posibilidad de adaptación a otras instituciones educativas.
 
-Biblioteca pequeña
+## Descripción
 
-Herramientas usadas para la creacion del sistema de Biblioteca
-- PyQt5
-- SqlAlchemy
-- PyInstaller
-- SQLite -----> Base de datos para pruebas
-- PostgresSQL -----> Base de datos para utilización normal
+Este sistema permite registrar, prestar y gestionar libros de manera eficiente. Además, incluye un módulo para registrar y gestionar impresiones, en caso de que la biblioteca cuente con una impresora. Todo esto a través de una interfaz visual amigable, con funcionalidades administrativas básicas.
+
+## Tecnologias utilizadas durante la creación del sistema
+- **Python** - Lenguaje de Programacion Principal
+- **PyQt5** – Interfaz gráfica de usuario
+- **SQLAlchemy** – ORM para manejo de base de datos
+- **PyInstaller** – Empaquetado del sistema en un ejecutable
+- **SQLite** – Base de datos utilizada para pruebas
+- **PostgreSQL** – Base de datos utilizada en producción
