@@ -1,26 +1,24 @@
 import traceback
 from PyQt5.QtWidgets import QMessageBox, QErrorMessage
-from connection.session import (session, selected_user_by_rut, selected_libro_by_cod,
+from connection.session import (session, selected_user_by_rut,
                                 update)
 
 from datetime import datetime
 
 from sql.models import Libro, Impresiones, Usuario, CopiasLibros, Prestamos
 
-def insertar_libros(nombre_, codigo_, autor_, fecha_, stock_):
+def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, stock_):
     try:
-        libro_cod = selected_libro_by_cod(codigo_)
-        if libro_cod:
-            libro = libro_cod[0][0]
-        else:
-            libro = Libro(
+        libro = Libro(
                 nombre_libro = nombre_,
-                cod_barras = codigo_,
                 autor = autor_,
-                fecha_publicacion = fecha_
+                editorial = editorial_,
+                fecha_entrada = fecha_,
+                sector_biblioteca = sector_b,
+                sector_estanteria = sector_es
             )
-            session.add(libro)
-            session.commit()
+        session.add(libro)
+        session.commit()
         for _ in range(int(stock_)):
             copia = CopiasLibros(
                 libro_id = libro.id_libro,

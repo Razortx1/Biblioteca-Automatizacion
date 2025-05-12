@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QPushButton)
-from PyQt5.QtCore import (pyqtSignal)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QPushButton,
+                             QFrame, QSpacerItem, QSizePolicy)
+from PyQt5.QtCore import (pyqtSignal, Qt)
 
 class MenuImpresiones(QWidget):
     volver_principal = pyqtSignal()
@@ -10,19 +11,31 @@ class MenuImpresiones(QWidget):
         super().__init__()
 
         #Definicion de Layout
-        horizontal_layout = QHBoxLayout()
+        main_layout = QVBoxLayout()
+        horizontal_layout = QVBoxLayout()
+
+        frame = QFrame()
+        frame.setFrameShape(QFrame.StyledPanel)
+
+        horizontal_layout.setAlignment(Qt.AlignTop | Qt.AlignVCenter)
 
         #Creacion de los Botones
         self.historial_impresion = QPushButton("Historial de Impresion")
         self.agregar_impresion = QPushButton("Agregar Impresion")
-        self.volver = QPushButton("Volver Atras")
+        self.volver = QPushButton("Volver al Menu Principal")
 
         #Agregarndo los botones al layout
-        horizontal_layout.addWidget(self.historial_impresion)
         horizontal_layout.addWidget(self.agregar_impresion)
+        horizontal_layout.addSpacing(10)
+        horizontal_layout.addWidget(self.historial_impresion)
+        horizontal_layout.addSpacing(10)
         horizontal_layout.addWidget(self.volver)
 
-        self.setLayout(horizontal_layout)
+        frame.setLayout(horizontal_layout)
+        main_layout.addWidget(frame)
+        main_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        self.setLayout(main_layout)
 
         #Funcionalidad del boton
         self.historial_impresion.clicked.connect(self.ir_a_historial_impresiones.emit)

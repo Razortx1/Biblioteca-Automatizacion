@@ -48,7 +48,7 @@ class HistorialImpresiones(QWidget):
 
         # Crear botones
         self.cambiar_estado = QPushButton("Cambiar Estado")
-        self.volver_atras = QPushButton("Volver Atras")
+        self.volver_atras = QPushButton("Volver al Menu de Impresiones")
 
         # Layout para los filtros
         filter_layout.addWidget(self.filtro_estado)

@@ -1,16 +1,20 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidget,
-                             QMessageBox, QVBoxLayout, QHeaderView, QHBoxLayout)
+                             QAbstractItemView, QVBoxLayout, QHeaderView, QHBoxLayout,
+                             QMessageBox)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
 from connection.session import select_libros_available
 from .actualizar_ui.actualizar_libros import ActualizarLibros
+from .prestamo_libros import PrestamoLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
+    ir_prestamo_libro = pyqtSignal(str, str, str, str)
+    pasar_datos = pyqtSignal(str, str, str, str)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent = None):
+        super().__init__(parent)
 
         self.w = None
         # Layout principal
@@ -18,8 +22,8 @@ class HistorialLibros(QWidget):
 
         # Crear la tabla de libros
         self.tabla_libros = QTableWidget()
-        self.tabla_libros.setColumnCount(6)
-        headers = ["Nombre Libro", "Código de Barras", "Autor", "Fecha Publicación", "Stock de Libros", "Estado del Libro"]
+        self.tabla_libros.setColumnCount(8)
+        headers = ["Nombre Libro", "Autor", "Editorial", "Fecha Entrada a Biblioteca","Area de Biblioteca", "Sector Estanteria" , "Stock de Libros", "Estado del Libro"]
         self.tabla_libros.setMinimumHeight(300)
         self.tabla_libros.setMaximumHeight(700)
         
@@ -34,7 +38,8 @@ class HistorialLibros(QWidget):
 
         # Crear los botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
-        self.volver_inicio = QPushButton("Volver a Inicio")
+        self.volver_inicio = QPushButton("Volver al Menu Principal")
+        self.agregar_prestamo = QPushButton("Agregar prestamo del libro")
 
         # Agregar los widgets al layout principal
         button_layout = QHBoxLayout()
@@ -42,7 +47,11 @@ class HistorialLibros(QWidget):
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_inicio)
         main_layout.addWidget(self.tabla_libros)
+        main_layout.addWidget(self.agregar_prestamo)
         main_layout.addLayout(button_layout)
+
+        self.tabla_libros.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tabla_libros.setSelectionMode(QAbstractItemView.SingleSelection)
 
         # Agregar espaciadores si es necesario (opcional)
         main_layout.addStretch(1)
@@ -57,6 +66,7 @@ class HistorialLibros(QWidget):
         # Conectar los botones con las funciones
         self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_inicio.clicked.connect(self.volver_principal.emit)
+        self.agregar_prestamo.clicked.connect(self.prestamo_ir)
 
     def rellenar_tabla(self):
         self.tabla_libros.setRowCount(0)
@@ -73,34 +83,64 @@ class HistorialLibros(QWidget):
 
                 # Insertar los datos del libro
                 self.tabla_libros.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
-                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(l.cod_barras))
-                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.autor))
-                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_publicacion)))
-                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(str(l.stock)))
-                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.estado_libro))
+                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(l.autor))
+                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.editorial))
+                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_entrada)))
+                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(l.sector_biblioteca))
+                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.sector_estanteria))
+                self.tabla_libros.setItem(row_position, 6, QTableWidgetItem(str(l.stock)))
+                self.tabla_libros.setItem(row_position, 7, QTableWidgetItem(l.estado_libro))
 
                 # Asignar colores dependiendo del estado
-                estado_libro = self.tabla_libros.item(row_position, 5).text()
+                estado_libro = self.tabla_libros.item(row_position, 7).text()
 
                 if estado_libro == "Buen Estado":
-                    self.tabla_libros.item(row_position, 5).setBackground(buen_estado)
+                    self.tabla_libros.item(row_position, 7).setBackground(buen_estado)
                 elif estado_libro == "Mal Estado":
-                    self.tabla_libros.item(row_position, 5).setBackground(mal_estado)
+                    self.tabla_libros.item(row_position, 7).setBackground(mal_estado)
                 elif estado_libro == "Estado Regular":
-                    self.tabla_libros.item(row_position, 5).setBackground(estado_regular)
+                    self.tabla_libros.item(row_position, 7).setBackground(estado_regular)
                 elif estado_libro == "Dado de Baja":
-                    self.tabla_libros.item(row_position, 5).setBackground(dado_baja)
+                    self.tabla_libros.item(row_position, 7).setBackground(dado_baja)
         else:
+            return
+        
+    def prestamo_ir(self):
+        selected_rows = self.tabla_libros.selectionModel().selectedRows()
+        if not selected_rows:
             msg = QMessageBox()
-            msg.setWindowTitle("No hay libros")
-            msg.setText("No hay libros disponibles para mostrar.")
+            msg.setWindowTitle("Seleccion Invalida")
+            msg.setText("Por favor, selecciona un libro antes de continuar")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
+            return
+        for row in selected_rows:
+            nombre = self.tabla_libros.item(row.row(), 0).text()
+            autor = self.tabla_libros.item(row.row(), 1).text()
+            editorial = self.tabla_libros.item(row.row(), 2).text()
+            fecha = self.tabla_libros.item(row.row(), 3).text()
+        self.ir_prestamo_libro.emit(nombre, autor, editorial, fecha)
 
     def actualizar_estado(self):
+        selected_row = self.tabla_libros.selectionModel().selectedRows()
+        if not selected_row:
+            msg = QMessageBox()
+            msg.setWindowTitle("Seleccion Invalida")
+            msg.setText("Por favor, selecciona un libro antes de continuar")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+            return
+        
+        for row in selected_row:
+            nombre = self.tabla_libros.item(row.row(), 0).text()
+            autor = self.tabla_libros.item(row.row(), 1).text()
+            editorial = self.tabla_libros.item(row.row(), 2).text()
+            fecha = self.tabla_libros.item(row.row(), 3).text()
         if self.w is None:
             self.w = ActualizarLibros()
             self.w.actualizar_datos.connect(self.rellenar_tabla)
+            self.pasar_datos.connect(self.w.traer_datos)
+            self.pasar_datos.emit(nombre, autor, editorial, fecha)
             self.w.show()
             self.w.cerrar_ventana.connect(self.cerrar_ventana)
 

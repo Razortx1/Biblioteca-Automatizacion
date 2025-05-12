@@ -8,7 +8,12 @@ from sql.models import (Usuario, Libro, Estado_Libro,
 
 
 with Session(engine) as session:
-    def select_libros_available():
+    def select_libros_available(nombre= None, 
+                                autor= None, 
+                                Editorial= None, 
+                                SectorBiblio= None,
+                                SectorEstanteria= None, 
+                                Estado_= None):
         try:
             # Subconsulta: obtener el último préstamo por copia
             ultimo_prestamo = (
@@ -20,40 +25,58 @@ with Session(engine) as session:
                 .subquery()
             )
 
-            # Alias para el join posterior con el préstamo más reciente
             p_alias = aliased(Prestamos)
 
-            # Consulta principal
-            libros = (
-                session.execute(
-                    select(
-                        Libro.nombre_libro,
-                        Libro.cod_barras,
-                        Libro.autor,
-                        Libro.fecha_publicacion,
-                        Estado_Libro.estado_libro,
-                        func.count(CopiasLibros.id_copia).label("stock")
-                    )
-                    .join(CopiasLibros.libro)
-                    .join(CopiasLibros.estado)
-                    .outerjoin(ultimo_prestamo, CopiasLibros.id_copia == ultimo_prestamo.c.copia_id)
-                    .outerjoin(p_alias, p_alias.id_prestamos == ultimo_prestamo.c.ultimo_prestamo_id)
-                    .where(
-                        or_(
-                            p_alias.id_prestamos == None,  # Sin préstamo
-                            p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
-                        )
-                    )
-                    .group_by(
-                        Libro.nombre_libro,
-                        Libro.cod_barras,
-                        Libro.autor,
-                        Libro.fecha_publicacion,
-                        Estado_Libro.estado_libro
+            # Comenzamos a construir la consulta
+            query = (
+                select(
+                    Libro.nombre_libro,
+                    Libro.autor,
+                    Libro.editorial,
+                    Libro.fecha_entrada,
+                    Libro.sector_biblioteca,
+                    Libro.sector_estanteria,
+                    Estado_Libro.estado_libro,
+                    func.count(CopiasLibros.id_copia).label("stock")
+                )
+                .join(CopiasLibros.libro)
+                .join(CopiasLibros.estado)
+                .outerjoin(ultimo_prestamo, CopiasLibros.id_copia == ultimo_prestamo.c.copia_id)
+                .outerjoin(p_alias, p_alias.id_prestamos == ultimo_prestamo.c.ultimo_prestamo_id)
+                .where(
+                    or_(
+                        p_alias.id_prestamos == None,
+                        p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
                     )
                 )
             )
-            return libros
+
+            # Filtros opcionales
+            if nombre:
+                query = query.where(Libro.nombre_libro.ilike(f"%{nombre}%"))
+            if autor:
+                query = query.where(Libro.autor.ilike(f"%{autor}%"))
+            if Editorial:
+                query = query.where(Libro.editorial.ilike(f"%{Editorial}%"))
+            if SectorBiblio:
+                query = query.where(Libro.sector_biblioteca == SectorBiblio)
+            if SectorEstanteria:
+                query = query.where(Libro.sector_estanteria == SectorEstanteria)
+            if Estado_:
+                query = query.where(Estado_Libro.estado_libro)
+
+            query = query.group_by(
+                Libro.nombre_libro,
+                Libro.autor,
+                Libro.editorial,
+                Libro.fecha_entrada,
+                Libro.sector_biblioteca,
+                Libro.sector_estanteria,
+                Estado_Libro.estado_libro
+            )
+
+            result = session.execute(query)
+            return result
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -94,14 +117,6 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
-    def selected_libro_by_cod(barras):
-        try:
-            libro = session.execute(select(Libro).where(Libro.cod_barras == barras)).all()
-            return libro
-        except Exception as e:
-            traceback.print_exc()
-            print(f"Errores {e}")
-
     def select_estado_libro_all():
         try:
             estado_libro = session.execute(select(Estado_Libro)).all()
@@ -131,9 +146,9 @@ with Session(engine) as session:
                 select(
                     CopiasLibros.id_copia,
                     Libro.nombre_libro,
-                    Libro.cod_barras,
                     Libro.autor,
-                    Libro.fecha_publicacion,
+                    Libro.editorial,
+                    Libro.fecha_entrada,
                     Estado_Libro.estado_libro
                 )
                 .join(CopiasLibros.libro)
@@ -147,7 +162,7 @@ with Session(engine) as session:
                         p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
                     )
                 )
-            )
+            ).all()
             return libros
 
         except Exception as e:
@@ -157,7 +172,7 @@ with Session(engine) as session:
 
     def select_prestamo_by_fecha(fecha):
         try:
-            prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.cod_barras,
+            prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.editorial, Libro.autor,
                                                     Prestamos.fecha_inicio, Prestamos.fecha_termino,
                                                     Estado_Libro.estado_libro, CopiasLibros.id_copia, Prestamos.id_prestamos)
                                                     .join(Prestamos.copia)
@@ -169,6 +184,22 @@ with Session(engine) as session:
                                                     .where(or_(Estado_Prestamo.estado_prestamo == "Prestado",
                                                                Estado_Prestamo.estado_prestamo == "Extraviado")))
             return prestamo_fecha
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
+
+    def select_prestamo_libro(nombre, autor, editorial, fecha):
+        try:
+            prestamos = session.execute(select(Libro.nombre_libro, Libro.autor, Libro.editorial,
+                                               Libro.fecha_entrada, Estado_Libro.estado_libro, CopiasLibros.id_copia,
+                                               Libro.id_libro)
+                                               .join(Libro.copias)
+                                               .join_from(CopiasLibros, Estado_Libro, CopiasLibros.estado_id == Estado_Libro.id_estadolibro)
+                                               .where(Libro.nombre_libro == nombre)
+                                               .where(Libro.autor == autor)
+                                               .where(Libro.editorial == editorial)
+                                               .where(Libro.fecha_entrada == fecha)).all()
+            return prestamos
         except Exception as e:
             traceback.print_exc()
             print(f"Error {e}")

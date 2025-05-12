@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QPushButton, QTableWidget, QLineEdit, QLabel,
                              QComboBox, QHBoxLayout, QMessageBox, QTableWidgetItem,
-                             QAbstractItemView, QCheckBox)
+                             QAbstractItemView, QCheckBox, QHeaderView)
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
 
-from connection.session import (select_estado_libro_all, selected_libro_by_cod,
-                                select_copia_libros_by_id)
+from connection.session import (select_estado_libro_all,
+                                select_copia_libros_by_id, select_prestamo_libro)
 from connection.connection import update_estado_libro
 
 style_sheet = """
@@ -69,12 +69,8 @@ class ActualizarLibros(QWidget):
         vertical_layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
 
-        #Creacion de los QLineEdits
-        self.buscar_codbarras = QLineEdit()
-
         #Creacion de Boton
-        self.buscar_libros = QPushButton("Buscar")
-        self.cambiar_estado = QPushButton("Cambiar estado")
+        self.cambiar_estado = QPushButton("Cambiar estado del libro(s)")
 
         #Creacion de combobox
         self.estado = QComboBox()
@@ -83,9 +79,6 @@ class ActualizarLibros(QWidget):
         #Creacion del Checkbox
         self.check = QCheckBox("Cerrar ventana luego de cambios")
 
-        #creacion de labels
-        self.cod = QLabel("Ingresa codigo de barras")
-
         #Creacion de la tabla
         self.tabla_cambiarlibros = QTableWidget()
         self.tabla_cambiarlibros.setColumnCount(6)
@@ -93,13 +86,13 @@ class ActualizarLibros(QWidget):
         item.setText("Nombre Libro")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(0, item)
         item = QTableWidgetItem()
-        item.setText("Codigo de Barras")
+        item.setText("Autor")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(1, item)
         item = QTableWidgetItem()
-        item.setText("Autor")
+        item.setText("Editorial")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(2, item)
         item = QTableWidgetItem()
-        item.setText("Fecha Publicacion")
+        item.setText("Fecha Ingreso Biblioteca")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(3, item)
         item = QTableWidgetItem()
         item.setText("Estado del Libro")
@@ -108,19 +101,20 @@ class ActualizarLibros(QWidget):
         item.setText("Id Interno")
         self.tabla_cambiarlibros.setHorizontalHeaderItem(5, item)
 
+        self.tabla_cambiarlibros.setColumnHidden(5, True)
+
         #Asignar tablas
+        header = self.tabla_cambiarlibros.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.tabla_cambiarlibros.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_cambiarlibros.setSelectionMode(QAbstractItemView.MultiSelection)
 
         #Asignar los widgets/layout a los principales layout
-        horizontal_layout_1.addWidget(self.buscar_codbarras)
-        horizontal_layout_1.addWidget(self.buscar_libros)
 
         horizontal_layout.addWidget(self.cambiar_estado)
         horizontal_layout.addWidget(self.estado)
         horizontal_layout.addWidget(self.check)
 
-        vertical_layout.addWidget(self.cod)
         vertical_layout.addLayout(horizontal_layout_1)
         vertical_layout.addWidget(self.tabla_cambiarlibros)
         vertical_layout.addLayout(horizontal_layout)
@@ -129,25 +123,12 @@ class ActualizarLibros(QWidget):
         self.setLayout(vertical_layout)
 
         #Establecer funciones del boton
-        self.buscar_libros.clicked.connect(self.rellenar_tabla)
         self.cambiar_estado.clicked.connect(self.seleccion_datos)
 
         #Rellenar Combobox
         estado_libro = select_estado_libro_all()
         for es in estado_libro:
             self.estado.insertItem(es[0].id_estadolibro, es[0].estado_libro)
-
-    def verificar_codi(self, codigo):
-        msg = QMessageBox()
-        msg.setWindowTitle("Libro no encontrado")
-        msg.setText("No se ha encontrado el libro espeficicado")
-        msg.setIcon(QMessageBox.Information)
-        libros = selected_libro_by_cod(codigo)
-        if libros:
-            return libros
-        else:
-            msg.exec()
-            return None
         
     def seleccion_datos(self):
         is_true = self.check.isChecked()
@@ -161,32 +142,30 @@ class ActualizarLibros(QWidget):
 
     def color_por_estado(self, estado: str) -> QColor:
         colores = {
-            "Buen Estado": QColor(90,255,90),
-            "Mal Estado": QColor(255, 205, 0),
-            "Estado Regular": QColor(255,255,0),
-            "Dado de Baja": QColor(255,50,50)
+            "Buen Estado": QColor("#b2f7b2"),
+            "Mal Estado": QColor("#ffd62e"),
+            "Estado Regular": QColor("#ffe066"),
+            "Dado de Baja": QColor("#ff6b6b")
         }
         return colores.get(estado, QColor(255, 255, 255))
 
     def rellenar_tabla(self):
         try:
             self.tabla_cambiarlibros.setRowCount(0)
-            codigo = self.buscar_codbarras.text()
-            libro = self.verificar_codi(codigo)
-            id = libro[0][0].id_libro
+            libro = select_prestamo_libro(self.nombre, self.autor, self.editorial, self.fecha)
+            id = libro[0].id_libro
             copias = select_copia_libros_by_id(id)
-
             tablerow = 0
-            self.tabla_cambiarlibros.setRowCount(50)
-
             column_count = self.tabla_cambiarlibros.columnCount()-2
 
             if copias:
                 for l in copias:
+                    row_position = self.tabla_cambiarlibros.rowCount()
+                    self.tabla_cambiarlibros.insertRow(row_position)
                     self.tabla_cambiarlibros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
-                    self.tabla_cambiarlibros.setItem(tablerow, 1, QTableWidgetItem(l.cod_barras))
-                    self.tabla_cambiarlibros.setItem(tablerow, 2, QTableWidgetItem(l.autor))
-                    self.tabla_cambiarlibros.setItem(tablerow, 3, QTableWidgetItem(str(l.fecha_publicacion)))
+                    self.tabla_cambiarlibros.setItem(tablerow, 1, QTableWidgetItem(l.autor))
+                    self.tabla_cambiarlibros.setItem(tablerow, 2, QTableWidgetItem(l.editorial))
+                    self.tabla_cambiarlibros.setItem(tablerow, 3, QTableWidgetItem(str(l.fecha_entrada)))
                     self.tabla_cambiarlibros.setItem(tablerow, 4, QTableWidgetItem(l.estado_libro))
                     self.tabla_cambiarlibros.setItem(tablerow, 5, QTableWidgetItem(str(l.id_copia)))
 
@@ -202,6 +181,14 @@ class ActualizarLibros(QWidget):
             import traceback
             traceback.print_exc()
             print(f"Error {e}")
+
+    def traer_datos(self, nombre_, autor_, editorial_, fecha_):
+        self.nombre = nombre_
+        self.autor = autor_
+        self.editorial = editorial_
+        self.fecha = fecha_
+        self.rellenar_tabla()
+        return self.nombre, self.autor, self.editorial, self.fecha
 
     def act_datos(self):
         selected_rows = self.tabla_cambiarlibros.selectionModel().selectedRows()
@@ -219,6 +206,7 @@ class ActualizarLibros(QWidget):
             if id_item:
                 copia_id = int(id_item.text())
                 update_estado_libro(copia_id, estado_id)
+        self.rellenar_tabla()
         
     def closeEvent(self, a0):
         self.cerrar_ventana.emit()

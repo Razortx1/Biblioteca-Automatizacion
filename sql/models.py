@@ -120,9 +120,11 @@ class Libro(Base):
 
     id_libro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     nombre_libro: Mapped[str]
-    cod_barras: Mapped[str] = mapped_column(unique=True)
     autor: Mapped[Optional[str]]
-    fecha_publicacion: Mapped[date]
+    editorial : Mapped[Optional[str]]
+    fecha_entrada: Mapped[date]
+    sector_biblioteca : Mapped[str]
+    sector_estanteria: Mapped[str]
 
     copias: Mapped[List["CopiasLibros"]] = relationship(back_populates="libro")
 

@@ -84,7 +84,6 @@ class Window(QMainWindow):
         # Establecer el funcionamiento para cambiar de páginas entre página principal a las demás
         self.pages["pagina_principal"].ir_a_agregar_libros.connect(lambda: self.cambiar_pagina("agregar_libros"))
         self.pages["pagina_principal"].ir_a_historia_libros.connect(lambda: self.cambiar_pagina("historia_libros"))
-        self.pages["pagina_principal"].ir_prestamo_libro.connect(lambda: self.cambiar_pagina("prestamo_libros"))
         self.pages["pagina_principal"].ir_a_menu_impresiones.connect(lambda: self.cambiar_pagina("menu_impresiones"))
         self.pages["pagina_principal"].ir_a_historial_prestamo.connect(lambda: self.cambiar_pagina("historial_prestamos"))
 
@@ -92,12 +91,17 @@ class Window(QMainWindow):
         self.pages["menu_impresiones"].ir_a_historial_impresiones.connect(lambda: self.cambiar_pagina("historial_impresiones"))
         self.pages["menu_impresiones"].ir_a_agregar_impresiones.connect(lambda: self.cambiar_pagina("agregar_impresiones"))
 
+        #Establecer el funcionamiento para cammbiar de paginas entre el historial de libros y el prestamo de libros
+        self.pages["historia_libros"].ir_prestamo_libro.connect(lambda: self.cambiar_pagina("prestamo_libros"))
+        self.pages["historia_libros"].ir_prestamo_libro.connect(self.pages["prestamo_libros"].traer_objeto)
+
+
         # Establecer el funcionamiento para volver a las anteriores ventanas
         self.pages["agregar_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["historia_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["menu_impresiones"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["historial_prestamos"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
-        self.pages["prestamo_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["prestamo_libros"].volver_principal.connect(lambda: self.cambiar_pagina("historia_libros"))
 
         # Establecer el funcionamiento para volver al menú de impresiones
         self.pages["agregar_impresiones"].volver_menu.connect(lambda: self.cambiar_pagina("menu_impresiones"))
