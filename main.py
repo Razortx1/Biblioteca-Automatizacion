@@ -93,6 +93,7 @@ class Window(QMainWindow):
 
         #Establecer el funcionamiento para cammbiar de paginas entre el historial de libros y el prestamo de libros
         self.pages["historia_libros"].ir_prestamo_libro.connect(lambda: self.cambiar_pagina("prestamo_libros"))
+        self.pages["historia_libros"].ir_prestamo_libro.connect(self.pages["prestamo_libros"].traer_objeto)
 
 
         # Establecer el funcionamiento para volver a las anteriores ventanas
@@ -100,7 +101,7 @@ class Window(QMainWindow):
         self.pages["historia_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["menu_impresiones"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["historial_prestamos"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
-        self.pages["prestamo_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["prestamo_libros"].volver_principal.connect(lambda: self.cambiar_pagina("historia_libros"))
 
         # Establecer el funcionamiento para volver al menú de impresiones
         self.pages["agregar_impresiones"].volver_menu.connect(lambda: self.cambiar_pagina("menu_impresiones"))

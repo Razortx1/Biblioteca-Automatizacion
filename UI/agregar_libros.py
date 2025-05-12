@@ -102,6 +102,12 @@ class AgregarLibros(QWidget):
 
         # Validación simple para asegurarse de que los campos no están vacíos
         if not nombre or not stock or not sector_biblioteca or not sector_estanteria:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error de Entrada")
+            msg.setText("Favor de ingresar los datos correspondientes del libro segun muestra el formulario \n" \
+            "A excepcion de autor o editorial si se desconoce")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec()
             return
         if not stock.isdigit():
             msg = QMessageBox()

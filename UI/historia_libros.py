@@ -11,6 +11,7 @@ from .prestamo_libros import PrestamoLibros
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
     ir_prestamo_libro = pyqtSignal(str, str, str, str)
+    pasar_datos = pyqtSignal(str, str, str, str)
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -118,14 +119,28 @@ class HistorialLibros(QWidget):
             autor = self.tabla_libros.item(row.row(), 1).text()
             editorial = self.tabla_libros.item(row.row(), 2).text()
             fecha = self.tabla_libros.item(row.row(), 3).text()
-        prestamos = PrestamoLibros()
-        self.ir_prestamo_libro.connect(prestamos.traer_objeto)
         self.ir_prestamo_libro.emit(nombre, autor, editorial, fecha)
 
     def actualizar_estado(self):
+        selected_row = self.tabla_libros.selectionModel().selectedRows()
+        if not selected_row:
+            msg = QMessageBox()
+            msg.setWindowTitle("Seleccion Invalida")
+            msg.setText("Por favor, selecciona un libro antes de continuar")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+            return
+        
+        for row in selected_row:
+            nombre = self.tabla_libros.item(row.row(), 0).text()
+            autor = self.tabla_libros.item(row.row(), 1).text()
+            editorial = self.tabla_libros.item(row.row(), 2).text()
+            fecha = self.tabla_libros.item(row.row(), 3).text()
         if self.w is None:
             self.w = ActualizarLibros()
             self.w.actualizar_datos.connect(self.rellenar_tabla)
+            self.pasar_datos.connect(self.w.traer_datos)
+            self.pasar_datos.emit(nombre, autor, editorial, fecha)
             self.w.show()
             self.w.cerrar_ventana.connect(self.cerrar_ventana)
 

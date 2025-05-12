@@ -124,9 +124,9 @@ with Session(engine) as session:
                 select(
                     CopiasLibros.id_copia,
                     Libro.nombre_libro,
-                    Libro.cod_barras,
                     Libro.autor,
-                    Libro.fecha_publicacion,
+                    Libro.editorial,
+                    Libro.fecha_entrada,
                     Estado_Libro.estado_libro
                 )
                 .join(CopiasLibros.libro)
@@ -140,7 +140,7 @@ with Session(engine) as session:
                         p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
                     )
                 )
-            )
+            ).all()
             return libros
 
         except Exception as e:
@@ -150,7 +150,7 @@ with Session(engine) as session:
 
     def select_prestamo_by_fecha(fecha):
         try:
-            prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.cod_barras,
+            prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.editorial, Libro.autor,
                                                     Prestamos.fecha_inicio, Prestamos.fecha_termino,
                                                     Estado_Libro.estado_libro, CopiasLibros.id_copia, Prestamos.id_prestamos)
                                                     .join(Prestamos.copia)
@@ -169,13 +169,14 @@ with Session(engine) as session:
     def select_prestamo_libro(nombre, autor, editorial, fecha):
         try:
             prestamos = session.execute(select(Libro.nombre_libro, Libro.autor, Libro.editorial,
-                                               Libro.fecha_entrada, Estado_Libro.estado_libro, CopiasLibros.id_copia)
+                                               Libro.fecha_entrada, Estado_Libro.estado_libro, CopiasLibros.id_copia,
+                                               Libro.id_libro)
                                                .join(Libro.copias)
                                                .join_from(CopiasLibros, Estado_Libro, CopiasLibros.estado_id == Estado_Libro.id_estadolibro)
                                                .where(Libro.nombre_libro == nombre)
                                                .where(Libro.autor == autor)
                                                .where(Libro.editorial == editorial)
-                                               .where(Libro.fecha_entrada == fecha))
+                                               .where(Libro.fecha_entrada == fecha)).all()
             return prestamos
         except Exception as e:
             traceback.print_exc()

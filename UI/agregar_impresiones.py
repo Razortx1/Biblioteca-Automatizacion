@@ -31,6 +31,7 @@ class AgregarImpresiones(QWidget):
         # Creación de los Widgets
         self.nombre_solicitante = self.crear_line_edit("Ingrese el nombre del Alumno/Profesor", True)
         self.rut_solicitante = self.crear_line_edit("Ingrese el rut Alumno/Profesor", False, "00.000.000-n;_")
+        self.rut_solicitante.setFocus()
         self.cursos = self.crear_line_edit("Ingrese Curso o Departamento", True)
 
         self.cambiar_curso = QCheckBox("Habilitar para cambiar departamento o curso")
@@ -52,12 +53,12 @@ class AgregarImpresiones(QWidget):
         horizontal_layout.addWidget(self.rut_solicitante)
         horizontal_layout.addWidget(self.boton_buscar_usuario)
 
-        self.nombre = self.crear_label("Nombre Alumno/Profesor")
-        self.rut = self.crear_label("Rut del alumno/profesor")
-        self.cantidad_c = self.crear_label("Cantidad de Copias a necesitar")
-        self.cantidad_p = self.crear_label("Cantidad de paginas que tiene el documento en total")
-        self.curso = self.crear_label("Curso/Departamento")
-        self.descip = self.crear_label("Descripcion de la Impresion")
+        self.nombre = self.crear_label("Nombre Alumno/Profesor *")
+        self.rut = self.crear_label("Rut del alumno/profesor *")
+        self.cantidad_c = self.crear_label("Cantidad de Copias a necesitar *")
+        self.cantidad_p = self.crear_label("Cantidad de paginas que tiene el documento en total *")
+        self.curso = self.crear_label("Curso/Departamento *")
+        self.descip = self.crear_label("Descripcion de la Impresion *")
 
         # Configurar el Layout principal
         main_layout.addWidget(self.rut)
@@ -124,7 +125,19 @@ class AgregarImpresiones(QWidget):
 
     # Función para agregar una impresión
     def agregar_impresiones(self):
-
+        copias = self.cantidad_copias.text()
+        paginas = self.cantidad_paginas.text()
+        nombre = self.nombre_solicitante.text()
+        curso = self.cursos.text()
+        rut = self.rut_solicitante.text()
+        descrip = self.descripcion.toPlainText()
+        if not nombre or not curso or not descrip or not copias or not paginas:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error de Entrada")
+            msg.setText("Por Favor, ingrese los datos necesarios para la impresion, estos estan marcados por un *")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec()
+            return
         if not copias.isdigit() or not paginas.isdigit():
             msg = QMessageBox()
             msg.setWindowTitle("Error de Entrada")
@@ -132,12 +145,6 @@ class AgregarImpresiones(QWidget):
             msg.setIcon(QMessageBox.Warning)
             msg.exec()
             return
-        nombre = self.nombre_solicitante.text()
-        curso = self.cursos.text()
-        rut = self.rut_solicitante.text()
-        copias = self.cantidad_copias.text()
-        paginas = self.cantidad_paginas.text()
-        descrip = self.descripcion.toPlainText()
         ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip)
         msg = QMessageBox()
         msg.setWindowTitle("Impresión Agregada")

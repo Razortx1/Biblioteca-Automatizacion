@@ -15,6 +15,7 @@ from connection.connection import insert_prestamos
 
 class PrestamoLibros(QWidget):
     volver_principal = pyqtSignal()
+    actualizar_datos = pyqtSignal()
     def __init__(self, parent = None):
         super().__init__(parent)
 
@@ -46,13 +47,13 @@ class PrestamoLibros(QWidget):
         self.cambiar_curso.stateChanged.connect(self.check_event)
 
         #Creacion de los labes
-        self.fecha = QLabel("Fecha Maxima a Entregar")
-        self.rut = QLabel("Rut del Alumno/Profesor")
-        self.nombre = QLabel("Nombre del Alumno/Profesor")
-        self.curso = QLabel("Curso del Alumno/Profesor")
+        self.fecha = QLabel("Fecha Maxima a Entregar *")
+        self.rut = QLabel("Rut del Alumno/Profesor *")
+        self.nombre = QLabel("Nombre del Alumno/Profesor *")
+        self.curso = QLabel("Curso del Alumno/Profesor *")
 
         #Definicion de los botones
-        self.boton_volver = QPushButton("Ir al Menu Principal")
+        self.boton_volver = QPushButton("Ir al Historial de Libros")
         self.boton_buscar_rut = QPushButton("Buscar")
         self.boton_agregar_prestamo = QPushButton("Agregar Prestamo")
 
@@ -89,6 +90,8 @@ class PrestamoLibros(QWidget):
         item = QTableWidgetItem()
         item.setText("Id Interno")
         self.tabla_libro_prestamo.setHorizontalHeaderItem(5, item)
+
+        self.tabla_libro_prestamo.setColumnHidden(5, True)
 
 
         #Agregar los widgets a los layouts
@@ -133,16 +136,15 @@ class PrestamoLibros(QWidget):
 
             column_count = self.tabla_libro_prestamo.columnCount()-2
 
-            mal_estado = QColor(255, 205, 0)
-            buen_estado = QColor(90,255,90)
-            dado_baja = QColor(255,50,50)
-            estado_regular = QColor(255,255,0)
+            mal_estado = QColor("#ffd62e")  # Mal estado
+            buen_estado = QColor("#b2f7b2")  # Buen estado
+            dado_baja = QColor("#ff6b6b")  # Dado de baja
+            estado_regular = QColor("#ffe066")  # Estado regular
 
             if libros:
                 for l in libros:
                     row_position = self.tabla_libro_prestamo.rowCount()
                     self.tabla_libro_prestamo.insertRow(row_position)
-                    print(l)
 
                     self.tabla_libro_prestamo.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
                     self.tabla_libro_prestamo.setItem(row_position, 1, QTableWidgetItem(l.autor))
@@ -185,7 +187,7 @@ class PrestamoLibros(QWidget):
         fecha = datetime.now()
         fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
         fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
-        selected_rows = self.tabla_libros.selectionModel().selectedRows()
+        selected_rows = self.tabla_libro_prestamo.selectionModel().selectedRows()
         fecha_ = self.fecha_maxima.dateTime().toPyDateTime().date()
         rut = self.rut_.text()
         nombre = self.nombre_prestatario.text()
@@ -204,13 +206,12 @@ class PrestamoLibros(QWidget):
         msg.exec()
         if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
             for row in selected_rows:
-                id_interno = int(self.tabla_libros.item(row.row(), 5).text())
+                id_interno = int(self.tabla_libro_prestamo.item(row.row(), 5).text())
                 if id_interno:
                     insert_prestamos(fecha,fecha_, rut, nombre, curso, id_interno)
             self.nombre_prestatario.clear()
             self.curso_prestatario.clear()
-            self.cod_barras.clear()
-            self.tabla_libros.setRowCount(0)
+            self.tabla_libro_prestamo.setRowCount(0)
             self.rut_.clear()
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
