@@ -46,12 +46,12 @@ class AgregarLibros(QWidget):
         self.volver_atras = QPushButton("Volver al Menu Principal")
         
         # Etiquetas
-        self.nombre = QLabel("Nombre del Libro")
+        self.nombre = QLabel("Nombre del Libro *")
         self.editorial = QLabel("Editorial del Libro")
         self.autor = QLabel("Autor del Libro")
-        self.stock = QLabel("Stock del Libro")
-        self.sector_b = QLabel("Sector Biblioteca")
-        self.sector_es = QLabel("Sector de la Estanteria")
+        self.stock = QLabel("Stock del Libro *")
+        self.sector_b = QLabel("Sector Biblioteca *")
+        self.sector_es = QLabel("Sector de la Estanteria *")
 
         # Añadir widgets al layout
 

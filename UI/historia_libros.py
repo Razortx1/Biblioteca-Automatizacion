@@ -134,10 +134,10 @@ class HistorialLibros(QWidget):
         no_editorial = self.editorial.text()
         autor = self.autor_libro.text()
         nombre = self.nombre_filtro.text()
-        estado = self.estado_filtro.currentText()
-        if estado == "Selecciona un estado":
-            estado = None
-        else:
+        estado = ""
+        if self.estado_filtro.currentText() != "Selecciona un estado":
+            estado = self.estado_filtro.currentText()
+        elif estado == "Selecciona un estado":
             self.rellenar_tabla()
             return
         libros = select_libros_available(nombre=nombre,autor= autor,Editorial=no_editorial, Estado_=estado,
