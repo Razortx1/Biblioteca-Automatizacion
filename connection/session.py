@@ -1,6 +1,6 @@
 import traceback
 from sqlalchemy.orm import Session, aliased
-from sqlalchemy import select, insert, delete, update, func, or_
+from sqlalchemy import select, insert, delete, update, func, or_, distinct
 from sql.models import engine
 from sql.models import (Usuario, Libro, Estado_Libro,
                         Estado_Impresion, Estado_Prestamo, Prestamos,
@@ -59,17 +59,16 @@ with Session(engine) as session:
             if Editorial:
                 query = query.where(Libro.editorial.ilike(f"%{Editorial}%"))
             if SectorBiblio:
-                query = query.where(Libro.sector_biblioteca == SectorBiblio)
+                query = query.where(Libro.sector_biblioteca.ilike(f"%{SectorBiblio}%"))
             if SectorEstanteria:
-                query = query.where(Libro.sector_estanteria == SectorEstanteria)
+                query = query.where(Libro.sector_estanteria.ilike(f"%{SectorEstanteria}%"))
             if Estado_:
-                query = query.where(Estado_Libro.estado_libro)
+                query = query.where(Estado_Libro.estado_libro.contains(Estado_))
 
             query = query.group_by(
                 Libro.nombre_libro,
                 Libro.autor,
                 Libro.editorial,
-                Libro.fecha_entrada,
                 Libro.sector_biblioteca,
                 Libro.sector_estanteria,
                 Estado_Libro.estado_libro
@@ -220,10 +219,21 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Errores {e}")
 
-    def select_impresiones_filtradas(filtro):
+    def select_type_sheet():
+        try:
+            hoja = session.execute(select(distinct(Impresiones.tipo_papel)))
+            return hoja
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
+
+    def select_impresiones_filtradas(estado=None, papel=None):
         try:
             query = session.query(Impresiones, Estado_Impresion, Usuario).join(Impresiones, Usuario.id_user == Impresiones.user_id).join(Impresiones.estado_impresion)
-            query = query.filter(Impresiones.estado_impresion_id == filtro)
+            if estado:
+                query = query.filter(Impresiones.estado_impresion_id == estado)
+            if papel:
+                query = query.filter(Impresiones.tipo_papel == papel)
             resultado = query.all()
             return resultado
         except Exception as e:

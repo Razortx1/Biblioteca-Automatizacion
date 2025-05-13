@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
 from connection.session import (select_impresion_all, select_all_estado_impresion,
-                                select_impresiones_filtradas)
+                                select_impresiones_filtradas, select_type_sheet)
 from connection.connection import update_estado_impresion
 
 
@@ -22,17 +22,18 @@ class HistorialImpresiones(QWidget):
         button_layout = QHBoxLayout()
 
         # Widgets para Filtros
-        self.filtrar = QPushButton("Filtrar Estado")
-        self.borrar_filtro = QPushButton("Quitar Filtro")
+        self.filtrar = QPushButton("Aplicar Filtro(s)")
+        self.borrar_filtro = QPushButton("Quitar Filtro(s)")
         self.filtro_estado = QComboBox()
+        self.filtro_tipo_papel = QComboBox()
 
         # Crear la tabla de impresiones
         self.tabla_impresiones = QTableWidget()
-        self.tabla_impresiones.setColumnCount(8)
+        self.tabla_impresiones.setColumnCount(9)
         self.tabla_impresiones.setMaximumHeight(400)
         headers = ["Nombre Alumno/Profesor", "Curso/Departamento", "Cantidad de Páginas",
                    "Cantidad de Copias", "Hojas Usadas en Total", "Fecha de Impresión",
-                   "Descripción", "Estado de la Impresión"]
+                   "Descripción","Tipo de Hoja" ,"Estado de la Impresión"]
         for i, header in enumerate(headers):
             item = QTableWidgetItem(header)
             self.tabla_impresiones.setHorizontalHeaderItem(i, item)
@@ -52,6 +53,7 @@ class HistorialImpresiones(QWidget):
 
         # Layout para los filtros
         filter_layout.addWidget(self.filtro_estado)
+        filter_layout.addWidget(self.filtro_tipo_papel)
         filter_layout.addWidget(self.filtrar)
         filter_layout.addWidget(self.borrar_filtro)
 
@@ -80,9 +82,16 @@ class HistorialImpresiones(QWidget):
         for es in estados:
             self.filtro_estado.insertItem(es[0].id_estadoimpresiones, es[0].estado_impresion)
 
+        hoja = select_type_sheet()
+        self.filtro_tipo_papel.addItem("Selecciona un tipo de papel")
+        for h in hoja:
+            self.filtro_tipo_papel.addItem(h[0])
+
     def rellenar_tabla(self):
         self.tabla_impresiones.setRowCount(0)
         impresiones = select_impresion_all()
+        self.filtro_estado.setCurrentIndex(0)
+        self.filtro_tipo_papel.setCurrentIndex(0)
         self.tabla(impresiones)
 
     def actualizar_estado(self):
@@ -96,7 +105,7 @@ class HistorialImpresiones(QWidget):
         else:
             for row in selected_row:
                 item = self.tabla_impresiones.item(row.row(), 5).text()
-                estado = self.tabla_impresiones.item(row.row(), 7).text()
+                estado = self.tabla_impresiones.item(row.row(), 8).text()
                 if estado == "Aun no Impreso":
                     estado = 2
                 elif estado == "Ya Impreso":
@@ -114,8 +123,9 @@ class HistorialImpresiones(QWidget):
     def filtrar_tabla(self):
         self.tabla_impresiones.setRowCount(0)
         estado_seleccionado = self.filtro_estado.currentIndex()
-        if estado_seleccionado != 0:
-            datos_tabla = select_impresiones_filtradas(estado_seleccionado)
+        papel = self.filtro_tipo_papel.currentText()
+        if estado_seleccionado != 0 or papel != "Selecciona un tipo de papel":
+            datos_tabla = select_impresiones_filtradas(estado_seleccionado, papel)
             self.tabla(datos_tabla)
         else:
             self.rellenar_tabla()
@@ -139,7 +149,8 @@ class HistorialImpresiones(QWidget):
                 self.tabla_impresiones.setItem(tablerow, 4, QTableWidgetItem(str(suma)))
                 self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(str(i.Impresiones.fecha_impresion)))
                 self.tabla_impresiones.setItem(tablerow, 6, QTableWidgetItem(i.Impresiones.descripcion))
-                self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
+                self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Impresiones.tipo_papel))
+                self.tabla_impresiones.setItem(tablerow, 8, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
 
                 texto_tabla = self.tabla_impresiones.item(tablerow, column_count-1).text()
 

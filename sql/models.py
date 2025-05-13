@@ -189,6 +189,7 @@ class Impresiones(Base):
     cantidad_copias: Mapped[int]
     cantidad_paginas: Mapped[int]
     fecha_impresion: Mapped[datetime]
+    tipo_papel: Mapped[str]
     estado_impresion_id: Mapped[int] = mapped_column(ForeignKey("estado_impresiones.id_estadoimpresiones"))
 
     estado_impresion: Mapped["Estado_Impresion"] = relationship()

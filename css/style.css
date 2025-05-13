@@ -19,13 +19,8 @@ QPushButton:pressed {
     background-color: #b2f27c;
 }
 
-/*Combobox*/
-QComboBox {
-    font-size: 14px;
-    padding: 5px;
-}
 /*Para los inputs tanto de texto como de fecha*/
-QLineEdit, QDateEdit, QTextEdit{
+QLineEdit, QDateEdit, QTextEdit, QComboBox{
     background-color: #ffffff;
     border: 1px solid #bbb;
     border-radius: 8px;
