@@ -132,7 +132,7 @@ class PrestamoLibros(QWidget):
     def rellenar_tablas(self):
         try:
             self.tabla_libro_prestamo.setRowCount(0)
-            libros = select_prestamo_libro(self.nombre_libro, self.autor_libro, self.editorial_libro, self.fecha_libro)
+            libros = select_prestamo_libro(self.nombre_libro, self.autor_libro, self.editorial_libro)
 
             column_count = self.tabla_libro_prestamo.columnCount()-2
 
@@ -221,15 +221,14 @@ class PrestamoLibros(QWidget):
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
 
-    def traer_objeto(self, nombre, autor, editorial, fecha):
-        if not nombre or not autor or not editorial or not fecha:
+    def traer_objeto(self, nombre, autor, editorial):
+        if not nombre or not autor or not editorial:
             return
         self.nombre_libro = nombre
         self.autor_libro = autor
         self.editorial_libro = editorial
-        self.fecha_libro = fecha
         self.rellenar_tablas()
-        return self.nombre_libro, self.autor_libro, self.editorial_libro, self.fecha_libro
+        return self.nombre_libro, self.autor_libro, self.editorial_libro
 
 
     def check_event(self, event):

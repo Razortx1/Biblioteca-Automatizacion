@@ -202,17 +202,39 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
-    def select_prestamo_libro(nombre, autor, editorial, fecha):
+    def select_prestamo_libro(nombre, autor, editorial):
         try:
+            # Subconsulta: último préstamo por copia
+            ultimo_prestamo = (
+                select(
+                    Prestamos.copia_id,
+                    func.max(Prestamos.id_prestamos).label("ultimo_prestamo_id")
+                )
+                .group_by(Prestamos.copia_id)
+                .subquery()
+            )
+
+            # Alias para Prestamos
+            p_alias = aliased(Prestamos)
+
+            # Datos de prestamos
             prestamos = session.execute(select(Libro.nombre_libro, Libro.autor, Libro.editorial,
                                                Libro.fecha_entrada, Estado_Libro.estado_libro, CopiasLibros.id_copia,
                                                Libro.id_libro)
                                                .join(Libro.copias)
-                                               .join_from(CopiasLibros, Estado_Libro, CopiasLibros.estado_id == Estado_Libro.id_estadolibro)
+                                               .join(CopiasLibros.estado)
+                                               .outerjoin(ultimo_prestamo, CopiasLibros.id_copia == ultimo_prestamo.c.copia_id)
+                                               .outerjoin(p_alias, p_alias.id_prestamos == ultimo_prestamo.c.ultimo_prestamo_id)
                                                .where(Libro.nombre_libro == nombre)
                                                .where(Libro.autor == autor)
                                                .where(Libro.editorial == editorial)
-                                               .where(Libro.fecha_entrada == fecha)).all()
+                                               .where(
+                                                    or_(
+                                                            p_alias.id_prestamos == None,  # nunca ha sido prestado
+                                                            p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
+                                                        )
+                                                    )
+                                               .order_by(Libro.fecha_entrada.desc())).all()
             return prestamos
         except Exception as e:
             traceback.print_exc()

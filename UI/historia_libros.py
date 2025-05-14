@@ -9,8 +9,8 @@ from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
     volver_principal = pyqtSignal()
-    ir_prestamo_libro = pyqtSignal(str, str, str, str)
-    pasar_datos = pyqtSignal(str, str, str, str)
+    ir_prestamo_libro = pyqtSignal(str, str, str)
+    pasar_datos = pyqtSignal(str, str, str)
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -154,8 +154,7 @@ class HistorialLibros(QWidget):
             nombre = self.tabla_libros.item(row.row(), 0).text()
             autor = self.tabla_libros.item(row.row(), 1).text()
             editorial = self.tabla_libros.item(row.row(), 2).text()
-            fecha = self.tabla_libros.item(row.row(), 3).text()
-        self.ir_prestamo_libro.emit(nombre, autor, editorial, fecha)
+        self.ir_prestamo_libro.emit(nombre, autor, editorial)
 
     def tabla(self, libros):
         self.tabla_libros.setRowCount(0)
@@ -212,7 +211,7 @@ class HistorialLibros(QWidget):
             self.w = ActualizarLibros()
             self.w.actualizar_datos.connect(self.rellenar_tabla)
             self.pasar_datos.connect(self.w.traer_datos)
-            self.pasar_datos.emit(nombre, autor, editorial, fecha)
+            self.pasar_datos.emit(nombre, autor, editorial)
             self.w.show()
             self.w.cerrar_ventana.connect(self.cerrar_ventana)
 

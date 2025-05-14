@@ -152,9 +152,7 @@ class ActualizarLibros(QWidget):
     def rellenar_tabla(self):
         try:
             self.tabla_cambiarlibros.setRowCount(0)
-            libro = select_prestamo_libro(self.nombre, self.autor, self.editorial, self.fecha)
-            id = libro[0].id_libro
-            copias = select_copia_libros_by_id(id)
+            copias = select_prestamo_libro(self.nombre, self.autor, self.editorial)
             tablerow = 0
             column_count = self.tabla_cambiarlibros.columnCount()-2
 
@@ -182,13 +180,12 @@ class ActualizarLibros(QWidget):
             traceback.print_exc()
             print(f"Error {e}")
 
-    def traer_datos(self, nombre_, autor_, editorial_, fecha_):
+    def traer_datos(self, nombre_, autor_, editorial_):
         self.nombre = nombre_
         self.autor = autor_
         self.editorial = editorial_
-        self.fecha = fecha_
         self.rellenar_tabla()
-        return self.nombre, self.autor, self.editorial, self.fecha
+        return self.nombre, self.autor, self.editorial
 
     def act_datos(self):
         selected_rows = self.tabla_cambiarlibros.selectionModel().selectedRows()
