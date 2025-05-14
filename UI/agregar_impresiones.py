@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QHBoxLayout,
-                             QTextEdit, QCheckBox, QMessageBox)
+                             QTextEdit, QCheckBox, QMessageBox,
+                             QComboBox)
 
 from PyQt5.QtCore import (pyqtSignal, Qt, QTimer)
 
-from connection.session import selected_user_by_rut
+from connection.session import selected_user_by_rut, select_type_sheet
 from connection.connection import ingresar_impresiones
 
 
@@ -17,6 +18,9 @@ class AgregarImpresiones(QWidget):
         # Definición de Layouts
         main_layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
+        horizontal_layout_column = QHBoxLayout()
+        column1 = QVBoxLayout()
+        column2 = QVBoxLayout()
         button_layout = QHBoxLayout()
 
         # Ajustar márgenes y espaciado para tener menos espacio entre los widgets
@@ -44,6 +48,8 @@ class AgregarImpresiones(QWidget):
         self.descripcion.setPlaceholderText("Ingrese la descripcion de la impresion")
         self.descripcion.setMaximumHeight(100)  # Limitar altura de la caja de texto
 
+        self.combo_hoja = QComboBox()
+
         # Botones
         self.boton_agregar = QPushButton("Agregar Impresion")
         self.boton_volver = QPushButton("Volver al menu de Impresiones")
@@ -59,26 +65,42 @@ class AgregarImpresiones(QWidget):
         self.cantidad_p = self.crear_label("Cantidad de paginas que tiene el documento en total *")
         self.curso = self.crear_label("Curso/Departamento *")
         self.descip = self.crear_label("Descripcion de la Impresion *")
+        self.hojas = self.crear_label("Tipo de Hoja *")
 
         # Configurar el Layout principal
         main_layout.addWidget(self.rut)
         main_layout.addLayout(horizontal_layout)
-        main_layout.addWidget(self.nombre)
-        main_layout.addWidget(self.nombre_solicitante)
-        main_layout.addWidget(self.curso)
-        main_layout.addWidget(self.cursos)
-        main_layout.addWidget(self.cantidad_c)
-        main_layout.addWidget(self.cantidad_copias)
-        main_layout.addWidget(self.cantidad_p)
-        main_layout.addWidget(self.cantidad_paginas)
+
+        column1.addWidget(self.nombre)
+        column1.addWidget(self.nombre_solicitante)
+        column1.addWidget(self.curso)
+        column1.addWidget(self.cursos)
+        column1.addWidget(self.cantidad_c)
+        column1.addWidget(self.cantidad_copias)
+        horizontal_layout_column.addLayout(column1)
+
+        column2.addWidget(self.cantidad_p)
+        column2.addWidget(self.cantidad_paginas)
+        column2.addWidget(self.hojas)
+        column2.addWidget(self.combo_hoja)
+        horizontal_layout_column.addLayout(column2)
+
+
+        main_layout.addLayout(horizontal_layout_column)
         main_layout.addWidget(self.descip)
         main_layout.addWidget(self.descripcion)
         
         button_layout.addWidget(self.boton_agregar)
         button_layout.addWidget(self.boton_volver)
 
+        self.combo_hoja.addItem("Selecciona el tipo de hoja a usar")
+        hoja = select_type_sheet()
+        for ho in hoja:
+            self.combo_hoja.addItem(ho[0])
+
         
         # Agregar botones
+        main_layout.setSpacing(15)
         main_layout.addLayout(button_layout)
 
         # Asignar el Layout
@@ -131,6 +153,7 @@ class AgregarImpresiones(QWidget):
         curso = self.cursos.text()
         rut = self.rut_solicitante.text()
         descrip = self.descripcion.toPlainText()
+        hoja = ""
         if not nombre or not curso or not descrip or not copias or not paginas:
             msg = QMessageBox()
             msg.setWindowTitle("Error de Entrada")
@@ -145,7 +168,11 @@ class AgregarImpresiones(QWidget):
             msg.setIcon(QMessageBox.Warning)
             msg.exec()
             return
-        ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip)
+        if self.combo_hoja.currentText() != "Selecciona el tipo de hoja a usar":
+            hoja = self.combo_hoja.currentText()
+        elif self.combo_hoja.currentText() == "Selecciona el tipo de hoja a usar":
+            hoja = ""
+        ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip, hoja)
         msg = QMessageBox()
         msg.setWindowTitle("Impresión Agregada")
         msg.setText("La impresión ha sido agregada con éxito.")

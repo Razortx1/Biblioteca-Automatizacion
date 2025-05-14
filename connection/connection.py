@@ -52,7 +52,7 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
     finally:
         session.close()
 
-def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descripcion_):
+def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descripcion_, tipo_hoja):
     fecha = datetime.now()
     fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
     fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
@@ -75,6 +75,7 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             cantidad_copias = cant_copias,
             cantidad_paginas = cant_paginas,
             fecha_impresion = (fecha),
+            tipo_papel = tipo_hoja,
             estado_impresion_id = 1,
             user_id = user.id_user
         )

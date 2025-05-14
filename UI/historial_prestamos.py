@@ -1,12 +1,14 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
-                             QPushButton, QLabel, QAbstractItemView,
-                             QMessageBox, QHBoxLayout, QSizePolicy)
+                             QPushButton, QComboBox, QAbstractItemView,
+                             QMessageBox, QHBoxLayout, QSizePolicy,
+                             QLineEdit)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 
-from connection.session import select_prestamos_all
+from connection.session import (select_prestamos_all, select_all_estado_prestamos, 
+                                select_cursos_user)
 from .actualizar_ui.actualizar_prestamos import ActualizarPrestamos
 
 class HistorialPrestamos(QWidget):
@@ -17,16 +19,33 @@ class HistorialPrestamos(QWidget):
 
         self.w = None
 
-        #Definicion del layout
+        # Definicion del layout
         vertical_layout = QVBoxLayout()
 
-        self.voidLabel_1 = QLabel()
-        self.voidLabel_2 = QLabel()
+        filtro_layout = QHBoxLayout()
+
+        # Definicion de combobox para filtrado
+        self.estado_prestamo = QComboBox()
+        self.combo_curso = QComboBox()
+
+        # Definicion de lineedit para filtrado
+        self.rut_prestatario = QLineEdit()
+        self.rut_prestatario.setInputMask("00.000.000-n;_")
+
+        self.nombre_libro = QLineEdit()
+        self.nombre_libro.setPlaceholderText("Nombre Libro")
+
+        self.nombre_user = QLineEdit()
+        self.nombre_user.setPlaceholderText("Nombre Alumno/Profesor")
+
+        # Definicion botones para filtrado
+        self.filtrar = QPushButton("Aplicar Filtro")
+        self.quitar_filtro = QPushButton("Quitar Filtro")
 
         vertical_layout.setContentsMargins(15, 15, 15, 15)
         vertical_layout.setSpacing(5)
 
-        #Creacion de la tabla
+        # Creacion de la tabla
         self.tabla_historial = QTableWidget()
         self.tabla_historial.setColumnCount(8)
 
@@ -62,16 +81,25 @@ class HistorialPrestamos(QWidget):
         item.setText("Estado Prestamo")
         self.tabla_historial.setHorizontalHeaderItem(7, item)
 
-        #Tamaño Columnas
+        # Tamaño Columnas
         header = self.tabla_historial.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tabla_historial.setRowCount(0)
 
-        #Creacion botones
+        # Creacion botones
         self.cambiar_estado = QPushButton("Cambiar Estado")
         self.volver_atras = QPushButton("Volver al Menu Principal")
 
-        #Agregar los Widgets al layout
+        # Agregar los Widgets al layout
+        filtro_layout.addWidget(self.nombre_user)
+        filtro_layout.addWidget(self.combo_curso)
+        filtro_layout.addWidget(self.rut_prestatario)
+        filtro_layout.addWidget(self.nombre_libro)
+        filtro_layout.addWidget(self.estado_prestamo)
+        filtro_layout.addWidget(self.filtrar)
+        filtro_layout.addWidget(self.quitar_filtro)
+
+        vertical_layout.addLayout(filtro_layout)
         vertical_layout.addWidget(self.tabla_historial)
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
@@ -81,24 +109,39 @@ class HistorialPrestamos(QWidget):
         button_layout.addWidget(self.volver_atras)
         vertical_layout.addLayout(button_layout)
 
-        #Asignar el layout
+        # Asignar el layout
         self.setLayout(vertical_layout)
 
         self.tabla_historial.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_historial.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tabla_historial.setMinimumHeight(300)
-        self.tabla_historial.setMaximumHeight(500)
+        self.tabla_historial.setMaximumHeight(400)
 
-        #Funcionamiento Botones
+        # Funcionamiento Botones
         self.cambiar_estado.clicked.connect(self.cambiar_state)
         self.volver_atras.clicked.connect(self.volver_principal.emit)
+        self.quitar_filtro.clicked.connect(self.quitar_filtros)
+        self.filtrar.clicked.connect(self.filtrado_datos)
+
+        self.estado_prestamo.addItem("Selecciona un estado")
+        estado = select_all_estado_prestamos()
+        for es in estado:
+            self.estado_prestamo.insertItem(es[0].id_estadoprestamo, es[0].estado_prestamo)
+        
+        self.combo_curso.addItem("Selecciona un curso")
+        curso = select_cursos_user()
+        for cur in curso:
+            self.combo_curso.addItem(cur[0])
 
         self.rellenar_tabla()
 
-    #Funcion para rellenar la tabla
+    # Funcion para rellenar la tabla
     def rellenar_tabla(self):
-        self.tabla_historial.setRowCount(0)
         prestamos = select_prestamos_all()
+        self.tabla(prestamos)
+
+    def tabla(self, prestamos):
+        self.tabla_historial.setRowCount(0)
         tablerow = 0
         columna = 0
         column_count = self.tabla_historial.columnCount()
@@ -131,6 +174,37 @@ class HistorialPrestamos(QWidget):
                 columna+=1
         else:
             pass
+
+    def filtrado_datos(self):
+        estado = ""
+        rut_prest = ""
+        libro_nombre = self.nombre_libro.text()
+        user_nombre = self.nombre_user.text()
+        curso = ""
+        if self.estado_prestamo.currentText() != "Selecciona un estado":
+            estado = self.estado_prestamo.currentIndex()
+        elif estado == "Selecciona un estado":
+            estado = ""
+        if self.rut_prestatario.text() != "..-":
+            rut_prest = self.rut_prestatario.text()
+        if self.combo_curso.currentText() != "Selecciona un curso":
+            curso = self.combo_curso.currentText()
+        elif curso == "Selecciona un estado":
+            curso = ""
+
+        tabla = select_prestamos_all(estado=estado, rut=rut_prest, 
+                                     nombre_libro=libro_nombre,
+                                     nombre_user=user_nombre,
+                                     curso=curso)
+        self.tabla(tabla)
+
+    def quitar_filtros(self):
+        self.estado_prestamo.setCurrentIndex(0)
+        self.combo_curso.setCurrentIndex(0)
+        self.rut_prestatario.clear()
+        self.nombre_libro.clear()
+        self.nombre_user.clear()
+        self.rellenar_tabla()
 
 
     def cambiar_state(self):

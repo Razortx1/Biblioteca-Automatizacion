@@ -92,9 +92,13 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
-    def select_prestamos_all():
+    def select_prestamos_all(estado=None, 
+                             rut=None, 
+                             nombre_libro=None,
+                             nombre_user=None,
+                             curso=None):
         try:
-            prestamos = session.execute(select(Prestamos.fecha_inicio, Prestamos.fecha_termino, Estado_Prestamo.estado_prestamo,
+            query = (select(Prestamos.fecha_inicio, Prestamos.fecha_termino, Estado_Prestamo.estado_prestamo,
                                                Usuario.nombre, Usuario.curso, Usuario.rut, Libro.nombre_libro,
                                                func.count(Libro.nombre_libro).label("stock"))
                                                .join(Prestamos.estado_prestamo)
@@ -103,6 +107,17 @@ with Session(engine) as session:
                                                .join_from(CopiasLibros, Libro, CopiasLibros.libro_id == Libro.id_libro)
                                                .group_by(Usuario.nombre, Libro.nombre_libro,Prestamos.fecha_inicio, Estado_Prestamo.estado_prestamo)
                                                .order_by(Prestamos.fecha_inicio.desc()))
+            if estado:
+                query = query.where(Prestamos.estado_prestamo_id == estado)
+            if rut:
+                query = query.where(Usuario.rut.contains(rut))
+            if nombre_libro:
+                query = query.where(Libro.nombre_libro.contains(nombre_libro))
+            if nombre_user:
+                query = query.where(Usuario.nombre.contains(nombre_user))
+            if curso:
+                query = query.where(Usuario.curso.contains(curso))
+            prestamos = session.execute(query)
             return prestamos
         except Exception as e:
             traceback.print_exc()
@@ -203,6 +218,13 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
+    def select_cursos_user():
+        try:
+            curso = session.execute(select(distinct(Usuario.curso)))
+            return curso
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
     def select_all_estado_prestamos():
         try:
             estado = session.execute(select(Estado_Prestamo)).all()
@@ -227,13 +249,15 @@ with Session(engine) as session:
             traceback.print_exc()
             print(f"Error {e}")
 
-    def select_impresiones_filtradas(estado=None, papel=None):
+    def select_impresiones_filtradas(estado=None, papel=None, departamento=None):
         try:
             query = session.query(Impresiones, Estado_Impresion, Usuario).join(Impresiones, Usuario.id_user == Impresiones.user_id).join(Impresiones.estado_impresion)
             if estado:
                 query = query.filter(Impresiones.estado_impresion_id == estado)
             if papel:
                 query = query.filter(Impresiones.tipo_papel == papel)
+            if departamento:
+                query = query.filter(Usuario.curso.contains(departamento))
             resultado = query.all()
             return resultado
         except Exception as e:

@@ -51,7 +51,7 @@ class HistorialLibros(QWidget):
         headers = ["Nombre Libro", "Autor", "Editorial", "Fecha Entrada a Biblioteca","Area de Biblioteca", 
                    "Sector Estanteria" , "Stock de Libros", "Estado del Libro"]
         self.tabla_libros.setMinimumHeight(300)
-        self.tabla_libros.setMaximumHeight(700)
+        self.tabla_libros.setMaximumHeight(400)
         
         # Asignar encabezados de las columnas
         for i, header in enumerate(headers):
@@ -69,7 +69,6 @@ class HistorialLibros(QWidget):
 
         # Agregar los widgets al layout principal
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(15)
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_inicio)
 
@@ -84,6 +83,7 @@ class HistorialLibros(QWidget):
 
         main_layout.addLayout(filtro_layout)
         main_layout.addWidget(self.tabla_libros)
+        main_layout.addSpacing(10)
         main_layout.addWidget(self.agregar_prestamo)
         main_layout.addLayout(button_layout)
 
@@ -114,7 +114,6 @@ class HistorialLibros(QWidget):
             self.estado_filtro.addItem(es[0].estado_libro)
 
     def rellenar_tabla(self):
-        self.tabla_libros.setRowCount(0)
         libros = select_libros_available()
         self.tabla(libros)
 
@@ -128,7 +127,6 @@ class HistorialLibros(QWidget):
         self.rellenar_tabla()
 
     def aplicar_filtros(self):
-        self.tabla_libros.setRowCount(0)
         biblioteca = self.sector_biblioteca.text()
         estanteria = self.sector_estanteria.text()
         no_editorial = self.editorial.text()
@@ -138,7 +136,6 @@ class HistorialLibros(QWidget):
         if self.estado_filtro.currentText() != "Selecciona un estado":
             estado = self.estado_filtro.currentText()
         elif estado == "Selecciona un estado":
-            self.rellenar_tabla()
             return
         libros = select_libros_available(nombre=nombre,autor= autor,Editorial=no_editorial, Estado_=estado,
                                          SectorBiblio=biblioteca, SectorEstanteria=estanteria)
@@ -161,6 +158,7 @@ class HistorialLibros(QWidget):
         self.ir_prestamo_libro.emit(nombre, autor, editorial, fecha)
 
     def tabla(self, libros):
+        self.tabla_libros.setRowCount(0)
         mal_estado = QColor("#ffd62e")  # Mal estado
         buen_estado = QColor("#b2f7b2")  # Buen estado
         dado_baja = QColor("#ff6b6b")  # Dado de baja
