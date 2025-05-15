@@ -157,15 +157,15 @@ class ActualizarLibros(QWidget):
             column_count = self.tabla_cambiarlibros.columnCount()-2
 
             if copias:
-                for l in copias:
+                for co in copias:
                     row_position = self.tabla_cambiarlibros.rowCount()
                     self.tabla_cambiarlibros.insertRow(row_position)
-                    self.tabla_cambiarlibros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
-                    self.tabla_cambiarlibros.setItem(tablerow, 1, QTableWidgetItem(l.autor))
-                    self.tabla_cambiarlibros.setItem(tablerow, 2, QTableWidgetItem(l.editorial))
-                    self.tabla_cambiarlibros.setItem(tablerow, 3, QTableWidgetItem(str(l.fecha_entrada)))
-                    self.tabla_cambiarlibros.setItem(tablerow, 4, QTableWidgetItem(l.estado_libro))
-                    self.tabla_cambiarlibros.setItem(tablerow, 5, QTableWidgetItem(str(l.id_copia)))
+                    self.tabla_cambiarlibros.setItem(tablerow, 0, QTableWidgetItem(co.nombre_libro))
+                    self.tabla_cambiarlibros.setItem(tablerow, 1, QTableWidgetItem(co.autor))
+                    self.tabla_cambiarlibros.setItem(tablerow, 2, QTableWidgetItem(co.editorial))
+                    self.tabla_cambiarlibros.setItem(tablerow, 3, QTableWidgetItem(str(co.fecha_entrada)))
+                    self.tabla_cambiarlibros.setItem(tablerow, 4, QTableWidgetItem(co.estado_libro))
+                    self.tabla_cambiarlibros.setItem(tablerow, 5, QTableWidgetItem(str(co.id_copia)))
 
 
                     estado = self.tabla_cambiarlibros.item(tablerow, column_count).text()

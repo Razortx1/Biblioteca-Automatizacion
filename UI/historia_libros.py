@@ -168,19 +168,19 @@ class HistorialLibros(QWidget):
         estado_regular = QColor("#ffe066")  # Estado regular
 
         if libros:
-            for l in libros:
+            for li in libros:
                 row_position = self.tabla_libros.rowCount()
                 self.tabla_libros.insertRow(row_position)
 
                 # Insertar los datos del libro
-                self.tabla_libros.setItem(row_position, 0, QTableWidgetItem(l.nombre_libro))
-                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(l.autor))
-                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(l.editorial))
-                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(l.fecha_entrada)))
-                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(l.sector_biblioteca))
-                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(l.sector_estanteria))
-                self.tabla_libros.setItem(row_position, 6, QTableWidgetItem(str(l.stock)))
-                self.tabla_libros.setItem(row_position, 7, QTableWidgetItem(l.estado_libro))
+                self.tabla_libros.setItem(row_position, 0, QTableWidgetItem(li.nombre_libro))
+                self.tabla_libros.setItem(row_position, 1, QTableWidgetItem(li.autor))
+                self.tabla_libros.setItem(row_position, 2, QTableWidgetItem(li.editorial))
+                self.tabla_libros.setItem(row_position, 3, QTableWidgetItem(str(li.fecha_entrada)))
+                self.tabla_libros.setItem(row_position, 4, QTableWidgetItem(li.sector_biblioteca))
+                self.tabla_libros.setItem(row_position, 5, QTableWidgetItem(li.sector_estanteria))
+                self.tabla_libros.setItem(row_position, 6, QTableWidgetItem(str(li.stock)))
+                self.tabla_libros.setItem(row_position, 7, QTableWidgetItem(li.estado_libro))
 
                 # Asignar colores dependiendo del estado
                 estado_libro = self.tabla_libros.item(row_position, 7).text()
