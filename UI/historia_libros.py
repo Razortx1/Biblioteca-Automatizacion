@@ -69,6 +69,7 @@ class HistorialLibros(QWidget):
 
         # Agregar los widgets al layout principal
         button_layout = QHBoxLayout()
+        
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_inicio)
 
@@ -108,6 +109,9 @@ class HistorialLibros(QWidget):
         self.quitar_filtro.clicked.connect(self.vaciar_filtrado)
 
         # Rellenado del combobox
+
+    def rellenar_combobox(self):
+        self.estado_filtro.clear()
         self.estado_filtro.addItem("Selecciona un estado")
         estado = select_estado_libro_all()
         for es in estado:

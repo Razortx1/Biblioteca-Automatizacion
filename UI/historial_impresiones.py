@@ -44,7 +44,6 @@ class HistorialImpresiones(QWidget):
         # Tamaño de las columnas
         header = self.tabla_impresiones.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.tabla_impresiones.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.tabla_impresiones.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_impresiones.setSelectionMode(QAbstractItemView.MultiSelection)

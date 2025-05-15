@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
                              QPushButton, QComboBox, QAbstractItemView,
-                             QMessageBox, QHBoxLayout, QSizePolicy,
+                             QMessageBox, QHBoxLayout,
                              QLineEdit)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
@@ -42,8 +42,6 @@ class HistorialPrestamos(QWidget):
         self.filtrar = QPushButton("Aplicar Filtro")
         self.quitar_filtro = QPushButton("Quitar Filtro")
 
-        vertical_layout.setContentsMargins(15, 15, 15, 15)
-        vertical_layout.setSpacing(5)
 
         # Creacion de la tabla
         self.tabla_historial = QTableWidget()
@@ -84,7 +82,8 @@ class HistorialPrestamos(QWidget):
         # Tamaño Columnas
         header = self.tabla_historial.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.tabla_historial.setRowCount(0)
+        self.tabla_historial.setMinimumHeight(300)
+        self.tabla_historial.setMaximumHeight(400)
 
         # Creacion botones
         self.cambiar_estado = QPushButton("Cambiar Estado")
@@ -101,12 +100,11 @@ class HistorialPrestamos(QWidget):
 
         vertical_layout.addLayout(filtro_layout)
         vertical_layout.addWidget(self.tabla_historial)
+
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(10)
-        self.cambiar_estado.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.volver_atras.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_atras)
+
         vertical_layout.addLayout(button_layout)
 
         # Asignar el layout
@@ -114,8 +112,6 @@ class HistorialPrestamos(QWidget):
 
         self.tabla_historial.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_historial.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tabla_historial.setMinimumHeight(300)
-        self.tabla_historial.setMaximumHeight(400)
 
         # Funcionamiento Botones
         self.cambiar_estado.clicked.connect(self.cambiar_state)
@@ -126,6 +122,8 @@ class HistorialPrestamos(QWidget):
         self.rellenar_tabla()
 
     def rellenar_combobox(self):
+        self.estado_prestamo.clear()
+        self.combo_curso.clear()
         self.estado_prestamo.addItem("Selecciona un estado")
         estado = select_all_estado_prestamos()
         for es in estado:

@@ -122,6 +122,7 @@ class Window(QMainWindow):
                 self.pages[nombre_pagina].rellenar_combobox()
             elif nombre_pagina == "historia_libros":
                 self.pages[nombre_pagina].rellenar_tabla()
+                self.pages[nombre_pagina].rellenar_combobox()
             elif nombre_pagina == "historial_prestamos":
                 self.pages[nombre_pagina].rellenar_tabla()
                 self.pages[nombre_pagina].rellenar_combobox()
