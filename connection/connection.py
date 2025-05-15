@@ -1,24 +1,38 @@
 import traceback
 from PyQt5.QtWidgets import QMessageBox, QErrorMessage
-from connection.session import (session, selected_user_by_rut,
-                                update)
 
 from datetime import datetime
 
+from connection.session import (session, selected_user_by_rut,
+                                update, select_libros_equal)
 from sql.models import Libro, Impresiones, Usuario, CopiasLibros, Prestamos
+
+def get_create_libros(nombre_, autor_, editorial_, fecha_, sector_b, sector_es):
+        libro_ = select_libros_equal(nombre=nombre_,
+                                     autor=autor_,
+                                     editorial=editorial_,
+                                     fecha=fecha_,
+                                     sectorbiblioteca=sector_b,
+                                     sectorestanteria=sector_es)
+        if libro_:
+            libro = libro_[0].Libro
+            return libro
+        else:
+            libro = Libro(
+                    nombre_libro = nombre_,
+                    autor = autor_,
+                    editorial = editorial_,
+                    fecha_entrada = fecha_,
+                    sector_biblioteca = sector_b,
+                    sector_estanteria = sector_es
+                )
+            session.add(libro)
+            session.flush()
+            return libro
 
 def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, stock_):
     try:
-        libro = Libro(
-                nombre_libro = nombre_,
-                autor = autor_,
-                editorial = editorial_,
-                fecha_entrada = fecha_,
-                sector_biblioteca = sector_b,
-                sector_estanteria = sector_es
-            )
-        session.add(libro)
-        session.commit()
+        libro = get_create_libros(nombre_,autor_,editorial_,fecha_,sector_b,sector_es)
         for _ in range(int(stock_)):
             copia = CopiasLibros(
                 libro_id = libro.id_libro,
@@ -32,7 +46,13 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
         msg.setIcon(QMessageBox.Question)
         msg.exec()
         if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
+            msg_ok = QMessageBox()
+            msg_ok.setWindowTitle("Libro Agregado")
+            msg_ok.setText("El libro se ha agregado correctamente.")
+            msg_ok.setIcon(QMessageBox.Information)
+            msg_ok.exec()
             session.commit()
+            
 
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
@@ -49,27 +69,30 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
         error_mensaje.showMessage(f"A ocurrido un error al momento de insertar el libro.\
                                   Favor de volver a intentarlo. {e}")
         session.rollback()
-    finally:
-        session.close()
+
+def get_or_create_user(nombre_, curso_, rut_):
+    user_rut = selected_user_by_rut(rut_)
+    if user_rut:
+        user = user_rut[0].Usuario
+        if user.curso != curso_:
+            update_usuario(user.id_user, curso_)
+        return user
+    else:
+        user = Usuario(
+            nombre = nombre_,
+            curso = curso_,
+            rut = rut_
+        )
+        session.add(user)
+        session.flush()
+        return user
 
 def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descripcion_, tipo_hoja):
     fecha = datetime.now()
     fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
     fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
     try:
-        user_rut = selected_user_by_rut(rut_)
-        if user_rut:
-            user = user_rut[0][0]
-            if user.curso != curso_:
-                update_usuario(user.id_user, curso_)
-        else:
-            user = Usuario(
-                nombre = nombre_,
-                curso = curso_,
-                rut = rut_
-            )
-            session.add(user)
-            session.commit()
+        user = get_or_create_user(nombre_, curso_, rut_)
         impresion = Impresiones(
             descripcion = descripcion_,
             cantidad_copias = cant_copias,
@@ -96,6 +119,7 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             cancelAction.setIcon(QMessageBox.Information)
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
+            session.rollback()
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -107,8 +131,6 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             session.rollback()
         except:
             print("No se pudo obtener el error")
-    finally:
-        session.close()
 
 def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
     try:
@@ -124,7 +146,7 @@ def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
                 rut = rut_
             )
             session.add(user)
-            session.commit()
+            session.flush()
         prestamo = Prestamos(
             fecha_inicio = fecha_i,
             fecha_termino = fecha_m,
@@ -145,8 +167,6 @@ def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
             session.rollback()
         except:
             print("No se pudo obtener el error")
-    finally:
-        session.close()
 
 def update_estado_libro(id, estado):
     try:
@@ -165,8 +185,6 @@ def update_estado_libro(id, estado):
             session.rollback()
         except:
             print("No se pudo obtener el error")
-    finally:
-        session.close()
 
 def update_estado_impresion(fecha, estado):
     try:
@@ -185,8 +203,6 @@ def update_estado_impresion(fecha, estado):
             session.rollback()
         except:
             print("No se pudo obtener el error")
-    finally:
-        session.close()
 
 def update_estado_prestamos(id, estado):
     try:
@@ -205,14 +221,13 @@ def update_estado_prestamos(id, estado):
             session.rollback()
         except:
             print("No se pudo obtener el error")
-    finally:
-        session.close()
 
 def update_usuario(id, curso_):
     try:
         session.execute(update(Usuario)
                         .where(Usuario.id_user == id)
-                        .values(curso = curso_))
+                        .values(curso = curso_)
+                        .execution_options(synchronize_session="fetch"))
         session.commit()
     except Exception as e:
         import traceback

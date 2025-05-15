@@ -119,10 +119,12 @@ class Window(QMainWindow):
             self.setWindowTitle(f"Sistema Biblioteca | {nombre}")
             if nombre_pagina == "historial_impresiones":
                 self.pages[nombre_pagina].rellenar_tabla()
+                self.pages[nombre_pagina].rellenar_combobox()
             elif nombre_pagina == "historia_libros":
                 self.pages[nombre_pagina].rellenar_tabla()
             elif nombre_pagina == "historial_prestamos":
                 self.pages[nombre_pagina].rellenar_tabla()
+                self.pages[nombre_pagina].rellenar_combobox()
         else:
             print(f"Pagina {nombre_pagina} no encontrada")
 

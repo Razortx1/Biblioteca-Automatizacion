@@ -81,6 +81,10 @@ class HistorialImpresiones(QWidget):
         self.rellenar_tabla()
 
         # Rellenar ComboBox con los estados de impresión
+    def rellenar_combobox(self):
+        self.filtro_estado.clear()
+        self.filtro_tipo_papel.clear()
+        self.filtro_curso.clear()
         estados = select_all_estado_impresion()
         self.filtro_estado.addItem("Selecciona un estado")
         for es in estados:
@@ -100,6 +104,7 @@ class HistorialImpresiones(QWidget):
         impresiones = select_impresion_all()
         self.filtro_estado.setCurrentIndex(0)
         self.filtro_tipo_papel.setCurrentIndex(0)
+        self.filtro_curso.setCurrentIndex(0)
         self.tabla(impresiones)
 
     def actualizar_estado(self):

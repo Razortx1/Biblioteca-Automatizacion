@@ -122,7 +122,10 @@ class HistorialPrestamos(QWidget):
         self.volver_atras.clicked.connect(self.volver_principal.emit)
         self.quitar_filtro.clicked.connect(self.quitar_filtros)
         self.filtrar.clicked.connect(self.filtrado_datos)
+        
+        self.rellenar_tabla()
 
+    def rellenar_combobox(self):
         self.estado_prestamo.addItem("Selecciona un estado")
         estado = select_all_estado_prestamos()
         for es in estado:
@@ -132,8 +135,6 @@ class HistorialPrestamos(QWidget):
         curso = select_cursos_user()
         for cur in curso:
             self.combo_curso.addItem(cur[0])
-
-        self.rellenar_tabla()
 
     # Funcion para rellenar la tabla
     def rellenar_tabla(self):

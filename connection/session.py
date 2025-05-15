@@ -48,8 +48,7 @@ with Session(engine) as session:
                         p_alias.id_prestamos == None,
                         p_alias.estado_prestamo_id.in_([2, 3])  # Devuelto o Extraviado
                     )
-                )
-            )
+            ).offset(0).limit(50))
 
             # Filtros opcionales
             if nombre:
@@ -80,13 +79,28 @@ with Session(engine) as session:
             import traceback
             traceback.print_exc()
             print(f"Error {e}")
+    def select_libros_equal(nombre, autor, editorial, sectorbiblioteca, sectorestanteria, fecha):
+        try:
+            query = (select(Libro)
+                     .where(Libro.nombre_libro == nombre)
+                     .where(Libro.autor == autor)
+                     .where(Libro.editorial == editorial)
+                     .where(Libro.sector_biblioteca == sectorbiblioteca)
+                     .where(Libro.sector_estanteria == sectorestanteria)
+                     .where(Libro.fecha_entrada == fecha))
+                
+            libros = session.execute(query).all()
+            return libros
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
 
     def select_impresion_all():
         try:
             impresion = session.execute(select(Impresiones, Estado_Impresion, Usuario)
                                         .join(Impresiones.estado_impresion)
                                         .join_from(Impresiones, Usuario, Impresiones.user_id == Usuario.id_user)
-                                        .order_by(Impresiones.id_impresion.desc()))
+                                        .order_by(Impresiones.fecha_impresion.desc()))
             return impresion
         except Exception as e:
             traceback.print_exc()
@@ -280,7 +294,7 @@ with Session(engine) as session:
                 query = query.filter(Impresiones.tipo_papel == papel)
             if departamento:
                 query = query.filter(Usuario.curso.contains(departamento))
-            resultado = query.all()
+            resultado = query.order_by(Impresiones.fecha_impresion.desc()).all()
             return resultado
         except Exception as e:
             traceback.print_exc()

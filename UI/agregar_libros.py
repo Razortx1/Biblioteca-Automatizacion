@@ -131,8 +131,3 @@ class AgregarLibros(QWidget):
         self.sector_biblioteca.clear()
         self.sector_estanteria.clear()
         self.stock_libro.clear()
-        msg = QMessageBox()
-        msg.setWindowTitle("Libro Agregado")
-        msg.setText("El libro se ha agregado correctamente.")
-        msg.setIcon(QMessageBox.Information)
-        msg.exec()
