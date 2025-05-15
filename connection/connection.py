@@ -129,8 +129,8 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer ingreso de la impresion.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
-        except:
-            print("No se pudo obtener el error")
+        except Exception as e:
+            print(f"Error {e}")
 
 def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
     try:
@@ -165,8 +165,8 @@ def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado del Libro.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
-        except:
-            print("No se pudo obtener el error")
+        except Exception as e:
+            print(f"Error {e}")
 
 def update_estado_libro(id, estado):
     try:
@@ -183,8 +183,8 @@ def update_estado_libro(id, estado):
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado del Libro.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
-        except:
-            print("No se pudo obtener el error")
+        except Exception as e:
+            print(f"Error {e}")
 
 def update_estado_impresion(fecha, estado):
     try:
@@ -219,8 +219,8 @@ def update_estado_prestamos(id, estado):
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado de la Impresion.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
-        except:
-            print("No se pudo obtener el error")
+        except Exception as e:
+            print(f"Error {e}")
 
 def update_usuario(id, curso_):
     try:
@@ -238,5 +238,5 @@ def update_usuario(id, curso_):
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado de la Impresion.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
-        except:
-            print("No se pudo obtener el error")
+        except Exception as e:
+            print(f"Error {e}")

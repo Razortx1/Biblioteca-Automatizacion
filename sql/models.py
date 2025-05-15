@@ -328,4 +328,4 @@ try:
     session.bulk_insert_mappings(Estado_Prestamo, estados)
     session.commit()
 except Exception as e:
-    pass
+    print(f"Error {e}")
