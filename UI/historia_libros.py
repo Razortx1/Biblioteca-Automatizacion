@@ -4,8 +4,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidge
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
-from connection.session import (select_libros_available, select_estado_libro_all,
-                                count_libro)
+from connection.session import (select_libros_available, select_estado_libro_all)
 from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
@@ -36,7 +35,6 @@ class HistorialLibros(QWidget):
         self.anterior = QPushButton("<---")
         self.anterior.setDisabled(True)
         self.siguiente = QPushButton("--->")
-        self.siguiente.setDisabled(True)
 
         #Label para paginacion
         self.pagina = QLabel()
@@ -155,19 +153,13 @@ class HistorialLibros(QWidget):
 
 
     def rellenar_tabla(self):
-        self.siguiente.setDisabled(False)
-        self.anterior.setDisabled(False)
-        count = count_libro()
-        for i in count:
-            self.number +=1
         offset = self.current_page * self.page_size
         libros = select_libros_available(offset=offset, limit=self.page_size)
         if self.current_page == 0:
             self.anterior.setDisabled(True)
-        self.tabla(libros)
-        if self.tabla_libros.rowCount() > self.number:
             self.siguiente.setDisabled(False)
-        elif self.tabla_libros.rowCount() < self.page_size or self.tabla_libros.rowCount() == self.number:
+        self.tabla(libros)
+        if self.tabla_libros.rowCount() < self.page_size:
             self.siguiente.setDisabled(True)
         
 
@@ -195,7 +187,7 @@ class HistorialLibros(QWidget):
         elif estado == "Selecciona un estado":
             return
         libros = select_libros_available(nombre=nombre,autor= autor,Editorial=no_editorial, Estado_=estado,
-                                         SectorBiblio=biblioteca, SectorEstanteria=estanteria)
+                                         SectorBiblio=biblioteca, SectorEstanteria=estanteria, limit=self.page_size)
         self.tabla(libros)
         
     def prestamo_ir(self):

@@ -98,7 +98,7 @@ with Session(engine) as session:
                     traceback.print_exc()
                     print(f"Error {e}")
 
-            def select_impresion_all(estado=None, papel=None, departamento=None):
+            def select_impresion_all(estado=None, papel=None, departamento=None, offset=None, limit=None):
                 try:
                     query = (select(Impresiones, Estado_Impresion, Usuario)
                                                 .join(Impresiones.estado_impresion)
@@ -110,8 +110,9 @@ with Session(engine) as session:
                         query = query.where(Impresiones.tipo_papel == papel)
                     if departamento:
                         query = query.where(Usuario.curso.contains(departamento))
-
+                    
                     query = query.order_by(Impresiones.fecha_impresion.desc())
+                    query = query.offset(offset).limit(limit)
                     impresion = session.execute(query).all()
                     return impresion
                 except Exception as e:
@@ -122,7 +123,9 @@ with Session(engine) as session:
                                     rut=None, 
                                     nombre_libro=None,
                                     nombre_user=None,
-                                    curso=None):
+                                    curso=None,
+                                    offset=None,
+                                    limit=None):
                 try:
                     query = (select(Prestamos.fecha_inicio, Prestamos.fecha_termino, Estado_Prestamo.estado_prestamo,
                                                     Usuario.nombre, Usuario.curso, Usuario.rut, Libro.nombre_libro,
@@ -143,6 +146,7 @@ with Session(engine) as session:
                         query = query.where(Usuario.nombre.contains(nombre_user))
                     if curso:
                         query = query.where(Usuario.curso.contains(curso))
+                    query = query.offset(offset).limit(limit)
                     prestamos = session.execute(query)
                     return prestamos
                 except Exception as e:
@@ -293,30 +297,6 @@ with Session(engine) as session:
                 try:
                     hoja = session.execute(select(distinct(Impresiones.tipo_papel)))
                     return hoja
-                except Exception as e:
-                    traceback.print_exc()
-                    print(f"Error {e}")
-
-            def count_libro():
-                try:
-                    count = session.execute(select(func.count(Libro.id_libro))
-                                            .join(Libro.copias)
-                                            .group_by(Libro.nombre_libro,
-                                                      Libro.autor,
-                                                      Libro.editorial,
-                                                      Libro.sector_biblioteca,
-                                                      Libro.sector_estanteria,
-                                                      CopiasLibros.estado_id))
-                    return count
-                except Exception as e:
-                    traceback.print_exc()
-                    print(f"Error {e}")
-
-            def count_impresion():
-                try:
-                    count = session.execute(select(func.count(Impresiones.id_impresion))
-                                            .group_by(Impresiones.fecha_impresion.desc()))
-                    return count
                 except Exception as e:
                     traceback.print_exc()
                     print(f"Error {e}")

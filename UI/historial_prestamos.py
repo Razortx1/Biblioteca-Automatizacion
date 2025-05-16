@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
                              QPushButton, QComboBox, QAbstractItemView,
                              QMessageBox, QHBoxLayout,
-                             QLineEdit)
+                             QLineEdit, QLabel)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -24,6 +24,8 @@ class HistorialPrestamos(QWidget):
 
         filtro_layout = QHBoxLayout()
 
+        paginacion_layout = QHBoxLayout()
+
         # Definicion de combobox para filtrado
         self.estado_prestamo = QComboBox()
         self.combo_curso = QComboBox()
@@ -42,6 +44,9 @@ class HistorialPrestamos(QWidget):
         self.filtrar = QPushButton("Aplicar Filtro")
         self.quitar_filtro = QPushButton("Quitar Filtro")
 
+        # Label para paginaciones
+        self.pagina = QLabel("Pagina 1")
+        self.pagina.setAlignment(Qt.AlignCenter)
 
         # Creacion de la tabla
         self.tabla_historial = QTableWidget()
@@ -83,11 +88,20 @@ class HistorialPrestamos(QWidget):
         header = self.tabla_historial.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tabla_historial.setMinimumHeight(300)
-        self.tabla_historial.setMaximumHeight(400)
+        self.tabla_historial.setMaximumHeight(300)
+
+        self.page_size = 7
+        self.current_page = 0
+        self.number = 0
 
         # Creacion botones
         self.cambiar_estado = QPushButton("Cambiar Estado")
         self.volver_atras = QPushButton("Volver al Menu Principal")
+
+        # Definicion PushButton para Paginaciones
+        self.anterior = QPushButton("<---")
+        self.anterior.setDisabled(True)
+        self.siguiente = QPushButton("--->")
 
         # Agregar los Widgets al layout
         filtro_layout.addWidget(self.nombre_user)
@@ -101,10 +115,15 @@ class HistorialPrestamos(QWidget):
         vertical_layout.addLayout(filtro_layout)
         vertical_layout.addWidget(self.tabla_historial)
 
+        paginacion_layout.addWidget(self.anterior)
+        paginacion_layout.addWidget(self.pagina)
+        paginacion_layout.addWidget(self.siguiente)
+
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_atras)
 
+        vertical_layout.addLayout(paginacion_layout)
         vertical_layout.addLayout(button_layout)
 
         # Asignar el layout
@@ -118,8 +137,9 @@ class HistorialPrestamos(QWidget):
         self.volver_atras.clicked.connect(self.volver_principal.emit)
         self.quitar_filtro.clicked.connect(self.quitar_filtros)
         self.filtrar.clicked.connect(self.filtrado_datos)
-        
-        self.rellenar_tabla()
+
+        self.anterior.clicked.connect(self.anterior_funcion)
+        self.siguiente.clicked.connect(self.siguiente_funcion)
 
     def rellenar_combobox(self):
         self.estado_prestamo.clear()
@@ -134,10 +154,33 @@ class HistorialPrestamos(QWidget):
         for cur in curso:
             self.combo_curso.addItem(cur[0])
 
+    def anterior_funcion(self):
+        if self.current_page > 0:
+            self.current_page -=1
+            self.pagina.setText(f"Pagina {self.current_page +1}")
+            self.rellenar_tabla()
+
+    def siguiente_funcion(self):
+        self.current_page+=1
+        self.pagina.setText(f"Pagina {self.current_page +1}")
+        self.anterior.setDisabled(False)
+        self.rellenar_tabla()
+
     # Funcion para rellenar la tabla
     def rellenar_tabla(self):
-        prestamos = select_prestamos_all()
+        offset = self.current_page * self.page_size
+        prestamos = select_prestamos_all(offset=offset, 
+                                         limit=self.page_size)
+        self.siguiente.setDisabled(False)
+        self.anterior.setDisabled(False)
+        if self.current_page == 0:
+            self.siguiente.setDisabled(False)
+            self.anterior.setDisabled(True)
         self.tabla(prestamos)
+        if self.tabla_historial.rowCount() > self.number:
+            self.siguiente.setDisabled(False)
+        if self.tabla_historial.rowCount() < self.page_size:
+            self.siguiente.setDisabled(True)
 
     def tabla(self, prestamos):
         self.tabla_historial.setRowCount(0)
@@ -175,11 +218,16 @@ class HistorialPrestamos(QWidget):
             pass
 
     def filtrado_datos(self):
+        self.current_page = 0
+        self.pagina.setText(f"Pagina {self.current_page+1}")
         estado = ""
         rut_prest = ""
         libro_nombre = self.nombre_libro.text()
         user_nombre = self.nombre_user.text()
         curso = ""
+
+        self.anterior.setDisabled(True)
+        self.siguiente.setDisabled(True)
         if self.estado_prestamo.currentText() != "Selecciona un estado":
             estado = self.estado_prestamo.currentIndex()
         elif estado == "Selecciona un estado":
@@ -190,11 +238,10 @@ class HistorialPrestamos(QWidget):
             curso = self.combo_curso.currentText()
         elif curso == "Selecciona un estado":
             curso = ""
-
         tabla = select_prestamos_all(estado=estado, rut=rut_prest, 
-                                     nombre_libro=libro_nombre,
-                                     nombre_user=user_nombre,
-                                     curso=curso)
+                                        nombre_libro=libro_nombre,
+                                        nombre_user=user_nombre,
+                                        curso=curso, limit=self.page_size)
         self.tabla(tabla)
 
     def quitar_filtros(self):

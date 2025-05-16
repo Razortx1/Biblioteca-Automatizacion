@@ -32,6 +32,7 @@ class HistorialImpresiones(QWidget):
         # PushButton Paginaciones
         self.anterior = QPushButton("<---")
         self.siguiente = QPushButton("--->")
+        self.siguiente.setDisabled(True)
 
         # Label para paginaciones
         self.pagina = QLabel("Pagina 1")
@@ -65,8 +66,8 @@ class HistorialImpresiones(QWidget):
 
         # Layout para los filtros
         filter_layout.addWidget(self.filtro_curso)
-        filter_layout.addWidget(self.filtro_estado)
         filter_layout.addWidget(self.filtro_tipo_papel)
+        filter_layout.addWidget(self.filtro_estado)
         filter_layout.addWidget(self.filtrar)
         filter_layout.addWidget(self.borrar_filtro)
 
@@ -84,6 +85,7 @@ class HistorialImpresiones(QWidget):
 
         self.page_size = 7
         self.current_page = 0
+        self.number = 0
 
         # Establecer el layout principal
         self.setLayout(main_layout)
@@ -92,16 +94,29 @@ class HistorialImpresiones(QWidget):
         self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_atras.clicked.connect(self.volver_menu.emit)
         self.filtrar.clicked.connect(self.filtrar_tabla)
-        self.borrar_filtro.clicked.connect(self.rellenar_tabla)
+        self.borrar_filtro.clicked.connect(self.vaciar_filtrado)
 
         self.anterior.clicked.connect(self.anterior_funcion)
         self.siguiente.clicked.connect(self.siguiente_funcion)
 
 
     def anterior_funcion(self):
-        pass
+        if self.current_page > 0:
+            self.current_page -=1
+            self.pagina.setText(f"Pagina {self.current_page +1}")
+            self.rellenar_tabla()
+
     def siguiente_funcion(self):
-        pass
+        self.current_page+=1
+        self.pagina.setText(f"Pagina {self.current_page +1}")
+        self.anterior.setDisabled(False)
+        self.rellenar_tabla()
+
+    def vaciar_filtrado(self):
+        self.filtro_estado.setCurrentIndex(0)
+        self.filtro_tipo_papel.setCurrentIndex(0)
+        self.filtro_curso.setCurrentIndex(0)
+        self.rellenar_tabla()
 
     # Rellenar ComboBox con los estados de impresión
     def rellenar_combobox(self):
@@ -124,11 +139,18 @@ class HistorialImpresiones(QWidget):
             self.filtro_curso.addItem(cur[0])
 
     def rellenar_tabla(self):
-        impresiones = select_impresion_all()
-        self.filtro_estado.setCurrentIndex(0)
-        self.filtro_tipo_papel.setCurrentIndex(0)
-        self.filtro_curso.setCurrentIndex(0)
+        offset = self.current_page * self.page_size
+        impresiones = select_impresion_all(limit=self.page_size, offset=offset)
+        self.siguiente.setDisabled(False)
+        self.anterior.setDisabled(False)
+        if self.current_page == 0:
+            self.siguiente.setDisabled(False)
+            self.anterior.setDisabled(True)
         self.tabla(impresiones)
+        if self.tabla_impresiones.rowCount() > self.number:
+            self.siguiente.setDisabled(False)
+        if self.tabla_impresiones.rowCount() < self.page_size:
+            self.siguiente.setDisabled(True)
 
     def actualizar_estado(self):
         selected_row = self.tabla_impresiones.selectionModel().selectedRows()
@@ -157,6 +179,8 @@ class HistorialImpresiones(QWidget):
             self.rellenar_tabla()
 
     def filtrar_tabla(self):
+        self.siguiente.setDisabled(True)
+        self.anterior.setDisabled(True)
         estado_seleccionado = self.filtro_estado.currentIndex()
         papel = self.filtro_tipo_papel.currentText()
         curso = self.filtro_curso.currentText()
@@ -168,7 +192,8 @@ class HistorialImpresiones(QWidget):
             curso = ""
         datos_tabla = select_impresion_all(estado=estado_seleccionado, 
                                                    papel=papel,
-                                                   departamento=curso)
+                                                   departamento=curso,
+                                                   limit=self.page_size)
         self.tabla(impresiones=datos_tabla)
 
     def tabla(self, impresiones):
