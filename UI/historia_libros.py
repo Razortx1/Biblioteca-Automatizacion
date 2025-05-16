@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidget,
                              QAbstractItemView, QVBoxLayout, QHeaderView, QHBoxLayout,
-                             QMessageBox, QComboBox, QLineEdit)
-from PyQt5.QtCore import pyqtSignal
+                             QMessageBox, QComboBox, QLineEdit, QLabel)
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
 from connection.session import (select_libros_available, select_estado_libro_all)
@@ -22,12 +22,23 @@ class HistorialLibros(QWidget):
         # Layout para filtrado
         filtro_layout = QHBoxLayout()
 
+        pagination_layout = QHBoxLayout()
+
         # PushButtons para filtrado de tabla
         self.filtrar = QPushButton("Aplicar Filtro(s)")
         self.quitar_filtro = QPushButton("Quitar Filtro(s)")
 
         # Combobox para filtrado de tabla
         self.estado_filtro = QComboBox()
+
+        # PushButtons para paginacion
+        self.anterior = QPushButton("<---")
+        self.anterior.setDisabled(True)
+        self.siguiente = QPushButton("--->")
+
+        #Label para paginacion
+        self.pagina = QLabel()
+        self.pagina.setAlignment(Qt.AlignCenter)
 
         # LineEdit para filtrado de tabla
         self.nombre_filtro = QLineEdit()
@@ -82,12 +93,24 @@ class HistorialLibros(QWidget):
         filtro_layout.addWidget(self.filtrar)
         filtro_layout.addWidget(self.quitar_filtro)
 
+        pagination_layout.addWidget(self.anterior)
+        pagination_layout.addWidget(self.pagina)
+        pagination_layout.addWidget(self.siguiente)
+
         main_layout.addLayout(filtro_layout)
         main_layout.addWidget(self.tabla_libros)
-        main_layout.addSpacing(10)
+        main_layout.addLayout(pagination_layout)
+        main_layout.addSpacing(15)
         main_layout.addWidget(self.agregar_prestamo)
         main_layout.addLayout(button_layout)
 
+        self.pagina.setText("Pagina 1")
+
+        # Paginaciones
+        self.current_page = 0
+        self.page_size = 5
+
+        # Seleccion de datos desde la tabla
         self.tabla_libros.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_libros.setSelectionMode(QAbstractItemView.SingleSelection)
 
@@ -108,8 +131,10 @@ class HistorialLibros(QWidget):
         self.filtrar.clicked.connect(self.aplicar_filtros)
         self.quitar_filtro.clicked.connect(self.vaciar_filtrado)
 
-        # Rellenado del combobox
+        self.anterior.clicked.connect(self.anterior_funcion)
+        self.siguiente.clicked.connect(self.siguiente_funcion)
 
+    # Rellenado del combobox
     def rellenar_combobox(self):
         self.estado_filtro.clear()
         self.estado_filtro.addItem("Selecciona un estado")
@@ -117,8 +142,28 @@ class HistorialLibros(QWidget):
         for es in estado:
             self.estado_filtro.addItem(es[0].estado_libro)
 
+    # Funcion Boton siguiente-anterior
+    def anterior_funcion(self):
+        print("Anterior")
+        if self.current_page > 0:
+                self.current_page -=1
+                self.pagina.setText(f"Pagina {self.current_page +1}")
+                self.rellenar_tabla()
+    def siguiente_funcion(self):
+        print("siguiente")
+        self.current_page+=1
+        self.pagina.setText(f"Pagina {self.current_page +1}")
+        self.anterior.setDisabled(False)
+        self.rellenar_tabla()
+
+
     def rellenar_tabla(self):
-        libros = select_libros_available()
+        self.siguiente.setDisabled(False)
+        self.anterior.setDisabled(False)
+        offset = self.current_page * self.page_size
+        libros = select_libros_available(offset=offset, limit=self.page_size)
+        if self.current_page == 0:
+            self.anterior.setDisabled(True)
         self.tabla(libros)
 
     def vaciar_filtrado(self):
@@ -131,6 +176,8 @@ class HistorialLibros(QWidget):
         self.rellenar_tabla()
 
     def aplicar_filtros(self):
+        self.siguiente.setDisabled(False)
+        self.anterior.setDisabled(False)
         biblioteca = self.sector_biblioteca.text()
         estanteria = self.sector_estanteria.text()
         no_editorial = self.editorial.text()
