@@ -297,6 +297,21 @@ with Session(engine) as session:
                     traceback.print_exc()
                     print(f"Error {e}")
 
+            def count_libro():
+                try:
+                    count = session.execute(select(func.count(Libro.id_libro))
+                                            .join(Libro.copias)
+                                            .group_by(Libro.nombre_libro,
+                                                      Libro.autor,
+                                                      Libro.editorial,
+                                                      Libro.sector_biblioteca,
+                                                      Libro.sector_estanteria,
+                                                      CopiasLibros.estado_id))
+                    return count
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
     except Exception as e:
         traceback.print_exc()
         print(f"Error {e}")
