@@ -312,6 +312,15 @@ with Session(engine) as session:
                     traceback.print_exc()
                     print(f"Error {e}")
 
+            def count_impresion():
+                try:
+                    count = session.execute(select(func.count(Impresiones.id_impresion))
+                                            .group_by(Impresiones.fecha_impresion.desc()))
+                    return count
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
     except Exception as e:
         traceback.print_exc()
         print(f"Error {e}")

@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidget,
                              QTableWidgetItem, QLabel, QVBoxLayout,
                              QHeaderView, QMessageBox, QAbstractItemView,
                              QComboBox, QHBoxLayout, QSizePolicy)
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
 from connection.session import (select_impresion_all, select_all_estado_impresion,
@@ -29,11 +29,19 @@ class HistorialImpresiones(QWidget):
         self.filtro_tipo_papel = QComboBox()
         self.filtro_curso = QComboBox()
 
+        # PushButton Paginaciones
+        self.anterior = QPushButton("<---")
+        self.siguiente = QPushButton("--->")
+
+        # Label para paginaciones
+        self.pagina = QLabel("Pagina 1")
+        self.pagina.setAlignment(Qt.AlignCenter)
+
         # Crear la tabla de impresiones
         self.tabla_impresiones = QTableWidget()
         self.tabla_impresiones.setColumnCount(9)
         self.tabla_impresiones.setMinimumHeight(300)
-        self.tabla_impresiones.setMaximumHeight(400)
+        self.tabla_impresiones.setMaximumHeight(300)
         headers = ["Nombre Alumno/Profesor", "Curso/Departamento", "Cantidad de Páginas",
                    "Cantidad de Copias", "Hojas Usadas en Total", "Fecha de Impresión",
                    "Descripción","Tipo de Hoja" ,"Estado de la Impresión"]
@@ -53,6 +61,8 @@ class HistorialImpresiones(QWidget):
         self.cambiar_estado = QPushButton("Cambiar Estado")
         self.volver_atras = QPushButton("Volver al Menu de Impresiones")
 
+        paginacion_layout = QHBoxLayout()
+
         # Layout para los filtros
         filter_layout.addWidget(self.filtro_curso)
         filter_layout.addWidget(self.filtro_estado)
@@ -60,12 +70,20 @@ class HistorialImpresiones(QWidget):
         filter_layout.addWidget(self.filtrar)
         filter_layout.addWidget(self.borrar_filtro)
 
+        paginacion_layout.addWidget(self.anterior)
+        paginacion_layout.addWidget(self.pagina)
+        paginacion_layout.addWidget(self.siguiente)
+
         # Layout principal
         main_layout.addLayout(filter_layout)
         main_layout.addWidget(self.tabla_impresiones)
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_atras)
+        main_layout.addLayout(paginacion_layout)
         main_layout.addLayout(button_layout)
+
+        self.page_size = 7
+        self.current_page = 0
 
         # Establecer el layout principal
         self.setLayout(main_layout)
@@ -76,7 +94,16 @@ class HistorialImpresiones(QWidget):
         self.filtrar.clicked.connect(self.filtrar_tabla)
         self.borrar_filtro.clicked.connect(self.rellenar_tabla)
 
-        # Rellenar ComboBox con los estados de impresión
+        self.anterior.clicked.connect(self.anterior_funcion)
+        self.siguiente.clicked.connect(self.siguiente_funcion)
+
+
+    def anterior_funcion(self):
+        pass
+    def siguiente_funcion(self):
+        pass
+
+    # Rellenar ComboBox con los estados de impresión
     def rellenar_combobox(self):
         self.filtro_estado.clear()
         self.filtro_tipo_papel.clear()
