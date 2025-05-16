@@ -98,12 +98,21 @@ with Session(engine) as session:
                     traceback.print_exc()
                     print(f"Error {e}")
 
-            def select_impresion_all():
+            def select_impresion_all(estado=None, papel=None, departamento=None):
                 try:
-                    impresion = session.execute(select(Impresiones, Estado_Impresion, Usuario)
+                    query = (select(Impresiones, Estado_Impresion, Usuario)
                                                 .join(Impresiones.estado_impresion)
-                                                .join_from(Impresiones, Usuario, Impresiones.user_id == Usuario.id_user)
-                                                .order_by(Impresiones.fecha_impresion.desc()))
+                                                .join_from(Impresiones, Usuario, Impresiones.user_id == Usuario.id_user))
+                    if estado:
+                        query = query.where(Impresiones.estado_impresion_id == estado)
+
+                    if papel:
+                        query = query.where(Impresiones.tipo_papel == papel)
+                    if departamento:
+                        query = query.where(Usuario.curso.contains(departamento))
+
+                    query = query.order_by(Impresiones.fecha_impresion.desc())
+                    impresion = session.execute(query).all()
                     return impresion
                 except Exception as e:
                     traceback.print_exc()
@@ -287,21 +296,6 @@ with Session(engine) as session:
                 except Exception as e:
                     traceback.print_exc()
                     print(f"Error {e}")
-
-            def select_impresiones_filtradas(estado=None, papel=None, departamento=None):
-                try:
-                    query = session.query(Impresiones, Estado_Impresion, Usuario).join(Impresiones, Usuario.id_user == Impresiones.user_id).join(Impresiones.estado_impresion)
-                    if estado:
-                        query = query.filter(Impresiones.estado_impresion_id == estado)
-                    if papel:
-                        query = query.filter(Impresiones.tipo_papel == papel)
-                    if departamento:
-                        query = query.filter(Usuario.curso.contains(departamento))
-                    resultado = query.order_by(Impresiones.fecha_impresion.desc()).all()
-                    return resultado
-                except Exception as e:
-                    traceback.print_exc()
-                    print(f"Errores {e}")
 
     except Exception as e:
         traceback.print_exc()

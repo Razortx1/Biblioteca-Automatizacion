@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
 from connection.session import (select_impresion_all, select_all_estado_impresion,
-                                select_impresiones_filtradas, select_type_sheet,
+                                select_type_sheet,
                                 select_cursos_user)
 from connection.connection import update_estado_impresion
 
@@ -76,9 +76,6 @@ class HistorialImpresiones(QWidget):
         self.filtrar.clicked.connect(self.filtrar_tabla)
         self.borrar_filtro.clicked.connect(self.rellenar_tabla)
 
-        # Rellenar la tabla al inicio
-        self.rellenar_tabla()
-
         # Rellenar ComboBox con los estados de impresión
     def rellenar_combobox(self):
         self.filtro_estado.clear()
@@ -142,7 +139,7 @@ class HistorialImpresiones(QWidget):
             papel = ""
         if curso == "Selecciona un curso":
             curso = ""
-        datos_tabla = select_impresiones_filtradas(estado=estado_seleccionado, 
+        datos_tabla = select_impresion_all(estado=estado_seleccionado, 
                                                    papel=papel,
                                                    departamento=curso)
         self.tabla(impresiones=datos_tabla)

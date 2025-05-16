@@ -108,7 +108,7 @@ class HistorialLibros(QWidget):
 
         # Paginaciones
         self.current_page = 0
-        self.page_size = 5
+        self.page_size = 7
 
         # Seleccion de datos desde la tabla
         self.tabla_libros.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -119,10 +119,6 @@ class HistorialLibros(QWidget):
 
         # Establecer el layout principal
         self.setLayout(main_layout)
-
-        # Inicializar la tabla
-        self.tabla_libros.setRowCount(0)
-        self.rellenar_tabla()
 
         # Conectar los botones con las funciones
         self.cambiar_estado.clicked.connect(self.actualizar_estado)
@@ -176,8 +172,8 @@ class HistorialLibros(QWidget):
         self.rellenar_tabla()
 
     def aplicar_filtros(self):
-        self.siguiente.setDisabled(False)
-        self.anterior.setDisabled(False)
+        self.siguiente.setDisabled(True)
+        self.anterior.setDisabled(True)
         biblioteca = self.sector_biblioteca.text()
         estanteria = self.sector_estanteria.text()
         no_editorial = self.editorial.text()

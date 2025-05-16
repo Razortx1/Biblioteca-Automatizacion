@@ -12,47 +12,48 @@ from connection.connection import update_estado_libro
 
 style_sheet = """
 QWidget#ActualizarLibros {
-    background-color: #B4E7FF;
+    background-color: #6ec1e4;
 }
 
 QPushButton {
-    background-color: #C7FF9C;
-    color: #222;
+    background-color: #61ce70;
+    color: #000000;
     border-radius: 10px;
     padding: 10px 20px;
     font-size: 14px;
-    border: 1px solid #a6d97b;
+    border: 1px solid #009c88;
+    outline: none;
+    height: 25px;
+}
+
+QPushButton:hover {
+    background-color: #79db8a;
 }
 
 QPushButton:pressed {
-    background-color: #b2f27c;
+    background-color: #4fa75e
 }
 
-QLineEdit {
+QLineEdit,
+QComboBox {
     background-color: #ffffff;
     border: 1px solid #bbb;
     border-radius: 8px;
     padding: 10px;
 }
-
 QTableWidget {
-    background-color: #FFF9DB;
+    background-color: #fdf9e3;
     border: 1px solid #ccc;
     font-size: 14px;
 }
 
 QHeaderView::section {
-    background-color: #FFF3B0;
+    background-color: #f7bc09;
     font-weight: bold;
     padding: 6px;
     border: none;
-}
-
-QComboBox {
-    font-size: 14px;
-    padding: 5px;
-}
-"""
+    color: #54595F
+}"""
 
 class ActualizarLibros(QWidget):
     actualizar_datos = pyqtSignal()
