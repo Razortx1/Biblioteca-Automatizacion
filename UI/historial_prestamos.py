@@ -99,9 +99,9 @@ class HistorialPrestamos(QWidget):
         self.volver_atras = QPushButton("Volver al Menu Principal")
 
         # Definicion PushButton para Paginaciones
-        self.anterior = QPushButton("<---")
+        self.anterior = QPushButton("Pagina Anterior")
         self.anterior.setDisabled(True)
-        self.siguiente = QPushButton("--->")
+        self.siguiente = QPushButton("Pagina Siguiente")
 
         # Agregar los Widgets al layout
         filtro_layout.addWidget(self.nombre_user)

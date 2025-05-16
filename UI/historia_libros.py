@@ -32,9 +32,9 @@ class HistorialLibros(QWidget):
         self.estado_filtro = QComboBox()
 
         # PushButtons para paginacion
-        self.anterior = QPushButton("<---")
+        self.anterior = QPushButton("Pagina Anterior")
         self.anterior.setDisabled(True)
-        self.siguiente = QPushButton("--->")
+        self.siguiente = QPushButton("Pagina Siguiente")
 
         #Label para paginacion
         self.pagina = QLabel()

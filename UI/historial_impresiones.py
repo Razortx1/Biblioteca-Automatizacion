@@ -30,9 +30,9 @@ class HistorialImpresiones(QWidget):
         self.filtro_curso = QComboBox()
 
         # PushButton Paginaciones
-        self.anterior = QPushButton("<---")
-        self.siguiente = QPushButton("--->")
-        self.siguiente.setDisabled(True)
+        self.anterior = QPushButton("Pagina Anterior")
+        self.siguiente = QPushButton("Pagina Siguiente")
+        self.anterior.setDisabled(True)
 
         # Label para paginaciones
         self.pagina = QLabel("Pagina 1")
