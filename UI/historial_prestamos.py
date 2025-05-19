@@ -90,7 +90,7 @@ class HistorialPrestamos(QWidget):
         self.tabla_historial.setMinimumHeight(300)
         self.tabla_historial.setMaximumHeight(300)
 
-        self.page_size = 4
+        self.page_size = 7
         self.current_page = 0
 
         # Creacion botones
