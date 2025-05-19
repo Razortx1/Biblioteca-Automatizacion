@@ -152,9 +152,11 @@ class HistorialLibros(QWidget):
         self.rellenar_tabla()
 
 
-    def rellenar_tabla(self):
+    def rellenar_tabla(self, nombre_=None, autor_=None,
+                       no_editorial=None,estado=None, biblioteca_=None, estanteria_=None ):
         offset = self.current_page * self.page_size
-        libros = list(select_libros_available(offset=offset, limit=self.page_size+1))
+        libros = list(select_libros_available(nombre=nombre_,autor= autor_,Editorial=no_editorial, Estado_=estado,
+                                         SectorBiblio=biblioteca_, SectorEstanteria=estanteria_ ,offset=offset, limit=self.page_size+1))
         if len(libros) > self.page_size:
             self.anterior.setDisabled(True)
             self.siguiente.setDisabled(False)
@@ -185,9 +187,8 @@ class HistorialLibros(QWidget):
             estado = self.estado_filtro.currentText()
         elif estado == "Selecciona un estado":
             return
-        libros = select_libros_available(nombre=nombre,autor= autor,Editorial=no_editorial, Estado_=estado,
-                                         SectorBiblio=biblioteca, SectorEstanteria=estanteria, limit=self.page_size)
-        self.tabla(libros)
+        self.rellenar_tabla(nombre_=nombre, autor_=autor, no_editorial=no_editorial,
+                                     estado=estado, biblioteca_=biblioteca, estanteria_=estanteria)
         
     def prestamo_ir(self):
         selected_rows = self.tabla_libros.selectionModel().selectedRows()
