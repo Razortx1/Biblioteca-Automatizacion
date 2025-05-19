@@ -190,6 +190,8 @@ class PrestamoLibros(QWidget):
         selected_rows = self.tabla_libro_prestamo.selectionModel().selectedRows()
         fecha_ = self.fecha_maxima.dateTime().toPyDateTime().date()
         rut = self.rut_.text()
+        if rut == "..-":
+            rut = ""
         nombre = self.nombre_prestatario.text()
         curso = self.curso_prestatario.text()
         if not selected_rows:
@@ -198,6 +200,14 @@ class PrestamoLibros(QWidget):
             msg.setText("No se ha seleccionado un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
+            return
+        if not nombre and not rut and not curso:
+                msg = QMessageBox()
+                msg.setWindowTitle("Usuario invalido")
+                msg.setText("No se especificado un usuario")
+                msg.setIcon(QMessageBox.Information)
+                msg.exec()
+                return
         msg = QMessageBox()
         msg.setWindowTitle("Confirmar Prestamo")
         msg.setText(f"¿Deseas guardar el prestamo de {len(selected_rows)} libro(s)?")
