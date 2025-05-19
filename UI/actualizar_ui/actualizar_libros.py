@@ -12,47 +12,48 @@ from connection.connection import update_estado_libro
 
 style_sheet = """
 QWidget#ActualizarLibros {
-    background-color: #B4E7FF;
+    background-color: #6ec1e4;
 }
 
 QPushButton {
-    background-color: #C7FF9C;
-    color: #222;
+    background-color: #61ce70;
+    color: #000000;
     border-radius: 10px;
     padding: 10px 20px;
     font-size: 14px;
-    border: 1px solid #a6d97b;
+    border: 1px solid #009c88;
+    outline: none;
+    height: 25px;
+}
+
+QPushButton:hover {
+    background-color: #79db8a;
 }
 
 QPushButton:pressed {
-    background-color: #b2f27c;
+    background-color: #4fa75e
 }
 
-QLineEdit {
+QLineEdit,
+QComboBox {
     background-color: #ffffff;
     border: 1px solid #bbb;
     border-radius: 8px;
     padding: 10px;
 }
-
 QTableWidget {
-    background-color: #FFF9DB;
+    background-color: #fdf9e3;
     border: 1px solid #ccc;
     font-size: 14px;
 }
 
 QHeaderView::section {
-    background-color: #FFF3B0;
+    background-color: #f7bc09;
     font-weight: bold;
     padding: 6px;
     border: none;
-}
-
-QComboBox {
-    font-size: 14px;
-    padding: 5px;
-}
-"""
+    color: #54595F
+}"""
 
 class ActualizarLibros(QWidget):
     actualizar_datos = pyqtSignal()
@@ -152,22 +153,20 @@ class ActualizarLibros(QWidget):
     def rellenar_tabla(self):
         try:
             self.tabla_cambiarlibros.setRowCount(0)
-            libro = select_prestamo_libro(self.nombre, self.autor, self.editorial, self.fecha)
-            id = libro[0].id_libro
-            copias = select_copia_libros_by_id(id)
+            copias = select_prestamo_libro(self.nombre, self.autor, self.editorial)
             tablerow = 0
             column_count = self.tabla_cambiarlibros.columnCount()-2
 
             if copias:
-                for l in copias:
+                for co in copias:
                     row_position = self.tabla_cambiarlibros.rowCount()
                     self.tabla_cambiarlibros.insertRow(row_position)
-                    self.tabla_cambiarlibros.setItem(tablerow, 0, QTableWidgetItem(l.nombre_libro))
-                    self.tabla_cambiarlibros.setItem(tablerow, 1, QTableWidgetItem(l.autor))
-                    self.tabla_cambiarlibros.setItem(tablerow, 2, QTableWidgetItem(l.editorial))
-                    self.tabla_cambiarlibros.setItem(tablerow, 3, QTableWidgetItem(str(l.fecha_entrada)))
-                    self.tabla_cambiarlibros.setItem(tablerow, 4, QTableWidgetItem(l.estado_libro))
-                    self.tabla_cambiarlibros.setItem(tablerow, 5, QTableWidgetItem(str(l.id_copia)))
+                    self.tabla_cambiarlibros.setItem(tablerow, 0, QTableWidgetItem(co.nombre_libro))
+                    self.tabla_cambiarlibros.setItem(tablerow, 1, QTableWidgetItem(co.autor))
+                    self.tabla_cambiarlibros.setItem(tablerow, 2, QTableWidgetItem(co.editorial))
+                    self.tabla_cambiarlibros.setItem(tablerow, 3, QTableWidgetItem(str(co.fecha_entrada)))
+                    self.tabla_cambiarlibros.setItem(tablerow, 4, QTableWidgetItem(co.estado_libro))
+                    self.tabla_cambiarlibros.setItem(tablerow, 5, QTableWidgetItem(str(co.id_copia)))
 
 
                     estado = self.tabla_cambiarlibros.item(tablerow, column_count).text()
@@ -182,13 +181,12 @@ class ActualizarLibros(QWidget):
             traceback.print_exc()
             print(f"Error {e}")
 
-    def traer_datos(self, nombre_, autor_, editorial_, fecha_):
+    def traer_datos(self, nombre_, autor_, editorial_):
         self.nombre = nombre_
         self.autor = autor_
         self.editorial = editorial_
-        self.fecha = fecha_
         self.rellenar_tabla()
-        return self.nombre, self.autor, self.editorial, self.fecha
+        return self.nombre, self.autor, self.editorial
 
     def act_datos(self):
         selected_rows = self.tabla_cambiarlibros.selectionModel().selectedRows()

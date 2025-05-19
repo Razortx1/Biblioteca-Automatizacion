@@ -35,7 +35,7 @@ class PaginaPrincipal(QWidget):
         botones = [
             ("Registro de Libros", self.ir_a_agregar_libros),
             ("Inventario de Libros", self.ir_a_historia_libros),
-            ("Historial de Préstamos", self.ir_a_historial_prestamo),
+            ("Ficha de Préstamos", self.ir_a_historial_prestamo),
             ("Menú de Impresiones", self.ir_a_menu_impresiones)
         ]
 

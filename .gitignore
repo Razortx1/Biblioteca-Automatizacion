@@ -5,6 +5,9 @@ dist
 #Ignorar Base de Datos
 *.db
 
+#Ignorar archivo .spec
+*.spec
+
 #Ignorar Cache de Python
 
 # Ignorar caché en subdirectorios como UI/

@@ -2,11 +2,12 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidget,
                              QTableWidgetItem, QLabel, QVBoxLayout,
                              QHeaderView, QMessageBox, QAbstractItemView,
                              QComboBox, QHBoxLayout, QSizePolicy)
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
 from connection.session import (select_impresion_all, select_all_estado_impresion,
-                                select_impresiones_filtradas)
+                                select_type_sheet,
+                                select_cursos_user)
 from connection.connection import update_estado_impresion
 
 
@@ -22,17 +23,29 @@ class HistorialImpresiones(QWidget):
         button_layout = QHBoxLayout()
 
         # Widgets para Filtros
-        self.filtrar = QPushButton("Filtrar Estado")
-        self.borrar_filtro = QPushButton("Quitar Filtro")
+        self.filtrar = QPushButton("Aplicar Filtro(s)")
+        self.borrar_filtro = QPushButton("Quitar Filtro(s)")
         self.filtro_estado = QComboBox()
+        self.filtro_tipo_papel = QComboBox()
+        self.filtro_curso = QComboBox()
+
+        # PushButton Paginaciones
+        self.anterior = QPushButton("Pagina Anterior")
+        self.siguiente = QPushButton("Pagina Siguiente")
+        self.anterior.setDisabled(True)
+
+        # Label para paginaciones
+        self.pagina = QLabel("Pagina 1")
+        self.pagina.setAlignment(Qt.AlignCenter)
 
         # Crear la tabla de impresiones
         self.tabla_impresiones = QTableWidget()
-        self.tabla_impresiones.setColumnCount(8)
-        self.tabla_impresiones.setMaximumHeight(400)
+        self.tabla_impresiones.setColumnCount(9)
+        self.tabla_impresiones.setMinimumHeight(300)
+        self.tabla_impresiones.setMaximumHeight(300)
         headers = ["Nombre Alumno/Profesor", "Curso/Departamento", "Cantidad de Páginas",
                    "Cantidad de Copias", "Hojas Usadas en Total", "Fecha de Impresión",
-                   "Descripción", "Estado de la Impresión"]
+                   "Descripción","Tipo de Hoja" ,"Estado de la Impresión"]
         for i, header in enumerate(headers):
             item = QTableWidgetItem(header)
             self.tabla_impresiones.setHorizontalHeaderItem(i, item)
@@ -40,7 +53,6 @@ class HistorialImpresiones(QWidget):
         # Tamaño de las columnas
         header = self.tabla_impresiones.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.tabla_impresiones.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.tabla_impresiones.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_impresiones.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -50,17 +62,29 @@ class HistorialImpresiones(QWidget):
         self.cambiar_estado = QPushButton("Cambiar Estado")
         self.volver_atras = QPushButton("Volver al Menu de Impresiones")
 
+        paginacion_layout = QHBoxLayout()
+
         # Layout para los filtros
+        filter_layout.addWidget(self.filtro_curso)
+        filter_layout.addWidget(self.filtro_tipo_papel)
         filter_layout.addWidget(self.filtro_estado)
         filter_layout.addWidget(self.filtrar)
         filter_layout.addWidget(self.borrar_filtro)
+
+        paginacion_layout.addWidget(self.anterior)
+        paginacion_layout.addWidget(self.pagina)
+        paginacion_layout.addWidget(self.siguiente)
 
         # Layout principal
         main_layout.addLayout(filter_layout)
         main_layout.addWidget(self.tabla_impresiones)
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_atras)
+        main_layout.addLayout(paginacion_layout)
         main_layout.addLayout(button_layout)
+
+        self.page_size = 7
+        self.current_page = 0
 
         # Establecer el layout principal
         self.setLayout(main_layout)
@@ -69,20 +93,62 @@ class HistorialImpresiones(QWidget):
         self.cambiar_estado.clicked.connect(self.actualizar_estado)
         self.volver_atras.clicked.connect(self.volver_menu.emit)
         self.filtrar.clicked.connect(self.filtrar_tabla)
-        self.borrar_filtro.clicked.connect(self.rellenar_tabla)
+        self.borrar_filtro.clicked.connect(self.vaciar_filtrado)
 
-        # Rellenar la tabla al inicio
+        self.anterior.clicked.connect(self.anterior_funcion)
+        self.siguiente.clicked.connect(self.siguiente_funcion)
+
+
+    def anterior_funcion(self):
+        if self.current_page > 0:
+            self.current_page -=1
+            self.pagina.setText(f"Pagina {self.current_page +1}")
+            self.filtrar_tabla()
+
+    def siguiente_funcion(self):
+        self.current_page+=1
+        self.pagina.setText(f"Pagina {self.current_page +1}")
+        self.anterior.setDisabled(False)
+        self.filtrar_tabla()
+
+    def vaciar_filtrado(self):
+        self.filtro_estado.setCurrentIndex(0)
+        self.filtro_tipo_papel.setCurrentIndex(0)
+        self.filtro_curso.setCurrentIndex(0)
         self.rellenar_tabla()
 
-        # Rellenar ComboBox con los estados de impresión
+    # Rellenar ComboBox con los estados de impresión
+    def rellenar_combobox(self):
+        self.filtro_estado.clear()
+        self.filtro_tipo_papel.clear()
+        self.filtro_curso.clear()
         estados = select_all_estado_impresion()
         self.filtro_estado.addItem("Selecciona un estado")
         for es in estados:
             self.filtro_estado.insertItem(es[0].id_estadoimpresiones, es[0].estado_impresion)
 
-    def rellenar_tabla(self):
-        self.tabla_impresiones.setRowCount(0)
-        impresiones = select_impresion_all()
+        hoja = select_type_sheet()
+        self.filtro_tipo_papel.addItem("Selecciona un tipo de papel")
+        for ho in hoja:
+            self.filtro_tipo_papel.addItem(ho[0])
+
+        curso = select_cursos_user()
+        self.filtro_curso.addItem("Selecciona un curso")
+        for cur in curso:
+            self.filtro_curso.addItem(cur[0])
+
+    def rellenar_tabla(self, estado_seleccionado=None, papel=None, curso=None):
+        offset = self.current_page * self.page_size
+        impresiones = list(select_impresion_all(estado=estado_seleccionado, 
+                                                   papel=papel,
+                                                   departamento=curso,
+                                                   limit=self.page_size+1, offset=offset))
+        if len(impresiones) > self.page_size:
+            self.siguiente.setDisabled(False)
+            self.anterior.setDisabled(True)
+            impresiones = impresiones[:self.page_size]
+        else:
+            self.siguiente.setDisabled(True)
         self.tabla(impresiones)
 
     def actualizar_estado(self):
@@ -96,7 +162,7 @@ class HistorialImpresiones(QWidget):
         else:
             for row in selected_row:
                 item = self.tabla_impresiones.item(row.row(), 5).text()
-                estado = self.tabla_impresiones.item(row.row(), 7).text()
+                estado = self.tabla_impresiones.item(row.row(), 8).text()
                 if estado == "Aun no Impreso":
                     estado = 2
                 elif estado == "Ya Impreso":
@@ -112,15 +178,19 @@ class HistorialImpresiones(QWidget):
             self.rellenar_tabla()
 
     def filtrar_tabla(self):
-        self.tabla_impresiones.setRowCount(0)
         estado_seleccionado = self.filtro_estado.currentIndex()
-        if estado_seleccionado != 0:
-            datos_tabla = select_impresiones_filtradas(estado_seleccionado)
-            self.tabla(datos_tabla)
-        else:
-            self.rellenar_tabla()
+        papel = self.filtro_tipo_papel.currentText()
+        curso = self.filtro_curso.currentText()
+        if estado_seleccionado == 0:
+            estado_seleccionado = ""
+        if papel == "Selecciona un tipo de papel":
+            papel = ""
+        if curso == "Selecciona un curso":
+            curso = ""
+        self.rellenar_tabla(estado_seleccionado=estado_seleccionado, papel=papel, curso=curso)
 
     def tabla(self, impresiones):
+        self.tabla_impresiones.setRowCount(0)
         column_count = self.tabla_impresiones.columnCount()
         tablerow = 0
         no_impreso = QColor("#ff6b6b")
@@ -139,7 +209,8 @@ class HistorialImpresiones(QWidget):
                 self.tabla_impresiones.setItem(tablerow, 4, QTableWidgetItem(str(suma)))
                 self.tabla_impresiones.setItem(tablerow, 5, QTableWidgetItem(str(i.Impresiones.fecha_impresion)))
                 self.tabla_impresiones.setItem(tablerow, 6, QTableWidgetItem(i.Impresiones.descripcion))
-                self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
+                self.tabla_impresiones.setItem(tablerow, 7, QTableWidgetItem(i.Impresiones.tipo_papel))
+                self.tabla_impresiones.setItem(tablerow, 8, QTableWidgetItem(i.Estado_Impresion.estado_impresion))
 
                 texto_tabla = self.tabla_impresiones.item(tablerow, column_count-1).text()
 

@@ -130,8 +130,9 @@ class Libro(Base):
 
     def __repr__(self) -> str:
         return f"Libro(id_libro={self.id_libro!r}, nombre_libro={self.nombre_libro!r},\
-            cod_barras={self.cod_barras!r}, editorial={self.autor!r}, \
-            fecha_publicacion={self.fecha_publicacion!r})"
+            autor={self.autor!r},editorial={self.editorial!r}, \
+            fecha_entrada={self.fecha_entrada!r}, sector_biblioteca={self.sector_biblioteca!r}\
+            sector_estanteria={self.sector_estanteria!r})"
     
 class CopiasLibros(Base):
     __tablename__ = "copia_libro"
@@ -189,6 +190,7 @@ class Impresiones(Base):
     cantidad_copias: Mapped[int]
     cantidad_paginas: Mapped[int]
     fecha_impresion: Mapped[datetime]
+    tipo_papel: Mapped[str]
     estado_impresion_id: Mapped[int] = mapped_column(ForeignKey("estado_impresiones.id_estadoimpresiones"))
 
     estado_impresion: Mapped["Estado_Impresion"] = relationship()
@@ -302,28 +304,28 @@ try:
     session.bulk_insert_mappings(Estado_Libro, estados)
 
     estados = [{
-        'id_estadolibro': 1,
+        'id_estadoimpresiones': 1,
         'estado_impresion': "Aun no Impreso"
     },
     {
-        'id_estadolibro': 2,
+        'id_estadoimpresiones': 2,
         'estado_impresion': "Ya Impreso"
     }]
     session.bulk_insert_mappings(Estado_Impresion, estados)
 
     estados = [{
-        'id_estadolibro': 1,
+        'id_estadoprestamo': 1,
         'estado_prestamo': "Prestado"
     },
     {
-        'id_estadolibro': 2,
+        'id_estadoprestamo': 2,
         'estado_prestamo': "Devuelto"
     },
     {
-        'id_estadolibro': 3,
+        'id_estadoprestamo': 3,
         'estado_prestamo': "Extraviado"
     }]
     session.bulk_insert_mappings(Estado_Prestamo, estados)
     session.commit()
 except Exception as e:
-    pass
+    print(f"Error {e}")
