@@ -144,12 +144,12 @@ class HistorialLibros(QWidget):
         if self.current_page > 0:
                 self.current_page -=1
                 self.pagina.setText(f"Pagina {self.current_page +1}")
-                self.rellenar_tabla()
+                self.aplicar_filtros()
     def siguiente_funcion(self):
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
-        self.rellenar_tabla()
+        self.aplicar_filtros()
 
 
     def rellenar_tabla(self, nombre_=None, autor_=None,

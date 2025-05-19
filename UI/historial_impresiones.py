@@ -85,7 +85,6 @@ class HistorialImpresiones(QWidget):
 
         self.page_size = 7
         self.current_page = 0
-        self.number = 0
 
         # Establecer el layout principal
         self.setLayout(main_layout)
@@ -104,13 +103,13 @@ class HistorialImpresiones(QWidget):
         if self.current_page > 0:
             self.current_page -=1
             self.pagina.setText(f"Pagina {self.current_page +1}")
-            self.rellenar_tabla()
+            self.filtrar_tabla()
 
     def siguiente_funcion(self):
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
-        self.rellenar_tabla()
+        self.filtrar_tabla()
 
     def vaciar_filtrado(self):
         self.filtro_estado.setCurrentIndex(0)
@@ -138,19 +137,19 @@ class HistorialImpresiones(QWidget):
         for cur in curso:
             self.filtro_curso.addItem(cur[0])
 
-    def rellenar_tabla(self):
+    def rellenar_tabla(self, estado_seleccionado=None, papel=None, curso=None):
         offset = self.current_page * self.page_size
-        impresiones = select_impresion_all(limit=self.page_size, offset=offset)
-        self.siguiente.setDisabled(False)
-        self.anterior.setDisabled(False)
-        if self.current_page == 0:
+        impresiones = list(select_impresion_all(estado=estado_seleccionado, 
+                                                   papel=papel,
+                                                   departamento=curso,
+                                                   limit=self.page_size+1, offset=offset))
+        if len(impresiones) > self.page_size:
             self.siguiente.setDisabled(False)
             self.anterior.setDisabled(True)
-        self.tabla(impresiones)
-        if self.tabla_impresiones.rowCount() > self.number:
-            self.siguiente.setDisabled(False)
-        if self.tabla_impresiones.rowCount() < self.page_size:
+            impresiones = impresiones[:self.page_size]
+        else:
             self.siguiente.setDisabled(True)
+        self.tabla(impresiones)
 
     def actualizar_estado(self):
         selected_row = self.tabla_impresiones.selectionModel().selectedRows()
@@ -179,8 +178,6 @@ class HistorialImpresiones(QWidget):
             self.rellenar_tabla()
 
     def filtrar_tabla(self):
-        self.siguiente.setDisabled(True)
-        self.anterior.setDisabled(True)
         estado_seleccionado = self.filtro_estado.currentIndex()
         papel = self.filtro_tipo_papel.currentText()
         curso = self.filtro_curso.currentText()
@@ -190,11 +187,7 @@ class HistorialImpresiones(QWidget):
             papel = ""
         if curso == "Selecciona un curso":
             curso = ""
-        datos_tabla = select_impresion_all(estado=estado_seleccionado, 
-                                                   papel=papel,
-                                                   departamento=curso,
-                                                   limit=self.page_size)
-        self.tabla(impresiones=datos_tabla)
+        self.rellenar_tabla(estado_seleccionado=estado_seleccionado, papel=papel, curso=curso)
 
     def tabla(self, impresiones):
         self.tabla_impresiones.setRowCount(0)

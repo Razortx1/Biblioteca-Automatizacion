@@ -90,9 +90,8 @@ class HistorialPrestamos(QWidget):
         self.tabla_historial.setMinimumHeight(300)
         self.tabla_historial.setMaximumHeight(300)
 
-        self.page_size = 7
+        self.page_size = 4
         self.current_page = 0
-        self.number = 0
 
         # Creacion botones
         self.cambiar_estado = QPushButton("Cambiar Estado")
@@ -158,29 +157,32 @@ class HistorialPrestamos(QWidget):
         if self.current_page > 0:
             self.current_page -=1
             self.pagina.setText(f"Pagina {self.current_page +1}")
-            self.rellenar_tabla()
+            self.filtrado_datos()
 
     def siguiente_funcion(self):
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
-        self.rellenar_tabla()
+        self.filtrado_datos()
 
     # Funcion para rellenar la tabla
-    def rellenar_tabla(self):
+    def rellenar_tabla(self, estado=None, rut_prest=None,
+                       libro_nombre=None, user_nombre=None,curso=None):
         offset = self.current_page * self.page_size
-        prestamos = select_prestamos_all(offset=offset, 
-                                         limit=self.page_size)
+        prestamos = list(select_prestamos_all(estado= estado, rut= rut_prest, 
+                                            nombre_libro= libro_nombre,
+                                            nombre_user= user_nombre,
+                                            curso= curso, offset= offset, 
+                                            limit= self.page_size+1))
         self.siguiente.setDisabled(False)
         self.anterior.setDisabled(False)
-        if self.current_page == 0:
+        if len(prestamos) > self.page_size:
             self.siguiente.setDisabled(False)
             self.anterior.setDisabled(True)
-        self.tabla(prestamos)
-        if self.tabla_historial.rowCount() > self.number:
-            self.siguiente.setDisabled(False)
-        if self.tabla_historial.rowCount() < self.page_size:
+            prestamos = prestamos[:self.page_size]
+        else:
             self.siguiente.setDisabled(True)
+        self.tabla(prestamos)
 
     def tabla(self, prestamos):
         self.tabla_historial.setRowCount(0)
@@ -218,16 +220,14 @@ class HistorialPrestamos(QWidget):
             pass
 
     def filtrado_datos(self):
-        self.current_page = 0
-        self.pagina.setText(f"Pagina {self.current_page+1}")
+        #self.current_page = 0
+        #self.pagina.setText(f"Pagina {self.current_page+1}")
         estado = ""
         rut_prest = ""
         libro_nombre = self.nombre_libro.text()
         user_nombre = self.nombre_user.text()
         curso = ""
 
-        self.anterior.setDisabled(True)
-        self.siguiente.setDisabled(True)
         if self.estado_prestamo.currentText() != "Selecciona un estado":
             estado = self.estado_prestamo.currentIndex()
         elif estado == "Selecciona un estado":
@@ -238,11 +238,10 @@ class HistorialPrestamos(QWidget):
             curso = self.combo_curso.currentText()
         elif curso == "Selecciona un estado":
             curso = ""
-        tabla = select_prestamos_all(estado=estado, rut=rut_prest, 
-                                        nombre_libro=libro_nombre,
-                                        nombre_user=user_nombre,
-                                        curso=curso, limit=self.page_size)
-        self.tabla(tabla)
+        self.rellenar_tabla(estado=estado, rut_prest=rut_prest, 
+                                        libro_nombre=libro_nombre,
+                                        user_nombre=user_nombre,
+                                        curso=curso)
 
     def quitar_filtros(self):
         self.estado_prestamo.setCurrentIndex(0)
