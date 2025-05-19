@@ -8,6 +8,8 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from datetime import date
 
+from pyqttoast import Toast, ToastPreset, ToastPosition
+
 from connection.session import (select_prestamos_all, select_all_estado_prestamos, 
                                 select_cursos_user)
 from .actualizar_ui.actualizar_prestamos import ActualizarPrestamos
@@ -185,6 +187,15 @@ class HistorialPrestamos(QWidget):
             self.siguiente.setDisabled(True)
         self.tabla(prestamos)
 
+    def show_toast(self, nombre=None, fecha=None, nombre_libro=None):
+        self.notificacion = Toast()
+        self.notificacion.setDuration(5000)
+        self.notificacion.setWindowTitle("Información de prestamos")
+        self.notificacion.setText(f"{nombre} debe entregar el dia de hoy, {fecha}, el libro {nombre_libro}")
+        self.notificacion.applyPreset(ToastPreset.INFORMATION)
+        self.notificacion.setPosition(ToastPosition.TOP_RIGHT)
+        self.notificacion.show()
+
     def tabla(self, prestamos):
         self.tabla_historial.setRowCount(0)
         tablerow = 0
@@ -209,7 +220,7 @@ class HistorialPrestamos(QWidget):
                 self.tabla_historial.setItem(tablerow, 7, QTableWidgetItem(p.estado_prestamo))
 
                 if str(p.fecha_termino) == fecha:
-                    print(f"{p.nombre} debe entregar hoy, fecha: {str(p.fecha_termino)} el libro {p.nombre_libro}")
+                    self.show_toast(p.nombre, str(p.fecha_termino), p.nombre_libro)
 
                 texto_tabla = self.tabla_historial.item(tablerow, column_count-1).text()
 
