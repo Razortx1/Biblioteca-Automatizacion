@@ -154,13 +154,14 @@ class HistorialLibros(QWidget):
 
     def rellenar_tabla(self):
         offset = self.current_page * self.page_size
-        libros = select_libros_available(offset=offset, limit=self.page_size)
-        if self.current_page == 0:
+        libros = list(select_libros_available(offset=offset, limit=self.page_size+1))
+        if len(libros) > self.page_size:
             self.anterior.setDisabled(True)
             self.siguiente.setDisabled(False)
-        self.tabla(libros)
-        if self.tabla_libros.rowCount() < self.page_size:
+            libros = libros[:self.page_size]
+        else:
             self.siguiente.setDisabled(True)
+        self.tabla(libros)
         
 
 
@@ -174,8 +175,6 @@ class HistorialLibros(QWidget):
         self.rellenar_tabla()
 
     def aplicar_filtros(self):
-        self.siguiente.setDisabled(True)
-        self.anterior.setDisabled(True)
         biblioteca = self.sector_biblioteca.text()
         estanteria = self.sector_estanteria.text()
         no_editorial = self.editorial.text()
