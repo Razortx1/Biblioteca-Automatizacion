@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
+from datetime import date
 
 from connection.session import (select_prestamos_all, select_all_estado_prestamos, 
                                 select_cursos_user)
@@ -189,6 +190,7 @@ class HistorialPrestamos(QWidget):
         tablerow = 0
         columna = 0
         column_count = self.tabla_historial.columnCount()
+        fecha = date.today().strftime("%Y-%m-%d")
 
         extraviado = QColor("#ff6b6b")  # rojo suave
         devuelto = QColor("#b2f7b2")    # verde claro
@@ -205,6 +207,9 @@ class HistorialPrestamos(QWidget):
                 self.tabla_historial.setItem(tablerow, 5, QTableWidgetItem(str(p.fecha_termino)))
                 self.tabla_historial.setItem(tablerow, 6, QTableWidgetItem(str(p.stock)))
                 self.tabla_historial.setItem(tablerow, 7, QTableWidgetItem(p.estado_prestamo))
+
+                if str(p.fecha_termino) == fecha:
+                    print(f"{p.nombre} debe entregar hoy, fecha: {str(p.fecha_termino)} el libro {p.nombre_libro}")
 
                 texto_tabla = self.tabla_historial.item(tablerow, column_count-1).text()
 
