@@ -301,6 +301,46 @@ with Session(engine) as session:
                     traceback.print_exc()
                     print(f"Error {e}")
 
+            def select_distinct_nombre_libro():
+                try:
+                    nombre_libro = session.execute(select(distinct(Libro.nombre_libro).label("nombre_libro")))
+                    return nombre_libro
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
+            def select_distinct_autor_libro():
+                try:
+                    autor = session.execute(select(distinct(Libro.autor).label("autor")))
+                    return autor
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
+            def select_distinct_editorial_libro():
+                try:
+                    editorial = session.execute(select(distinct(Libro.editorial).label("editorial")))
+                    return editorial
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
+            def select_distinct_estanteria_libro():
+                try:
+                    estanteria = session.execute(select(distinct(Libro.sector_estanteria).label("sector_estanteria")))
+                    return estanteria
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
+            def select_distinct_biblioteca_libro():
+                try:
+                    biblioteca = session.execute(select(distinct(Libro.sector_biblioteca).label("sector_biblioteca")))
+                    return biblioteca
+                except Exception as e:
+                    traceback.print_exc()
+                    print(f"Error {e}")
+
     except Exception as e:
         traceback.print_exc()
         print(f"Error {e}")
