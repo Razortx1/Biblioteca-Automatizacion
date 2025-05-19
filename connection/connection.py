@@ -201,7 +201,8 @@ def update_estado_impresion(fecha, estado):
             error_mensaje.showMessage(f"A ocurrido un error al momento de hacer un cambio en el estado de la Impresion.\
                                       Favor de volver a intentarlo. {e}")
             session.rollback()
-        except:
+        except Exception as e:
+            traceback.print_exc()
             print("No se pudo obtener el error")
 
 def update_estado_prestamos(id, estado):
