@@ -60,7 +60,7 @@ class PrestamoLibros(QWidget):
         #Definicion del LineEdit
         self.fecha_maxima = QDateEdit()
         self.fecha_maxima.setDisplayFormat("yyyy-MM-dd")
-        self.fecha_maxima.setDateRange(date.today(), QDate.currentDate().addDays(3))
+        self.fecha_maxima.setDateRange(date.today(), QDate.currentDate().addDays(7))
         self.fecha_maxima.setCalendarPopup(True)
 
         fecha = date.today()

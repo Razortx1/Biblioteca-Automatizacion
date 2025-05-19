@@ -262,6 +262,14 @@ class HistorialPrestamos(QWidget):
             msg.exec()
             return
         
+        if self.tabla_historial.item(selected_rows[0].row(), 7).text() == "Devuelto":
+            msg = QMessageBox()
+            msg.setWindowTitle("Libro ya devuelto")
+            msg.setText("Este libro(s) ya es uno que fue devuelto a biblioteca")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+            return
+        
         fecha_item = self.tabla_historial.item(selected_rows[0].row(), 4).text()
         if self.w is None:
             self.w = ActualizarPrestamos()
