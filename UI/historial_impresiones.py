@@ -127,6 +127,8 @@ class HistorialImpresiones(QWidget):
             "curso": "" 
         }
         self.rellenar_tabla()
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
 
     # Rellenar ComboBox con los estados de impresión
     def rellenar_combobox(self):
@@ -192,6 +194,8 @@ class HistorialImpresiones(QWidget):
         estado_seleccionado = self.filtro_estado.currentIndex()
         papel = self.filtro_tipo_papel.currentText()
         curso = self.filtro_curso.currentText()
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
         if estado_seleccionado == 0:
             estado_seleccionado = ""
         if papel == "Selecciona un tipo de papel":

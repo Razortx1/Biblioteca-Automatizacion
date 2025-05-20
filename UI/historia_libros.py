@@ -203,6 +203,8 @@ class HistorialLibros(QWidget):
         autor = self.autor_libro.text()
         nombre = self.nombre_filtro.text()
         estado = ""
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
         if self.estado_filtro.currentText() != "Selecciona un estado":
             estado = self.estado_filtro.currentText()
         elif estado == "Selecciona un estado":
@@ -283,7 +285,6 @@ class HistorialLibros(QWidget):
             nombre = self.tabla_libros.item(row.row(), 0).text()
             autor = self.tabla_libros.item(row.row(), 1).text()
             editorial = self.tabla_libros.item(row.row(), 2).text()
-            fecha = self.tabla_libros.item(row.row(), 3).text()
         if self.w is None:
             self.w = ActualizarLibros()
             self.w.actualizar_datos.connect(self.rellenar_tabla)
@@ -295,3 +296,4 @@ class HistorialLibros(QWidget):
     def cerrar_ventana(self):
         if self.w is not None:
             self.w = None
+            self.rellenar_tabla()

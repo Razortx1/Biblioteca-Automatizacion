@@ -263,7 +263,8 @@ class HistorialPrestamos(QWidget):
         user_nombre = self.nombre_user.text()
         curso = ""
         fecha = self.fecha_termino.date().toPyDate()
-
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
 
         if self.estado_prestamo.currentText() != "Selecciona un estado":
             estado = self.estado_prestamo.currentIndex()
@@ -292,6 +293,7 @@ class HistorialPrestamos(QWidget):
         self.rut_prestatario.clear()
         self.nombre_libro.clear()
         self.nombre_user.clear()
+        self.fecha_termino.setDate(date.today())
         self.filtros_actuales = {
         "estado": "",
         "rut_prest": "",
@@ -335,3 +337,4 @@ class HistorialPrestamos(QWidget):
     def cerrar_ventana(self):
         if self.w is not None:
             self.w = None
+            self.rellenar_tabla()
