@@ -55,23 +55,28 @@ def resource_path(relative_path):
 """
 base_datos = resource_path("biblioteca.db")
 
-"""
-    Se crea la base de datos sqlite
-    
-    echo sirve para verificar el codigo sql y comprobar si hay problemas o no
-    (para realizar debug). Una vez se suceda a produccion, quedará en False
-"""
-
 engine = create_engine(f"sqlite:///{base_datos}", echo=True)
-
 """
+    **Variable engine**\n
+
+    Sirve para poder crear la base de datos sqlite\n
+
+    **Parametros**\n
+    - url de la base de datos -> str
+    - echo: Booleano -> True para entorno de desarrollo | False en entorno de despliegue
+
+    **Mas informacion**\n
+    echo es usado para poder revisar las sentencias SQL que vaya realizando el ORM
+"""
+
+class Base(DeclarativeBase):
+    """
     **Clase Base**\n
     Es la clase que se utilizará como base para poder crear las tablas\n
 
     **Parametro**\n
     DeclarativeBase -> Clase Padre desde SQLAlchemy
-"""
-class Base(DeclarativeBase):
+    """
     pass
 
 
