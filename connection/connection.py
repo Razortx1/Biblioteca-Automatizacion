@@ -34,12 +34,12 @@ def get_create_libros(nombre_, autor_, editorial_, fecha_, sector_b, sector_es):
         Permite comprobar si el libro existe o no en la base de datos\n
 
         **Parametros**\n
-        nombre: str\n
-        autor: str\n
-        editorial: str\n
-        fecha: str | date\n
-        sector_b: str\n
-        sector_es: str\n
+        - nombre: str\n
+        - autor: str\n
+        - editorial: str\n
+        - fecha: str | date\n
+        - sector_b: str\n
+        - sector_es: str\n
 
         **Retorna**\n
         libro: Un objeto Libro
@@ -73,13 +73,13 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
     Añade a la base de datos, el libro si es que no existe con su respectivo stock\n
 
     **Parametros**\n
-    nombre: str\n
-    autor: str\n
-    editorial: str\n
-    fecha: str | date\n
-    sector_b: str\n
-    sector_es: str\n
-    stock: int\n
+    - nombre: str\n
+    - autor: str\n
+    - editorial: str\n
+    - fecha: str | date\n
+    - sector_b: str\n
+    - sector_es: str\n
+    - stock: int\n
     """
     try:
         libro = get_create_libros(nombre_,autor_,editorial_,fecha_,sector_b,sector_es)
@@ -128,9 +128,9 @@ def get_or_create_user(nombre_, curso_, rut_):
     con la funcion update_usuario. Sino existe se crea uno nuevo\n
 
     **Parametros**\n
-    nombre: str\n
-    curso: str\n
-    rut: str\n
+    - nombre: str\n
+    - curso: str\n
+    - - rut: str\n
 
     **Retorna**\n
     user: Un objeto Usuario
@@ -157,13 +157,13 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
     Permite agregar una impresion que esta enlazada a un usuario\n
 
     **Parametros**\n
-    nombre: str\n
-    curso: str\n
-    rut: str\n
-    cant_copias: str\n
-    cant_paginas: str\n
-    descripcion: str\n
-    tipo_hoja: str\n
+    - nombre: str\n
+    - curso: str\n
+    - rut: str\n
+    - cant_copias: str\n
+    - cant_paginas: str\n
+    - descripcion: str\n
+    - tipo_hoja: str\n
 
     **Excepcion**\n
     Devuelve un mensaje, a traves de un QErrorMessage, que no se pudo ingresar
@@ -219,12 +219,12 @@ def insert_prestamos(fecha_i,fecha_m, rut_, nombre_, curso_, copia_):
     Permite agregar un prestamo a la base de datos, con un usuario asignado a esta\n
 
     **Parametros**\n
-    fecha_i: str | datetime\n
-    fecha_m: str | date\n
-    rut: str\n
-    nombre: str\n
-    curso: str\n
-    copia: int\n
+    - fecha_i: str | datetime\n
+    - fecha_m: str | date\n
+    - rut: str\n
+    - nombre: str\n
+    - curso: str\n
+    - copia: int\n
 
     **Excepcion**\n
     Devuelve un mensaje, a traves de un QErrorMessage, que no se pudo ingresar
@@ -259,8 +259,8 @@ def update_estado_libro(id, estado):
     Permite el poder actualizar el estado de un libro\n
 
     **Parametros**\n
-    id: int\n
-    estado: int\n
+    - id: int\n
+    - estado: int\n
 
     **Excepcion**\n
     Devuelve un mensaje, a traves de un QErrorMessage, que no se pudo actualizar el estado del libro
@@ -288,8 +288,8 @@ def update_estado_impresion(fecha, estado):
     Permite el poder actualizar el estado de una impresion\n
 
     **Parametros**\n
-    fecha: str | datetime\n
-    estado: int\n
+    - fecha: str | datetime\n
+    - estado: int\n
 
     **Excepcion**\n
     Devuelve un mensaje, a traves de un QErrorMessage, que no se pudo actualizar el estado de
@@ -319,8 +319,8 @@ def update_estado_prestamos(id, estado):
     Permite poder actualizar el estado del prestamo\n
     
     **Parametros**\n
-    id: int\n
-    estado: int\n
+    - - id: int\n
+    - estado: int\n
 
     **Excepcion**\n
     Devuelve un mensaje, a traves de un QErrorMessage, que no se pudo actualizar el estado del prestamo
@@ -348,8 +348,8 @@ def update_usuario(id, curso_):
     Permite el poder actualizar el curso de un usuario\n
 
     **Parametros**\n
-    id: int\n
-    curso: str\n
+    - id: int\n
+    - curso: str\n
 
     **Excepcion**\n
     Devuelve un mensaje, a traves de un QErrorMessage, que no se pudo actualizar el usuario
