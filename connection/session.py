@@ -17,7 +17,7 @@
 
 import traceback
 from sqlalchemy.orm import Session, aliased
-from sqlalchemy import select, func, or_, distinct
+from sqlalchemy import select, func, or_, distinct, update
 from sql.models import engine
 from sql.models import (Usuario, Libro, Estado_Libro,
                         Estado_Impresion, Estado_Prestamo, Prestamos,
