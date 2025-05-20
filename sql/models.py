@@ -273,15 +273,6 @@ class Prestamos(Base):
         return f"Prestamos(id_prestamos={self.id_prestamos!r}, fecha_inicio={self.fecha_inicio!r},\
             fecha_inicio={self.fecha_termino!r})"
     
-"""
-    **Clase Estado_Prestamo**\n
-        Es la clase con la cual el ORM mapeara para poder crear la tabla de estado_prestamo.\n
-
-        **Columnas**\n
-        - id_estadoprestamo como numero, primary key y autoincremento\n
-        - estado_prestamo como un texto
-"""
-    
 class Estado_Prestamo(Base):
     """
         **Clase Estado_Prestamo**\n
