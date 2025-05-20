@@ -192,6 +192,7 @@ class PrestamoLibros(QWidget):
         rut = self.rut_.text()
         if rut == "..-":
             rut = ""
+            return
         nombre = self.nombre_prestatario.text()
         curso = self.curso_prestatario.text()
         if not selected_rows:
@@ -201,7 +202,7 @@ class PrestamoLibros(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.exec()
             return
-        if not nombre and not rut and not curso:
+        if not nombre or not rut or not curso:
                 msg = QMessageBox()
                 msg.setWindowTitle("Usuario invalido")
                 msg.setText("No se especificado un usuario")
@@ -227,7 +228,7 @@ class PrestamoLibros(QWidget):
             msg_ok.setWindowTitle("Accion ingresada correctamente")
             msg_ok.setText(f"El prestamo se ingreso correctamente")
             msg_ok.setIcon(QMessageBox.Information)
-            msg.exec()
+            msg_ok.exec()
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
             cancelAction.setText("Se cancelo la accion")
@@ -235,6 +236,7 @@ class PrestamoLibros(QWidget):
             cancelAction.setIcon(QMessageBox.Information)
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
+            return
 
     def traer_objeto(self, nombre, autor, editorial):
         if not nombre or not autor or not editorial:
