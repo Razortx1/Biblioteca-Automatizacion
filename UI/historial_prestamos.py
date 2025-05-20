@@ -214,8 +214,12 @@ class HistorialPrestamos(QWidget):
             if pres.estado_prestamo != "Devuelto":
                 self.notificacion = Toast()
                 self.notificacion.setDuration(9000)
-                self.notificacion.setSpacing(10)
+                self.notificacion.setSpacing(15)
                 self.notificacion.setWindowTitle("Información de prestamos")
+                self.notificacion.setMaximumOnScreen(5)
+                self.notificacion.setBorderRadius(5)
+                self.notificacion.setMaximumSize(350, 350)
+                self.notificacion.setMinimumSize(350, 100)
                 self.notificacion.setText(f"{pres.nombre} debe entregar el dia de hoy, {str(pres.fecha_termino)}, el(los) libro(s) {pres.nombre_libro}")
                 self.notificacion.applyPreset(ToastPreset.INFORMATION)
                 self.notificacion.setPosition(ToastPosition.TOP_RIGHT)
