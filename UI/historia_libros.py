@@ -15,6 +15,16 @@ class HistorialLibros(QWidget):
     def __init__(self, parent = None):
         super().__init__(parent)
 
+        # Lista para filtros
+        self.filtros_actuales = {
+        "nombre_": "",
+        "autor_": "",
+        "no_editorial": "",
+        "estado": "",
+        "biblioteca_": "",
+        "estanteria_": ""
+        }
+
         self.w = None
         # Layout principal
         main_layout = QVBoxLayout()
@@ -144,12 +154,12 @@ class HistorialLibros(QWidget):
         if self.current_page > 0:
                 self.current_page -=1
                 self.pagina.setText(f"Pagina {self.current_page +1}")
-                self.aplicar_filtros()
+                self.rellenar_tabla(**self.filtros_actuales)
     def siguiente_funcion(self):
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
-        self.aplicar_filtros()
+        self.rellenar_tabla(**self.filtros_actuales)
 
 
     def rellenar_tabla(self, nombre_=None, autor_=None,
@@ -174,7 +184,17 @@ class HistorialLibros(QWidget):
         self.editorial.clear()
         self.nombre_filtro.clear()
         self.autor_libro.clear()
-        self.rellenar_tabla()
+        self.filtros_actuales = {
+        "nombre_": "",
+        "autor_": "",
+        "no_editorial": "",
+        "estado": "",
+        "biblioteca_": "",
+        "estanteria_": ""
+        }
+        self.rellenar_tabla(**self.filtros_actuales)
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
 
     def aplicar_filtros(self):
         biblioteca = self.sector_biblioteca.text()
@@ -187,6 +207,14 @@ class HistorialLibros(QWidget):
             estado = self.estado_filtro.currentText()
         elif estado == "Selecciona un estado":
             return
+        self.filtros_actuales = {
+        "nombre_": nombre,
+        "autor_": autor,
+        "no_editorial": no_editorial,
+        "estado": estado,
+        "biblioteca_": biblioteca,
+        "estanteria_": estanteria
+        }
         self.rellenar_tabla(nombre_=nombre, autor_=autor, no_editorial=no_editorial,
                                      estado=estado, biblioteca_=biblioteca, estanteria_=estanteria)
         

@@ -29,6 +29,12 @@ class HistorialImpresiones(QWidget):
         self.filtro_tipo_papel = QComboBox()
         self.filtro_curso = QComboBox()
 
+        self.filtros_actuales ={
+            "estado_seleccionado": "",
+            "papel": "",
+            "curso": ""
+        }
+
         # PushButton Paginaciones
         self.anterior = QPushButton("Pagina Anterior")
         self.siguiente = QPushButton("Pagina Siguiente")
@@ -103,18 +109,23 @@ class HistorialImpresiones(QWidget):
         if self.current_page > 0:
             self.current_page -=1
             self.pagina.setText(f"Pagina {self.current_page +1}")
-            self.filtrar_tabla()
+            self.rellenar_tabla(**self.filtros_actuales)
 
     def siguiente_funcion(self):
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
-        self.filtrar_tabla()
+        self.rellenar_tabla(**self.filtros_actuales)
 
     def vaciar_filtrado(self):
         self.filtro_estado.setCurrentIndex(0)
         self.filtro_tipo_papel.setCurrentIndex(0)
         self.filtro_curso.setCurrentIndex(0)
+        self.filtros_actuales = {
+            "estado_seleccionado": "",
+            "papel": "",
+            "curso": "" 
+        }
         self.rellenar_tabla()
 
     # Rellenar ComboBox con los estados de impresión
@@ -187,7 +198,12 @@ class HistorialImpresiones(QWidget):
             papel = ""
         if curso == "Selecciona un curso":
             curso = ""
-        self.rellenar_tabla(estado_seleccionado=estado_seleccionado, papel=papel, curso=curso)
+        self.filtros_actuales ={
+            "estado_seleccionado": estado_seleccionado,
+            "papel": papel,
+            "curso": curso
+        }
+        self.rellenar_tabla(**self.filtros_actuales)
 
     def tabla(self, impresiones):
         self.tabla_impresiones.setRowCount(0)

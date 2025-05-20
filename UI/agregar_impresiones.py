@@ -94,10 +94,8 @@ class AgregarImpresiones(QWidget):
         button_layout.addWidget(self.boton_volver)
 
         self.combo_hoja.addItem("Selecciona el tipo de hoja a usar")
-        hoja = select_type_sheet()
-        for ho in hoja:
-            self.combo_hoja.addItem(ho[0])
-
+        self.combo_hoja.addItem("Carta")
+        self.combo_hoja.addItem("Oficio")
         
         # Agregar botones
         main_layout.setSpacing(15)

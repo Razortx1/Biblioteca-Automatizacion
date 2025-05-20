@@ -223,6 +223,11 @@ class PrestamoLibros(QWidget):
             self.curso_prestatario.clear()
             self.tabla_libro_prestamo.setRowCount(0)
             self.rut_.clear()
+            msg_ok = QMessageBox()
+            msg_ok.setWindowTitle("Accion ingresada correctamente")
+            msg_ok.setText(f"El prestamo se ingreso correctamente")
+            msg_ok.setIcon(QMessageBox.Information)
+            msg.exec()
         elif msg.standardButton(msg.clickedButton()) == QMessageBox.Cancel:
             cancelAction = QMessageBox()
             cancelAction.setText("Se cancelo la accion")

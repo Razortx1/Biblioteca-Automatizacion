@@ -36,6 +36,7 @@ class HistorialPrestamos(QWidget):
         # Definicion de lineedit para filtrado
         self.rut_prestatario = QLineEdit()
         self.rut_prestatario.setInputMask("00.000.000-n;_")
+        self.rut_prestatario.setToolTip("Rut del Prestatario")
 
         self.nombre_libro = QLineEdit()
         self.nombre_libro.setPlaceholderText("Nombre Libro")
@@ -212,7 +213,8 @@ class HistorialPrestamos(QWidget):
         for pres in prestamos:
             if pres.estado_prestamo != "Devuelto":
                 self.notificacion = Toast()
-                self.notificacion.setDuration(8000)
+                self.notificacion.setDuration(9000)
+                self.notificacion.setSpacing(10)
                 self.notificacion.setWindowTitle("Información de prestamos")
                 self.notificacion.setText(f"{pres.nombre} debe entregar el dia de hoy, {str(pres.fecha_termino)}, el(los) libro(s) {pres.nombre_libro}")
                 self.notificacion.applyPreset(ToastPreset.INFORMATION)
