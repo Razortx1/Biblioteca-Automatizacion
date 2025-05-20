@@ -2,10 +2,13 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
                              QPushButton, QComboBox, QAbstractItemView,
                              QMessageBox, QHBoxLayout,
-                             QLineEdit, QLabel)
+                             QLineEdit, QLabel, QDateEdit)
 from PyQt5.QtCore import (pyqtSignal)
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
+from datetime import date
+
+from pyqttoast import Toast, ToastPreset, ToastPosition
 
 from connection.session import (select_prestamos_all, select_all_estado_prestamos, 
                                 select_cursos_user)
@@ -33,12 +36,19 @@ class HistorialPrestamos(QWidget):
         # Definicion de lineedit para filtrado
         self.rut_prestatario = QLineEdit()
         self.rut_prestatario.setInputMask("00.000.000-n;_")
+        self.rut_prestatario.setToolTip("Rut del Prestatario")
 
         self.nombre_libro = QLineEdit()
         self.nombre_libro.setPlaceholderText("Nombre Libro")
 
         self.nombre_user = QLineEdit()
         self.nombre_user.setPlaceholderText("Nombre Alumno/Profesor")
+
+        self.fecha_termino = QDateEdit()
+        self.fecha_termino.setDisplayFormat("yyyy-MM-dd")
+        self.fecha_termino.setCalendarPopup(True)
+        self.fecha_termino.setDate(date.today())
+        self.fecha_termino.setToolTip("Fecha Termino del Prestamo")
 
         # Definicion botones para filtrado
         self.filtrar = QPushButton("Aplicar Filtro")
@@ -84,6 +94,17 @@ class HistorialPrestamos(QWidget):
         item.setText("Estado Prestamo")
         self.tabla_historial.setHorizontalHeaderItem(7, item)
 
+        self.notificaciones_for_today()
+
+        self.filtros_actuales = {
+            "estado": "",
+            "rut_prest": "",
+            "libro_nombre": "",
+            "user_nombre": "",
+            "curso": "",
+            "fecha": ""
+        }
+
         # Tamaño Columnas
         header = self.tabla_historial.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -106,6 +127,7 @@ class HistorialPrestamos(QWidget):
         filtro_layout.addWidget(self.nombre_user)
         filtro_layout.addWidget(self.combo_curso)
         filtro_layout.addWidget(self.rut_prestatario)
+        filtro_layout.addWidget(self.fecha_termino)
         filtro_layout.addWidget(self.nombre_libro)
         filtro_layout.addWidget(self.estado_prestamo)
         filtro_layout.addWidget(self.filtrar)
@@ -157,21 +179,22 @@ class HistorialPrestamos(QWidget):
         if self.current_page > 0:
             self.current_page -=1
             self.pagina.setText(f"Pagina {self.current_page +1}")
-            self.filtrado_datos()
+            self.rellenar_tabla(**self.filtros_actuales)
 
     def siguiente_funcion(self):
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
-        self.filtrado_datos()
+        self.rellenar_tabla(**self.filtros_actuales)
 
     # Funcion para rellenar la tabla
     def rellenar_tabla(self, estado=None, rut_prest=None,
-                       libro_nombre=None, user_nombre=None,curso=None):
+                       libro_nombre=None, user_nombre=None,curso=None, fecha=None):
         offset = self.current_page * self.page_size
         prestamos = list(select_prestamos_all(estado= estado, rut= rut_prest, 
                                             nombre_libro= libro_nombre,
                                             nombre_user= user_nombre,
+                                            fecha=fecha,
                                             curso= curso, offset= offset, 
                                             limit= self.page_size+1))
         self.siguiente.setDisabled(False)
@@ -183,6 +206,24 @@ class HistorialPrestamos(QWidget):
         else:
             self.siguiente.setDisabled(True)
         self.tabla(prestamos)
+
+    def notificaciones_for_today(self):
+        fecha = date.today().strftime("%Y-%m-%d")
+        prestamos = select_prestamos_all(fecha=fecha)
+        for pres in prestamos:
+            if pres.estado_prestamo != "Devuelto":
+                self.notificacion = Toast()
+                self.notificacion.setDuration(9000)
+                self.notificacion.setSpacing(15)
+                self.notificacion.setWindowTitle("Información de prestamos")
+                self.notificacion.setMaximumOnScreen(5)
+                self.notificacion.setBorderRadius(5)
+                self.notificacion.setMaximumSize(350, 350)
+                self.notificacion.setMinimumSize(350, 100)
+                self.notificacion.setText(f"{pres.nombre} debe entregar el dia de hoy, {str(pres.fecha_termino)}, el(los) libro(s) {pres.nombre_libro}")
+                self.notificacion.applyPreset(ToastPreset.INFORMATION)
+                self.notificacion.setPosition(ToastPosition.TOP_RIGHT)
+                self.notificacion.show()
 
     def tabla(self, prestamos):
         self.tabla_historial.setRowCount(0)
@@ -220,13 +261,14 @@ class HistorialPrestamos(QWidget):
             pass
 
     def filtrado_datos(self):
-        #self.current_page = 0
-        #self.pagina.setText(f"Pagina {self.current_page+1}")
         estado = ""
         rut_prest = ""
         libro_nombre = self.nombre_libro.text()
         user_nombre = self.nombre_user.text()
         curso = ""
+        fecha = self.fecha_termino.date().toPyDate()
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
 
         if self.estado_prestamo.currentText() != "Selecciona un estado":
             estado = self.estado_prestamo.currentIndex()
@@ -238,10 +280,16 @@ class HistorialPrestamos(QWidget):
             curso = self.combo_curso.currentText()
         elif curso == "Selecciona un estado":
             curso = ""
-        self.rellenar_tabla(estado=estado, rut_prest=rut_prest, 
-                                        libro_nombre=libro_nombre,
-                                        user_nombre=user_nombre,
-                                        curso=curso)
+
+        self.filtros_actuales = {
+            "estado": estado,
+            "rut_prest": rut_prest,
+            "libro_nombre": libro_nombre,
+            "user_nombre": user_nombre,
+            "curso": curso,
+            "fecha": fecha
+        }
+        self.rellenar_tabla(**self.filtros_actuales)
 
     def quitar_filtros(self):
         self.estado_prestamo.setCurrentIndex(0)
@@ -249,7 +297,18 @@ class HistorialPrestamos(QWidget):
         self.rut_prestatario.clear()
         self.nombre_libro.clear()
         self.nombre_user.clear()
-        self.rellenar_tabla()
+        self.fecha_termino.setDate(date.today())
+        self.filtros_actuales = {
+        "estado": "",
+        "rut_prest": "",
+        "libro_nombre": "",
+        "user_nombre": "",
+        "curso": "",
+        "fecha": ""
+        }
+        self.current_page = 0
+        self.pagina.setText("Pagina 1")
+        self.rellenar_tabla(**self.filtros_actuales)
 
 
     def cambiar_state(self):
@@ -258,6 +317,14 @@ class HistorialPrestamos(QWidget):
             msg = QMessageBox()
             msg.setWindowTitle("Seleccion Invalida")
             msg.setText("Por favor, selecciona un préstamo para continuar.")
+            msg.setIcon(QMessageBox.Information)
+            msg.exec()
+            return
+        
+        if self.tabla_historial.item(selected_rows[0].row(), 7).text() == "Devuelto":
+            msg = QMessageBox()
+            msg.setWindowTitle("Libro ya devuelto")
+            msg.setText("Este libro(s) ya es uno que fue devuelto a biblioteca")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
             return
@@ -274,3 +341,4 @@ class HistorialPrestamos(QWidget):
     def cerrar_ventana(self):
         if self.w is not None:
             self.w = None
+            self.rellenar_tabla()

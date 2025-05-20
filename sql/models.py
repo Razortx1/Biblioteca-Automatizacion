@@ -37,8 +37,9 @@ from datetime import date, datetime
 
 def resource_path(relative_path):
     """
+        **Funcion resource_path**\n
         if statement el cual necesita la libreria sys, 'frozen', el cual tiene como funcion de
-        comprobar si es un archivo ejecutable o no, y False
+        comprobar si es un archivo ejecutable o no, devolviendo True si no lo es, y False en caso que si sea
     """
     if getattr(sys, 'frozen', False):
         bundle_dir = sys._MEIPASS # for --onefile
@@ -54,37 +55,46 @@ def resource_path(relative_path):
 """
 base_datos = resource_path("biblioteca.db")
 
-"""
-    Se crea la base de datos sqlite
-    
-    echo sirve para verificar el codigo sql y comprobar si hay problemas o no
-    (para realizar debug)
-"""
-
 engine = create_engine(f"sqlite:///{base_datos}", echo=True)
+"""
+    **Variable engine**\n
 
+    Sirve para poder crear la base de datos sqlite\n
+
+    **Parametros**\n
+    - url de la base de datos -> str
+    - echo: Booleano -> True para entorno de desarrollo | False en entorno de despliegue
+
+    **Mas informacion**\n
+    echo es usado para poder revisar las sentencias SQL que vaya realizando el ORM
 """
-    class Base
-    Es la clase que se utilizará como base para poder crear las tablas
-"""
+
 class Base(DeclarativeBase):
+    """
+    **Clase Base**\n
+    Es la clase que se utilizará como base para poder crear las tablas\n
+
+    **Parametro**\n
+    DeclarativeBase -> Clase Padre desde SQLAlchemy
+    """
     pass
 
-"""
-    Class Usuario
-    Es la clase con la cual el ORM mapeara para poder crear la tabla de usuario.
-
-    Esta tabla tiene como columnas:
-    - id_user como numero, primary key y autoincremento
-    - nombre como texto
-    - curso como un texto opcional
-    - rut como un texto
-    
-    Ademas esta tabla tiene las referencias para las futuras tablas de impresion y prestamo
-
-"""
 
 class Usuario(Base):
+    """
+    **Clase Usuario**\n
+    Es la clase con la cual el ORM mapeara para poder crear la tabla de usuario.\n
+
+    **Columnas**\n
+    - id_user como numero, primary key y autoincremento\n
+    - nombre como texto\n
+    - curso como un texto opcional\n
+    - rut como un texto\n
+    
+    **Referencias**\n
+    Ademas esta tabla tiene las referencias para las futuras tablas de impresion y prestamo
+
+    """
     __tablename__ = "usuario"
 
     id_user: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -99,23 +109,23 @@ class Usuario(Base):
         return f"User(id_user={self.id_user!r}, nombre={self.nombre!r},\
         curso={self.curso!r}, rut={self.rut!r})"
     
-"""
-    Class Libro
-    Es la clase con la cual el ORM mapeara para poder crear la tabla de libro.
-
-    Esta tabla tiene como columnas:
-    - id_libro como numero, primary key y autoincremento
-    - nombre del libro como un texto
-    - cod_barra como un texto
-    - autor como un texto
-    - fecha_publicacion como una fecha de solo año-mes-dia
-    - stock como un numero
-    - estado_libro_id como un numero que conecta con la futura tabla de estado_libro
-
-    Ademas esta tabla tiene las referencias para las futuras tablas de estado_libro y prestamos_libros
-"""
-
 class Libro(Base):
+    """
+    **Class Libro**\n
+    Es la clase con la cual el ORM mapeara para poder crear la tabla de libro.\n
+
+    **Columnas**\n
+    - id_libro como numero, primary key y autoincremento\n
+    - nombre del libro como un texto\n
+    - cod_barra como un texto\n
+    - autor como un texto\n
+    - fecha_publicacion como una fecha de solo año-mes-dia\n
+    - stock como un numero\n
+    - estado_libro_id como un numero que conecta con la futura tabla de estado_libro\n
+
+    **Referencias**\n
+    Ademas esta tabla tiene las referencias para la tabla de copias libro
+    """
     __tablename__ = "libro_biblioteca"
 
     id_libro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -135,6 +145,20 @@ class Libro(Base):
             sector_estanteria={self.sector_estanteria!r})"
     
 class CopiasLibros(Base):
+    """
+    **Class CopiaLibros**\n
+    Es la clase con la cual el ORM mapeara para poder crear la tabla para la copia de
+    los libros.\n
+
+    **Columnas**\n
+    - id_copia como numero, primary key y autoincremento\n
+    - libro_id como un numero, foreing key\n
+    - estado_id como un numero, foreing key\n
+
+    **Referencias**\n
+    Ademas esta tabla tiene las referencias para las futuras tablas de estado_libro, prestamos_libros
+    y libro
+    """
     __tablename__ = "copia_libro"
 
     id_copia: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -148,16 +172,15 @@ class CopiasLibros(Base):
     def __repr__(self):
         return f"CopiasLibros(id_copia={self.id_copia}, libro={self.libro}, estado={self.estado}, prestamo={self.prestamos})"
 
-"""
-    Class Estado_Libro
-    Es la clase con la cual el ORM mapeara para poder crear la tabla de libro.
-
-    Esta tabla tiene como columnas:
-    - id_estadolibro como numero, primary key y autoincremento
-    - estado_libro como un texto
-"""
-
 class Estado_Libro(Base):
+    """
+        **Clase Estado_Libro**\n
+        Es la clase con la cual el ORM mapeara para poder crear la tabla para el estado del libro.\n
+
+        **Columna**\n
+        - id_estadolibro como numero, primary key y autoincremento\n
+        - estado_libro como un texto
+    """
     __tablename__ = "estado_libro"
 
     id_estadolibro: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -166,23 +189,23 @@ class Estado_Libro(Base):
     def __repr__(self) -> str:
         return f"Estado_Libro(id_estadolibro={self.id_estadolibro!r}, estado_libro={self.estado_libro!r})"
     
-"""
-    Class Impresiones
-    Es la clase con la cual el ORM mapeara para poder crear la tabla de impresion.
-
-    Esta tabla tiene como columnas:
-    - id_impresion como numero, primary key y autoincremento
-    - descripcion como un texto
-    - cantidad_copias como un numero
-    - cantidad_pagina como un numero
-    - fecha_impresion como una fecha de solo año-mes-dia hora-minutos-segundos
-    - estado_impresion_id como un numero que conecta con la tabla estado_impresiones
-    - user_id como un numero que conecta con la tabla usuario
-
-    Ademas esta tabla tiene las referencias para la futura tabla de estado impresion
-"""
-
 class Impresiones(Base):
+    """
+        **Clase Impresiones**\n
+        Es la clase con la cual el ORM mapeara para poder crear la tabla de impresion.\n
+
+        **Columnas**\n
+        - id_impresion como numero, primary key y autoincremento\n
+        - descripcion como un texto\n
+        - cantidad_copias como un numero\n
+        - cantidad_pagina como un numero\n
+        - fecha_impresion como una fecha de solo año-mes-dia hora-minutos-segundos\n
+        - estado_impresion_id como un numero que conecta con la tabla estado_impresiones\n
+        - user_id como un numero que conecta con la tabla usuario\n
+
+        **Referencias**\n
+        Ademas esta tabla tiene las referencias para la futura tabla de estado impresion
+    """
     __tablename__ = "impresion"
 
     id_impresion: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -202,17 +225,16 @@ class Impresiones(Base):
         return f"Impresion(id_impresion={self.id_impresion!r}, descripcion={self.descripcion!r},\
             cantidad_copias={self.cantidad_copias!r}, cantidad_paginas={self.cantidad_paginas!r}, \
                 fecha_impresion={self.fecha_impresion!r})"
-    
-"""
-    Class Estado_Impresiones
-    Es la clase con la cual el ORM mapeara para poder crear la tabla de estado_impresion.
-
-    Esta tabla tiene como columnas:
-    - id_estadoimpresiones como numero, primary key y autoincremento
-    - estado_impresion como texto
-"""
 
 class Estado_Impresion(Base):
+    """
+        **Clase Estado_Impresiones**\n
+        Es la clase con la cual el ORM mapeara para poder crear la tabla de estado_impresion.\n
+
+        **Columnas**\n
+        - id_estadoimpresiones como numero, primary key y autoincremento\n
+        - estado_impresion como texto
+    """
     __tablename__ = "estado_impresiones"
 
     id_estadoimpresiones: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -220,23 +242,23 @@ class Estado_Impresion(Base):
 
     def __repr__(self) -> str:
         return f"Estado_Impresion(id_estadoimpresiones={self.id_estadoimpresiones!r}, estado_impresion={self.estado_impresion!r})"
-    
-"""
-    Class Prestamos
-        Es la clase con la cual el ORM mapeara para poder crear la tabla de prestamos_libros.
-
-        Esta tabla tiene como columnas:
-        - id_prestamos como numero, primary key y autoincremento
-        - fecha_inicio como fecha con solo año-mes-dia hora-minutos-segundos
-        - fecha_termino como fecha con solo año-mes-dia
-        - estado_prestamo_id como numero conectando con la futura tabla de estado_prestamo
-        - user_id como numero conectando con la tabla de usuarios
-        - libro_id como numero conectando con la tabla de libro_biblioteca
-
-        Ademas esta tabla tiene las referencias para la futura tabla de estado estado_prestamo
-"""
 
 class Prestamos(Base):
+    """
+        **Clase Prestamos**\n
+            Es la clase con la cual el ORM mapeara para poder crear la tabla de prestamos_libros.\n
+
+        **Columnas**\n
+        - id_prestamos como numero, primary key y autoincremento\n
+        - fecha_inicio como fecha con solo año-mes-dia hora-minutos-segundos\n
+        - fecha_termino como fecha con solo año-mes-dia\n
+        - estado_prestamo_id como numero conectando con la futura tabla de estado_prestamo\n
+        - user_id como numero conectando con la tabla de usuarios\n
+        - libro_id como numero conectando con la tabla de libro_biblioteca\n
+
+        **Referencias**\n
+        Ademas esta tabla tiene las referencias para la futura tabla de estado estado_prestamo
+    """
     __tablename__ = "prestamos_libros"
 
     id_prestamos: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -256,16 +278,15 @@ class Prestamos(Base):
         return f"Prestamos(id_prestamos={self.id_prestamos!r}, fecha_inicio={self.fecha_inicio!r},\
             fecha_inicio={self.fecha_termino!r})"
     
-"""
-    Class Estado_Prestamo
-        Es la clase con la cual el ORM mapeara para poder crear la tabla de estado_prestamo.
-
-        Esta tabla tiene como columnas:
-        - id_estadoprestamo como numero, primary key y autoincremento
-        - estado_prestamo como un texto
-"""
-    
 class Estado_Prestamo(Base):
+    """
+        **Clase Estado_Prestamo**\n
+            Es la clase con la cual el ORM mapeara para poder crear la tabla de estado_prestamo.\n
+
+        **Columnas**\n
+        - id_estadoprestamo como numero, primary key y autoincremento\n
+        - estado_prestamo como un texto
+    """
     __tablename__ = "estado_prestamo"
 
     id_estadoprestamo: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

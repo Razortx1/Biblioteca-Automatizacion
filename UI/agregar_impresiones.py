@@ -94,10 +94,8 @@ class AgregarImpresiones(QWidget):
         button_layout.addWidget(self.boton_volver)
 
         self.combo_hoja.addItem("Selecciona el tipo de hoja a usar")
-        hoja = select_type_sheet()
-        for ho in hoja:
-            self.combo_hoja.addItem(ho[0])
-
+        self.combo_hoja.addItem("Carta")
+        self.combo_hoja.addItem("Oficio")
         
         # Agregar botones
         main_layout.setSpacing(15)
@@ -154,13 +152,6 @@ class AgregarImpresiones(QWidget):
         rut = self.rut_solicitante.text()
         descrip = self.descripcion.toPlainText()
         hoja = ""
-        if not nombre or not curso or not descrip or not copias or not paginas:
-            msg = QMessageBox()
-            msg.setWindowTitle("Error de Entrada")
-            msg.setText("Por Favor, ingrese los datos necesarios para la impresion, estos estan marcados por un *")
-            msg.setIcon(QMessageBox.Warning)
-            msg.exec()
-            return
         if not copias.isdigit() or not paginas.isdigit():
             msg = QMessageBox()
             msg.setWindowTitle("Error de Entrada")
@@ -172,6 +163,13 @@ class AgregarImpresiones(QWidget):
             hoja = self.combo_hoja.currentText()
         elif self.combo_hoja.currentText() == "Selecciona el tipo de hoja a usar":
             hoja = ""
+        if not nombre or not curso or not descrip or not copias or not paginas or not hoja:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error de Entrada")
+            msg.setText("Por Favor, ingrese los datos necesarios para la impresion, estos estan marcados por un *")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec()
+            return
         ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip, hoja)
         msg = QMessageBox()
         msg.setWindowTitle("Impresión Agregada")
