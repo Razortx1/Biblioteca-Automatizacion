@@ -1,7 +1,39 @@
+"""
+    **Modulo main.py**\n
+    Es el encargado de inicializar todo el programa, desde la llamada a la base de datos, como
+    todas las ventanas que vayan a utilizarse 
+
+    **Imports del modulo**\n
+
+    sys ---> Usado para obtener funciones de sistema
+    os ----> Usado principalmente para obtener las url de los diversos iconos a usar\n
+    PyQt5.QtWidgets ---> Usado para traer los diversos widgets que se necesitan para
+                        crear la interfaz grafica
+    PyQt5.QtCore ----> Usado principalmente para obtener otras configuraciones para los
+                        widgets
+    PyQt5.QtGui -----> Usado para obtener modulos con respecto a iconos e imagenes
+
+    UI.pagina_principal ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.agregar_libros ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.historia_libros ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.prestamo_libros ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.menu_impresiones ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.historial_prestamos ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.historial_impresiones ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+    UI.agregar_prestamos ----> Usado como pagina para los widgets importados de PyQt5.QWidgets
+                                StackWidgets
+"""
 import sys
 import os
-from PyQt5.QtWidgets import (QSizePolicy, QWidget, QStackedWidget,
-                             QPushButton, QVBoxLayout, QHBoxLayout,
+from PyQt5.QtWidgets import (QWidget, QStackedWidget,
+                             QVBoxLayout, QHBoxLayout,
                              QMainWindow, QApplication, QLabel)
 from PyQt5.QtCore import Qt, QLocale
 from PyQt5.QtGui import QIcon, QPixmap
@@ -16,6 +48,24 @@ from UI.historial_impresiones import HistorialImpresiones
 from UI.agregar_impresiones import AgregarImpresiones
 
 def resource_path(relative_path):
+    """
+    **Funcion resource_path**\n
+    Permite obtener la url completa de los archivos del sistema, con el fin de
+    poder utilizarlos sin tener problemas con la implementacion de estos en otros
+    entornos que no sean el pc del programador.\n 
+    Estos archivos pueden ser imagenes, iconos o archivos de estilo como los .css\n
+
+    **Parametros**\n
+    - relative_path: str
+
+    **Retorna**\n
+    url: str
+
+    **Ejemplo:**\n
+    imagen = "image.png"\n
+    img = resource_path(imagen)\n
+    print(img) ------> c:/user/downloads/
+    """
     if getattr(sys, 'frozen', False):
         bundle_dir = sys._MEIPASS  # for --onefile
     else:
@@ -25,7 +75,17 @@ def resource_path(relative_path):
 icon = resource_path("images/biblioteca.ico")
 
 class Window(QMainWindow):
+    """
+    **Clase Window**\n
+    Es la clase principal del sistema. Es la encargada de llevar todos los procesos de carga de
+    las demas ventanas, ademas de otorgarle los css correspondientes.
+    """
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Permite cargar todos los componentes que se van a utilizar durante el ciclo de vida de la
+        aplicacion, como lo pueden ser los widgets, las señales, o la misma apertura de la aplicacion
+        """
         super().__init__()
 
         # Definición de las páginas a usar
@@ -112,6 +172,15 @@ class Window(QMainWindow):
 
     # Función para cambiar entre páginas
     def cambiar_pagina(self, nombre_pagina):
+        """
+        **Funcion cambiar_pagina**\n
+        Le permite, al stackwidget, ir cambiando entre las diversas paginas que este posee, ademas de
+        poder actualizar las tablas y los combobox, en caso que esta las posea.\n
+
+        **Parametros**\n
+        self: Window\n
+        nombre_pagina: str
+        """
         if nombre_pagina in self.page_indice:
             self.stack.setCurrentIndex(self.page_indice[nombre_pagina])
             nombre = nombre_pagina.replace("_", " ")
