@@ -1,3 +1,21 @@
+"""
+    **Modulo historial_prestamos**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra revisar el historial de los prestamos que haya dentro del sistema\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la vista de los diversos prestamos\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    PyQt.QtGui -----> Usado para cambiar los colores de la ultima columna de la tabla
+
+    modulo session -----> Usado para poder obtener todos los estados del prestamo, los libros que 
+                            pertenezcan al prestamo y el curso perteneciente al usuario
+    modulo actualizar_prestamos ---> Usado para poder llamar a la ventana de actualizar prestamos
+
+"""
+
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTableWidget,
                              QTableWidgetItem, QHeaderView,
                              QPushButton, QComboBox, QAbstractItemView,
@@ -15,9 +33,19 @@ from connection.session import (select_prestamos_all, select_all_estado_prestamo
 from .actualizar_ui.actualizar_prestamos import ActualizarPrestamos
 
 class HistorialPrestamos(QWidget):
+    """
+    **Clase HistorialPrestamos**\n
+    Permite el poder observar los distintos prestamos presentes en la base
+    de datos, estos a traves de filtros y paginaciones
+    """
     volver_principal = pyqtSignal()
     pasar_fecha = pyqtSignal(str)
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Permite la carga de todos y cada uno de los widgets que se utilizaran durante el
+        ciclo de vida de esta ventana
+        """
         super().__init__()
 
         self.w = None
@@ -163,6 +191,10 @@ class HistorialPrestamos(QWidget):
         self.siguiente.clicked.connect(self.siguiente_funcion)
 
     def rellenar_combobox(self):
+        """
+        **Funcion rellenar_combobox**\n
+        Permite el poder rellenar los combobox que se encuentran como filtros
+        """
         self.estado_prestamo.clear()
         self.combo_curso.clear()
         self.estado_prestamo.addItem("Selecciona un estado")
@@ -176,12 +208,24 @@ class HistorialPrestamos(QWidget):
             self.combo_curso.addItem(cur[0])
 
     def anterior_funcion(self):
+        """
+        **Funcion anterior_funcion**\n
+        Permite poder manejar las paginaciones con los respectivos botones,
+        ademas del label utilizado para mostrar la pagina actual
+        Se usa normalmente para disminuir la cantidad de paginas
+        """
         if self.current_page > 0:
             self.current_page -=1
             self.pagina.setText(f"Pagina {self.current_page +1}")
             self.rellenar_tabla(**self.filtros_actuales)
 
     def siguiente_funcion(self):
+        """
+        **Funcion siguiente_funcion**\n
+        Permite poder manejar las paginaciones con los respectivos botones,
+        ademas del label utilizado para mostrar la pagina actual.\n
+        Se usa normalmente para incrementar la cantidad de paginas
+        """
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
@@ -190,6 +234,18 @@ class HistorialPrestamos(QWidget):
     # Funcion para rellenar la tabla
     def rellenar_tabla(self, estado=None, rut_prest=None,
                        libro_nombre=None, user_nombre=None,curso=None, fecha=None):
+        """
+        **Funcion rellenar_tabla**\n
+        Es la encargada de traer todos los libros que hay actualmente prestados
+        ademas de poder permitir la opcion de filtrado en los datos
+
+        **Parametros**\n
+        - estado: str | None
+        - rut_prest: str | None
+        - libro_nombre: str | None
+        - curso: str | None
+        - fecha: str | None
+        """
         offset = self.current_page * self.page_size
         prestamos = list(select_prestamos_all(estado= estado, rut= rut_prest, 
                                             nombre_libro= libro_nombre,
@@ -208,6 +264,13 @@ class HistorialPrestamos(QWidget):
         self.tabla(prestamos)
 
     def notificaciones_for_today(self):
+        """
+        **Funcion notificaciones_for_today**\n
+        Permite poder enviarle al usuario una notificacion con respecto a la fecha
+        de vencimiento del prestamo, indicando el alumno o profesor el cual tiene que entregar
+        la fecha del dia de 'hoy' que seria del prestamo y por ultimo, el nombre
+        del libro que fue prestado
+        """
         fecha = date.today().strftime("%Y-%m-%d")
         prestamos = select_prestamos_all(fecha=fecha)
         for pres in prestamos:
@@ -226,6 +289,13 @@ class HistorialPrestamos(QWidget):
                 self.notificacion.show()
 
     def tabla(self, prestamos):
+        """
+        **Funcion tabla**\n
+        Permite poder rellenar la tabla
+
+        **Parametros**\n
+        - prestamos: List[Prestamos]
+        """
         self.tabla_historial.setRowCount(0)
         tablerow = 0
         columna = 0
@@ -261,6 +331,11 @@ class HistorialPrestamos(QWidget):
             pass
 
     def filtrado_datos(self):
+        """
+        **Funcion filtrado_datos**\n
+        Permite poder obtener los datos de los prestamos en base a los filtros indicados
+        por el usuario
+        """
         estado = ""
         rut_prest = ""
         libro_nombre = self.nombre_libro.text()
@@ -292,6 +367,11 @@ class HistorialPrestamos(QWidget):
         self.rellenar_tabla(**self.filtros_actuales)
 
     def quitar_filtros(self):
+        """
+        **Funcion quitar_filtros**\n
+        Es la encargada de devolver todos los valores de los filtros a vacio, o en caso de ser un combobox,
+        se regresa a su indice 0, el cual esta establecido como 'Selecciona...'
+        """
         self.estado_prestamo.setCurrentIndex(0)
         self.combo_curso.setCurrentIndex(0)
         self.rut_prestatario.clear()
@@ -312,6 +392,11 @@ class HistorialPrestamos(QWidget):
 
 
     def cambiar_state(self):
+        """
+        **Funcion cambiar_state**\n
+        Permite poder leer el prestamo el cual fue seleccionado a traves de la tabla, y esos datos son luego
+        enviado a traves de una señal hacia actualizar_prestamo
+        """
         selected_rows = self.tabla_historial.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
@@ -339,6 +424,14 @@ class HistorialPrestamos(QWidget):
             self.w.cerrar_ventana.connect(self.cerrar_ventana)
     
     def cerrar_ventana(self):
+        """
+        **Funcion cerrar_ventana**\n
+        Es la encargada para poder comprobar si, existe o no existe una instancia de la ventana para
+        actualizar los libros, y en caso que si haya una, esta se sobreescribe por None, esto con el
+        fin de poder abrir nuevamente la ventana sin necesidad de cerrar la aplicacion donde ademas,
+        una vez cerrada la ventana, se vuelven a cargar los datos de la tabla, esto para mantener actualizado
+        lo mas posible los datos
+        """
         if self.w is not None:
             self.w = None
             self.rellenar_tabla()

@@ -1,3 +1,21 @@
+"""
+    **Modulo agregar_impresiones.py**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra hacer el ingreso de las impresiones que deba realizar\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la creacion del libro\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+
+    modulo connection ----> Usado para traer la funcion ingresar_impresiones, esto con el fin
+                            de poder ingresar la impresion a la base de datos, tomando los datos
+                            encontrados en los widgets\n
+    modulo session -----> Usado para poder obtener todos el usuario que pidio esa impresion
+
+"""
+
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QHBoxLayout,
                              QTextEdit, QCheckBox, QMessageBox,
@@ -5,14 +23,31 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
 
 from PyQt5.QtCore import (pyqtSignal, Qt, QTimer)
 
-from connection.session import selected_user_by_rut, select_type_sheet
+from connection.session import selected_user_by_rut
 from connection.connection import ingresar_impresiones
 
 
 class AgregarImpresiones(QWidget):
+    """
+    **Clase AgregarImpresiones**\n
+    Permite el poder agregar las impresiones a la base de datos, a traves de una interfaz
+    parecida a un formulario. Este formulario cuenta con los siguientes campos: \n
+
+    - Nombre del solicitante de la impresion\n
+    - Rut del solicitante de la impresion\n
+    - Curso del solicitante de la impresion\n
+    - Cantidad de copias a necesitar\n
+    - Cantidad de paginas a necesitar\n
+    - La descripcion de la impresion
+    """
     volver_menu = pyqtSignal()
 
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Es la encargada de cargar los widgets apenas se detecta que el 
+        usuario abrio el sistema
+        """
         super().__init__()
 
         # Definición de Layouts
@@ -110,6 +145,18 @@ class AgregarImpresiones(QWidget):
         self.boton_volver.clicked.connect(self.volver_menu.emit)
 
     def crear_line_edit(self, placeholder, disabled, input_mask=""):
+        """
+        **Funcion crear_line_edit**\n
+        Se encarga de crear los distintos lineedit\n
+
+        **Parametros**\n
+        - placeholder: str\n
+        - disabled: str\n
+        - input_mask: str | ""\n
+
+        **Retorna**\n
+        line_edit: Objeto Widget QLineEdit
+        """
         line_edit = QLineEdit()
         line_edit.setPlaceholderText(placeholder)
         if disabled:
@@ -119,17 +166,38 @@ class AgregarImpresiones(QWidget):
         return line_edit
 
     def crear_label(self, text):
+        """
+        **Funcion crear_label**\n
+        Se encarga de crear los distintos label\n
+
+        **Parametros**\n
+        - text: str\n
+
+        **Retorna**\n
+        label: Objeto Widget QLabel
+        """
         label = QLabel()
         label.setText(text)
         return label
 
     # Función para buscar un usuario por su rut
     def buscar_rut(self):
+        """
+        **Funcion buscar_rut**\n
+        Se utiliza para poder buscar el usuario a traves del rut, a traves de un tiempo de carga\n
+        """
         rut = self.rut_solicitante.text()
         # Espera 500 ms antes de ejecutar la búsqueda
         QTimer.singleShot(500, lambda: self.buscar_usuario(rut))
 
     def buscar_usuario(self, rut):
+        """
+        **Funcion buscar_usuario**\n
+        Se utiliza para poder obtener el usuario a traves del rut\n
+
+        **Parametros**\n
+        rut: str
+        """
         user = selected_user_by_rut(rut)
         if user:
             user = user[0][0]
@@ -145,6 +213,11 @@ class AgregarImpresiones(QWidget):
 
     # Función para agregar una impresión
     def agregar_impresiones(self):
+        """
+        **Funcion agregar_impresiones**\n
+        Se encarga de tomar todos los datos escritos por el usuario para
+        empezar el proceso de creacion de las impresiones
+        """
         copias = self.cantidad_copias.text()
         paginas = self.cantidad_paginas.text()
         nombre = self.nombre_solicitante.text()
@@ -181,6 +254,11 @@ class AgregarImpresiones(QWidget):
         self.limpiar_campos()
 
     def limpiar_campos(self):
+        """
+        **Funcion limpiar_campos**\n
+        Se encarga de devolver todos los valores a los predefinidos, esto para poder
+        ingresar otra impresion en caso de ser necesario una vez ingresada la impresion
+        """
         self.rut_solicitante.clear()
         self.nombre_solicitante.clear()
         self.cursos.clear()
@@ -191,6 +269,14 @@ class AgregarImpresiones(QWidget):
 
     # Función para habilitar o deshabilitar el campo de curso
     def check_event(self, event):
+        """
+        **Funcion check_event**\n
+        Se utiliza para poder cambiar el curso del alumno o profesor si es que el usuario 
+        lo permita\n
+
+        **Parametros**\n
+        - event: Bool
+        """
         if event == Qt.Checked:
             self.cursos.setDisabled(False)
         if event == Qt.Unchecked:

@@ -1,5 +1,25 @@
+"""
+    **Modulo actualizar_libros**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra hacer la actualizaciones con respecto a los estados de los libros\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la creacion del libro\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    PyQt.QtGui -----> Usado para cambiar los colores de la ultima columna de la tabla
+
+    modulo connection ----> Usado para traer la funcion update_estado_libro, esto con el fin
+                            de poder actualizar el estado del libro a la base de datos, tomando los datos
+                            encontrados en los widgets\n
+    modulo session -----> Usado para poder obtener todos los estados del libro y todos los libros que
+                            pertenecen a dicho estado
+
+"""
+
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
-                             QPushButton, QTableWidget, QLineEdit, QLabel,
+                             QPushButton, QTableWidget,
                              QComboBox, QHBoxLayout, QMessageBox, QTableWidgetItem,
                              QAbstractItemView, QCheckBox, QHeaderView)
 
@@ -7,7 +27,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
 
 from connection.session import (select_estado_libro_all,
-                                select_copia_libros_by_id, select_prestamo_libro)
+                                select_prestamo_libro)
 from connection.connection import update_estado_libro
 
 style_sheet = """
@@ -56,9 +76,22 @@ QHeaderView::section {
 }"""
 
 class ActualizarLibros(QWidget):
+    """
+    **Clase ActualizarLibros**\n
+    Permite el poder actualizar los estados de los libros a traves de una interfaz parecida a un formularios.
+    Este formulario cuenta con los siguientes campos: \n
+
+    - Datos pertenecientes a la tabla\n
+    - Estado de libro a partir de ComboBox
+    """
     actualizar_datos = pyqtSignal()
     cerrar_ventana = pyqtSignal()
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Se encarga de cargar tanto los widgets como los datos a los widgets tanto al comobox
+        como a la tabla, detectandose a penas el usuario presiona el boton de actualizar estado
+        """
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE LIBROS")
         self.setObjectName("ActualizarLibros")
@@ -132,6 +165,11 @@ class ActualizarLibros(QWidget):
             self.estado.insertItem(es[0].id_estadolibro, es[0].estado_libro)
         
     def seleccion_datos(self):
+        """
+        **Funcion seleccion_datos**\n
+        Es la encargada de comprobar el estado actual del checkbox, esto con el fin de poder
+        cerrar o no cerrar la ventana si es que el usuario no lo desea
+        """
         is_true = self.check.isChecked()
         if is_true is not True:
             self.act_datos()
@@ -142,6 +180,18 @@ class ActualizarLibros(QWidget):
             self.close()
 
     def color_por_estado(self, estado: str) -> QColor:
+        """
+        **Funcion color_por_estado**\n
+        Se encarga de obtener algunos colores para poder otorgarselas a la tabla, los cuales son los siguientes:\n
+
+        - Buen estado: Verde pastel clarito
+        - Mal Estado: Amarrillo pastel algo intenso
+        - Estado Regular: Amarillo pastel algo menos inteso
+        - Dado de Baja: Rojo pastel
+
+        **Retorna**\n
+        colores: Dict[str, QColor]
+        """
         colores = {
             "Buen Estado": QColor("#b2f7b2"),
             "Mal Estado": QColor("#ffd62e"),
@@ -151,6 +201,13 @@ class ActualizarLibros(QWidget):
         return colores.get(estado, QColor(255, 255, 255))
 
     def rellenar_tabla(self):
+        """
+        **Funcion rellenar_tabla**\n
+        Se encarga de obtener todos los libros para luego cargarlos a la tabla
+
+        **Excepcion**\n
+        Se implementa traceback para errores fantasmas ademas de imprimir el error por consola
+        """
         try:
             self.tabla_cambiarlibros.setRowCount(0)
             copias = select_prestamo_libro(self.nombre, self.autor, self.editorial)
@@ -182,6 +239,20 @@ class ActualizarLibros(QWidget):
             print(f"Error {e}")
 
     def traer_datos(self, nombre_, autor_, editorial_):
+        """
+        **Funcion traer_objeto**\n
+        Se encarga de traer los datos de los libros a traves de la señal propuesta por historial_libro
+
+        **Parametros**\n
+        - nombre: str\n
+        - autor: str\n
+        - editorial: str\n
+
+        **Retorna**\n
+        nombre_libro: str\n
+        autor_libro: str\n
+        editorial_libro: str\n
+        """
         self.nombre = nombre_
         self.autor = autor_
         self.editorial = editorial_
@@ -189,6 +260,12 @@ class ActualizarLibros(QWidget):
         return self.nombre, self.autor, self.editorial
 
     def act_datos(self):
+        """
+        **Funcion act_datos**\n
+        Permite la actualizacion de los libros con respecto a su estado,
+        con diversos validadores para poder comprobar si fue seleccionado un libro o no, o
+        si en caso que el usuario no desee actualizar ahora el libro
+        """
         selected_rows = self.tabla_cambiarlibros.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
@@ -207,5 +284,11 @@ class ActualizarLibros(QWidget):
         self.rellenar_tabla()
         
     def closeEvent(self, a0):
+        """
+        **Funcion closeEvent**\n
+        Detecta si la ventana se cierra ya sea a traves de un boton o si se cierra
+        por el boton de la X. Esto permite que se pueda volver a abrir sin necesidad
+        de cerrar la aplicacion
+        """
         self.cerrar_ventana.emit()
         a0.accept()

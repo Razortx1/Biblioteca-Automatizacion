@@ -1,6 +1,25 @@
+"""
+    **Modulo agregar_libros.py**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra hacer el ingreso de los libros que lleguen a la biblioteca\n
+
+    **Importanciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la creacion del libro\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    datetime ----> Usado para obtener la fecha de hoy\n
+
+    modulo connection ----> Usado para traer la funcion insertar_libros, esto con el fin
+                            de poder ingresar el libro a la base de datos, tomando los datos
+                            encontrados en los widgets\n
+    modulo session -----> Usado para poder obtener todos los nombres, autores, editoriales entre otros
+                            con el fin de facilitar el tipeado del usuario
+"""
+
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout,
-    QDateEdit, QSpacerItem, QSizePolicy, QMessageBox, QCompleter
+    QSpacerItem, QSizePolicy, QMessageBox, QCompleter
 )
 
 from PyQt5.QtCore import pyqtSignal, Qt
@@ -11,9 +30,27 @@ from connection.session import (select_distinct_nombre_libro, select_distinct_au
                                 select_distinct_estanteria_libro, select_distinct_biblioteca_libro)
 
 class AgregarLibros(QWidget):
+    """
+    **Clase AgregarLibros**\n
+    Permite el poder agregar libros a la base de datos, a traves de una interfaz parecida a un formulario.
+    Este formulario cuenta con los siguientes campos: \n
+
+    - Nombre Libro\n
+    - Autor del libro\n
+    - Editorial del libro\n
+    - Estanteria donde se encuentra el libro
+    - El sector de la biblioteca donde se encuentra la estanteria del libro\n
+    - Stock
+
+    """
     volver_principal = pyqtSignal()
 
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Es la encargada de cargar tanto los widgets como los datos a los widgets de autocompletado apenas
+        se detecta que el usuario abrio el sistema
+        """
         super().__init__()
 
         # Definición de Layouts
@@ -117,6 +154,12 @@ class AgregarLibros(QWidget):
         self.volver_atras.clicked.connect(self.volver_principal.emit)
 
     def actualizar_autocompletados(self):
+        """
+        **Funcion actualizar_autocompletados**\n
+        Se encarga de actualizar los autocompletados una vez se crea el libro.
+        Esta funcion tiene como fin el poder automatizar de mejor manera la aplicacion, sin la necesidad
+        de cerrar y volver a abrir el sistema
+        """
         nombre_libros = [nombre for nombre_ in select_distinct_nombre_libro() for nombre in nombre_]
         autor_libro = [autor for autor_ in select_distinct_autor_libro() for autor in autor_]
         editorial_libro = [editorial for editorial_ in select_distinct_editorial_libro() for editorial in editorial_]
@@ -130,6 +173,12 @@ class AgregarLibros(QWidget):
         self.estanteria_completado.model().setStringList(biblioteca_libro)
 
     def agregar_boton(self):
+        """
+        **Funcion agregar_boton**\n
+        Se encarga de tomar todos los datos escritos por el usuario para
+        empezar el proceso para la creacion del libro, y en caso que exista, agregarlo solamente como
+        stock
+        """
         nombre = self.agregar_nombre.text()
         autor = self.agregar_autor.text()
         editorial = self.agregar_editorial.text()

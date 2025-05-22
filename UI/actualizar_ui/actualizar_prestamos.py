@@ -1,3 +1,24 @@
+"""
+    **Modulo actualizar_prestamos**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra hacer la actualizaciones con respecto a los estados de los prestamos\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la actualizacion del estado del prestamo\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    PyQt.QtGui -----> Usado para cambiar los colores de la ultima columna de la tabla
+
+    modulo connection ----> Usado para traer la funcion update_estado_libro y el
+                            update_estado_prestamos, esto con el fin
+                            de poder actualizar el estado del libro a la base de datos, tomando los datos
+                            encontrados en los widgets\n
+    modulo session -----> Usado para poder obtener todos los estados del prestamo y los libros que 
+                            pertenezcan al prestamo
+
+"""
+
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout,
                              QMessageBox, QComboBox, QCheckBox,
                              QTableWidget, QTableWidgetItem,
@@ -57,9 +78,23 @@ QHeaderView::section {
 """
 
 class ActualizarPrestamos(QWidget):
+    """
+    **Clase ActualizarPrestamos**\n
+    Permite el poder actualizar los estados del prestamo de los diferentes libros que se encuentran
+    actualmente prestados, a traves una interfaz algo parecida a los formularios. Este formulario
+    cuenta con los siguientes campos:\n
+
+    - Datos pertenecientes a la tabla\n
+    - Estado del prestamo a partir de ComboBox
+    """
     actualizar_datos = pyqtSignal()
     cerrar_ventana = pyqtSignal()
     def __init__(self):
+        """
+        **Funcion __ init __**
+        Se encarga de cargar tanto los widgets como los datos correspondientes a estos,
+        donde a penas se detecta que el usuario presiono actualizar prestamos
+        """
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE PRESTAMOS")
         self.setObjectName("ActualizarPrestamos")
@@ -140,6 +175,10 @@ class ActualizarPrestamos(QWidget):
             self.estados.insertItem(es[0].id_estadoprestamo, es[0].estado_prestamo)
 
     def rellenar_tabla(self):
+        """
+        **Funcion rellenar_tabla**\n
+        Es la encargada de obtener todos los datos de los libros para luego cargalos a la tabla\n
+        """
         self.tabla_prestamos.setRowCount(0)
         prestamos = select_prestamo_by_fecha(self.fechas)
         tablerow = 0
@@ -181,6 +220,11 @@ class ActualizarPrestamos(QWidget):
 
 
     def actualizar_estado(self):
+        """
+        **Funcion actualizar_estado**\n
+        Es la encargada de comprobar el estado actual del checkbox, esto con el fin de poder
+        cerrar o no cerrar la ventana si es que el usuario no lo desea
+        """
         is_true = self.validacion_usuario.isChecked()
         if is_true is not True:
             self.camb_estado_pres_libro()
@@ -192,15 +236,37 @@ class ActualizarPrestamos(QWidget):
             self.close()
 
     def traer_fecha(self, fecha_item):
+        """
+        **Funcion traer_fecha**\n
+        Se encarga de traer los datos de los libros a traves de la señal propuesta por historial_prestamo
+
+        **Parametros**\n
+        - fecha_item: str | datetime
+
+        **Retorna**\n
+        fechas: str | datetime
+        """
         self.fechas = fecha_item
         self.rellenar_tabla()
         return self.fechas
     
     def closeEvent(self, a0):
+        """
+        **Funcion closeEvent**\n
+        Detecta si la ventana se cierra ya sea a traves de un boton o si se cierra
+        por el boton de la X. Esto permite que se pueda volver a abrir sin necesidad
+        de cerrar la aplicacion
+        """
         self.cerrar_ventana.emit()
         a0.accept()
 
     def camb_estado_pres_libro(self):
+        """
+        **Funcion camb_estado_pres_libro**\n
+        Permite la actualizacion de los prestamos con respecto a su estado, con
+        diversos validadores para poder comprobar si fue seleccionado un prestamo o no,
+        o si en caso que el usuario no desee actualizar ahora el prestamo
+        """
         selected_rows = self.tabla_prestamos.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()

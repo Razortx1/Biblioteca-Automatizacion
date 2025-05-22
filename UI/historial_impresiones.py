@@ -1,7 +1,27 @@
+"""
+    **Modulo historia_impresiones**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra revisar el historial de las impresiones que haya dentro del sistema\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante observacion del historial de las impresiones\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    PyQt.QtGui -----> Usado para cambiar los colores de la ultima columna de la tabla
+
+    modulo session -----> Usado para poder obtener todas las impresiones que hayan en la
+                        base de datos, ademas de sus estados, el tipo de hoja usada o los
+                        cursos pertenecientes a la tabla Usuarios
+    modulo connection ----> Usado principalmente para poder actualizar el estado de las
+                            impresiones
+
+"""
+
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidget,
                              QTableWidgetItem, QLabel, QVBoxLayout,
                              QHeaderView, QMessageBox, QAbstractItemView,
-                             QComboBox, QHBoxLayout, QSizePolicy)
+                             QComboBox, QHBoxLayout)
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
@@ -12,9 +32,19 @@ from connection.connection import update_estado_impresion
 
 
 class HistorialImpresiones(QWidget):
+    """
+    **Clase HistorialImpresiones**\n
+    Permite el poder observar las distintas impresiones presentes en la base de datos, esto
+    a traves de filtros y paginaciones
+    """
     volver_menu = pyqtSignal()
 
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Permite la carga de todos y cada uno de los widgets que se utilizaran durante el ciclo
+        de vida de esta ventana
+        """
         super().__init__()
 
         # Definición de Layout
@@ -106,18 +136,35 @@ class HistorialImpresiones(QWidget):
 
 
     def anterior_funcion(self):
+        """
+        **Funcion anterior_funcion**\n
+        Permite poder manejar las paginaciones con los respectivos botones,
+        ademas del label utilizado para mostrar la pagina actual
+        Se usa normalmente para disminuir la cantidad de paginas
+        """
         if self.current_page > 0:
             self.current_page -=1
             self.pagina.setText(f"Pagina {self.current_page +1}")
             self.rellenar_tabla(**self.filtros_actuales)
 
     def siguiente_funcion(self):
+        """
+        **Funcion siguiente_funcion**\n
+        Permite poder manejar las paginaciones con los respectivos botones,
+        ademas del label utilizado para mostrar la pagina actual.\n
+        Se usa normalmente para incrementar la cantidad de paginas
+        """
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
         self.rellenar_tabla(**self.filtros_actuales)
 
     def vaciar_filtrado(self):
+        """
+        **Funcion vaciar_filtrado**\n
+        Es la encargada de devolver todos los valores de los filtros a vacio, o en caso de ser un combobox,
+        se regresa a su indice 0, el cual esta establecido como 'Selecciona...'
+        """
         self.filtro_estado.setCurrentIndex(0)
         self.filtro_tipo_papel.setCurrentIndex(0)
         self.filtro_curso.setCurrentIndex(0)
@@ -132,6 +179,10 @@ class HistorialImpresiones(QWidget):
 
     # Rellenar ComboBox con los estados de impresión
     def rellenar_combobox(self):
+        """
+        **Funcion rellenar_combobox**\n
+        Permite el poder rellenar los combobox que se encuentran como filtros
+        """
         self.filtro_estado.clear()
         self.filtro_tipo_papel.clear()
         self.filtro_curso.clear()
@@ -151,6 +202,16 @@ class HistorialImpresiones(QWidget):
             self.filtro_curso.addItem(cur[0])
 
     def rellenar_tabla(self, estado_seleccionado=None, papel=None, curso=None):
+        """
+        **Funcion rellenar_tabla**\n
+        Es la encargada de traer todas las impresiones que actualmente hay en biblioteca ademas de
+        permitir la opcion de filtrado en los datos
+
+        **Parametros**\n
+        - estado_seleccionado: int | None\n
+        - papel: str | None\n
+        - curso: str | None
+        """
         offset = self.current_page * self.page_size
         impresiones = list(select_impresion_all(estado=estado_seleccionado, 
                                                    papel=papel,
@@ -165,6 +226,10 @@ class HistorialImpresiones(QWidget):
         self.tabla(impresiones)
 
     def actualizar_estado(self):
+        """
+        **Funcion actualizar_estado**\n
+        Permite poder actualizar los estados de las impresiones las cuales hayan sido seleccionadas en la tabla
+        """
         selected_row = self.tabla_impresiones.selectionModel().selectedRows()
         if not selected_row:
             msg = QMessageBox()
@@ -191,6 +256,10 @@ class HistorialImpresiones(QWidget):
             self.rellenar_tabla()
 
     def filtrar_tabla(self):
+        """
+        **Funcion filtrar_tabla**\n
+        Permite poder hacer uso de filtros a los datos mostrados en la tabla
+        """
         estado_seleccionado = self.filtro_estado.currentIndex()
         papel = self.filtro_tipo_papel.currentText()
         curso = self.filtro_curso.currentText()
@@ -210,6 +279,13 @@ class HistorialImpresiones(QWidget):
         self.rellenar_tabla(**self.filtros_actuales)
 
     def tabla(self, impresiones):
+        """
+        **Funcion tabla**\n
+        Permite poder rellenar la tabla
+
+        **Parametros**\n
+        - impresiones: List[Impresion]
+        """
         self.tabla_impresiones.setRowCount(0)
         column_count = self.tabla_impresiones.columnCount()
         tablerow = 0
