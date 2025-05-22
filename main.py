@@ -78,7 +78,9 @@ class Window(QMainWindow):
     """
     **Clase Window**\n
     Es la clase principal del sistema. Es la encargada de llevar todos los procesos de carga de
-    las demas ventanas, ademas de otorgarle los css correspondientes.
+    las demas ventanas, ademas de otorgarle los css correspondientes.\n
+
+    Hereda de QMainWindow
     """
     def __init__(self):
         """
