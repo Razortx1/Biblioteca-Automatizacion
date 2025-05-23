@@ -42,7 +42,7 @@ class PaginaPrincipal(QWidget):
         main_layout.setAlignment(Qt.AlignTop)
 
         # Título
-        titulo = QLabel("Sistema de Biblioteca")
+        titulo = QLabel("Bienvenido")
         titulo.setAlignment(Qt.AlignCenter)
         titulo.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
         main_layout.addWidget(titulo)

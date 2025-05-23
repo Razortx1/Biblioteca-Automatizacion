@@ -83,12 +83,6 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
     """
     try:
         libro = get_create_libros(nombre_,autor_,editorial_,fecha_,sector_b,sector_es)
-        for _ in range(int(stock_)):
-            copia = CopiasLibros(
-                libro_id = libro.id_libro,
-                estado_id = 1
-            )
-            session.add(copia)
         msg = QMessageBox()
         msg.setWindowTitle("Guardar Libro")
         msg.setText("¿Deseas guardar este libro?")
@@ -96,6 +90,12 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
         msg.setIcon(QMessageBox.Question)
         msg.exec()
         if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
+            for _ in range(int(stock_)):
+                copia = CopiasLibros(
+                    libro_id = libro.id_libro,
+                    estado_id = 1
+                )
+                session.add(copia)
             msg_ok = QMessageBox()
             msg_ok.setWindowTitle("Libro Agregado")
             msg_ok.setText("El libro se ha agregado correctamente.")
@@ -111,6 +111,7 @@ def insertar_libros(nombre_, autor_, editorial_, fecha_,sector_b, sector_es, sto
             cancelAction.setIcon(QMessageBox.Information)
             cancelAction.setWindowTitle("Accion Cancelada")
             cancelAction.exec()
+            return
 
     except Exception as e:
         traceback.print_exc()

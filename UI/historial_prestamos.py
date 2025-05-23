@@ -253,15 +253,16 @@ class HistorialPrestamos(QWidget):
                                             fecha=fecha,
                                             curso= curso, offset= offset, 
                                             limit= self.page_size+1))
-        self.siguiente.setDisabled(False)
-        self.anterior.setDisabled(False)
         if len(prestamos) > self.page_size:
             self.siguiente.setDisabled(False)
-            self.anterior.setDisabled(True)
             prestamos = prestamos[:self.page_size]
         else:
             self.siguiente.setDisabled(True)
         self.tabla(prestamos)
+        if self.current_page == 0:
+            self.anterior.setDisabled(True)
+        else:
+            self.anterior.setDisabled(False)
 
     def notificaciones_for_today(self):
         """

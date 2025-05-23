@@ -225,11 +225,14 @@ class HistorialLibros(QWidget):
         libros = list(select_libros_available(nombre=nombre_,autor= autor_,Editorial=no_editorial, Estado_=estado,
                                          SectorBiblio=biblioteca_, SectorEstanteria=estanteria_ ,offset=offset, limit=self.page_size+1))
         if len(libros) > self.page_size:
-            self.anterior.setDisabled(True)
             self.siguiente.setDisabled(False)
             libros = libros[:self.page_size]
         else:
             self.siguiente.setDisabled(True)
+        if self.current_page == 0:
+            self.anterior.setDisabled(True)
+        else:
+            self.anterior.setDisabled(False)
         self.tabla(libros)
         
 

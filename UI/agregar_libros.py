@@ -169,8 +169,8 @@ class AgregarLibros(QWidget):
         self.nombre_completado.model().setStringList(nombre_libros)
         self.autor_completado.model().setStringList(autor_libro)
         self.editorial_completado.model().setStringList(editorial_libro)
-        self.biblioteca_completado.model().setStringList(estanteria_libro)
-        self.estanteria_completado.model().setStringList(biblioteca_libro)
+        self.biblioteca_completado.model().setStringList(biblioteca_libro)
+        self.estanteria_completado.model().setStringList(estanteria_libro)
 
     def agregar_boton(self):
         """
@@ -191,8 +191,8 @@ class AgregarLibros(QWidget):
         if not nombre or not stock or not sector_biblioteca or not sector_estanteria:
             msg = QMessageBox()
             msg.setWindowTitle("Error de Entrada")
-            msg.setText("Favor de ingresar los datos correspondientes del libro segun muestra el formulario \n"
-            "A excepcion de autor o editorial si se desconoce")
+            msg.setText("Por favor, complete todos los campos obligatorios marcados con un asterisco (*).\n"
+                        "Los campos de autor y editorial pueden dejarse en blanco si se desconocen.")
             msg.setIcon(QMessageBox.Warning)
             msg.exec()
             return

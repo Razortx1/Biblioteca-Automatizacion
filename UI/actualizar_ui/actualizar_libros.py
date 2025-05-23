@@ -270,7 +270,7 @@ class ActualizarLibros(QWidget):
         if not selected_rows:
             msg = QMessageBox()
             msg.setWindowTitle("Seleccion erronea")
-            msg.setText("No se ha seleccionado un libro")
+            msg.setText("Debe seleccionar al menos un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
             

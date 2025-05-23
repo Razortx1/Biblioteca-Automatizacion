@@ -97,7 +97,7 @@ class Window(QMainWindow):
             "historia_libros": HistorialLibros(),
             "prestamo_libros": PrestamoLibros(),
             "menu_impresiones" : MenuImpresiones(),
-            "historial_prestamos": HistorialPrestamos(),
+            "ficha_prestamos": HistorialPrestamos(),
             "historial_impresiones" : HistorialImpresiones(),
             "agregar_impresiones": AgregarImpresiones()
         }
@@ -147,7 +147,7 @@ class Window(QMainWindow):
         self.pages["pagina_principal"].ir_a_agregar_libros.connect(lambda: self.cambiar_pagina("agregar_libros"))
         self.pages["pagina_principal"].ir_a_historia_libros.connect(lambda: self.cambiar_pagina("historia_libros"))
         self.pages["pagina_principal"].ir_a_menu_impresiones.connect(lambda: self.cambiar_pagina("menu_impresiones"))
-        self.pages["pagina_principal"].ir_a_historial_prestamo.connect(lambda: self.cambiar_pagina("historial_prestamos"))
+        self.pages["pagina_principal"].ir_a_historial_prestamo.connect(lambda: self.cambiar_pagina("ficha_prestamos"))
 
         # Establecer el funcionamiento para cambiar de páginas entre el menú de impresiones a sus "hijas"
         self.pages["menu_impresiones"].ir_a_historial_impresiones.connect(lambda: self.cambiar_pagina("historial_impresiones"))
@@ -162,7 +162,7 @@ class Window(QMainWindow):
         self.pages["agregar_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["historia_libros"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["menu_impresiones"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
-        self.pages["historial_prestamos"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
+        self.pages["ficha_prestamos"].volver_principal.connect(lambda: self.cambiar_pagina("pagina_principal"))
         self.pages["prestamo_libros"].volver_principal.connect(lambda: self.cambiar_pagina("historia_libros"))
 
         # Establecer el funcionamiento para volver al menú de impresiones
@@ -194,7 +194,7 @@ class Window(QMainWindow):
             elif nombre_pagina == "historia_libros":
                 self.pages[nombre_pagina].rellenar_tabla()
                 self.pages[nombre_pagina].rellenar_combobox()
-            elif nombre_pagina == "historial_prestamos":
+            elif nombre_pagina == "ficha_prestamos":
                 self.pages[nombre_pagina].rellenar_tabla()
                 self.pages[nombre_pagina].rellenar_combobox()
         else:

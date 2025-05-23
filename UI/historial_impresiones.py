@@ -218,11 +218,14 @@ class HistorialImpresiones(QWidget):
                                                    departamento=curso,
                                                    limit=self.page_size+1, offset=offset))
         if len(impresiones) > self.page_size:
-            self.siguiente.setDisabled(False)
             self.anterior.setDisabled(True)
             impresiones = impresiones[:self.page_size]
         else:
             self.siguiente.setDisabled(True)
+        if self.current_page == 0:
+            self.anterior.setDisabled(True)
+        else:
+            self.anterior.setDisabled(False)
         self.tabla(impresiones)
 
     def actualizar_estado(self):

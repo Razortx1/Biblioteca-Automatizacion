@@ -87,7 +87,7 @@ class PrestamoLibros(QWidget):
         self.curso = QLabel("Curso del Alumno/Profesor *")
 
         #Definicion de los botones
-        self.boton_volver = QPushButton("Ir al Historial de Libros")
+        self.boton_volver = QPushButton("Ir al Inventario de Libros")
         self.boton_buscar_rut = QPushButton("Buscar")
         self.boton_agregar_prestamo = QPushButton("Agregar Prestamo")
 
@@ -242,20 +242,19 @@ class PrestamoLibros(QWidget):
         rut = self.rut_.text()
         if rut == "..-":
             rut = ""
-            return
         nombre = self.nombre_prestatario.text()
         curso = self.curso_prestatario.text()
         if not selected_rows:
             msg = QMessageBox()
             msg.setWindowTitle("Seleccion erronea")
-            msg.setText("No se ha seleccionado un libro")
+            msg.setText("Debe seleccionar al menos un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
             return
         if not nombre or not rut or not curso:
                 msg = QMessageBox()
                 msg.setWindowTitle("Usuario invalido")
-                msg.setText("No se especificado un usuario")
+                msg.setText("No se especificado un alumno o profesor")
                 msg.setIcon(QMessageBox.Information)
                 msg.exec()
                 return
