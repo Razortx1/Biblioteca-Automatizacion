@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QTableWidget, QTableWidgetItem, QMessageBox,
                              QCheckBox, QHeaderView, QAbstractItemView)
 
-from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtCore import Qt, QDate, QTimer
 from PyQt5.QtGui import QColor
 
 from datetime import datetime, date
@@ -52,6 +52,9 @@ class PrestamoLibros(QWidget):
         los cuales se cargan apenas se detecta que el usuairo abrio el sistema\n
         """
         super().__init__(parent)
+
+        #Variable global para curso
+        self.curso_user = ""
 
         #Definicion de layouts principal
         vertical_layout_principal = QVBoxLayout()
@@ -208,18 +211,27 @@ class PrestamoLibros(QWidget):
             import traceback
             traceback.print_exc()
             print(f"Error {e}")
-
+        # Función para buscar un usuario por su rut
     def buscar_rut(self):
+        """
+        **Funcion buscar_rut**\n
+        Se utiliza para poder buscar el usuario a traves del rut, a traves de un tiempo de carga\n
+        """
+        rut = self.rut_.text()
+        # Espera 500 ms antes de ejecutar la búsqueda
+        QTimer.singleShot(500, lambda: self.buscar_usuario(rut))
+
+    def buscar_usuario(self, rut):
         """
         **Funcion buscar_rut**\n
         Se utiliza para poder buscar y cargar los datos del usuario a traves del rut indicado por el usuario
         """
-        rut = self.rut_.text()
         user = selected_user_by_rut(rut)
         if user:
             user = user[0][0]
             self.nombre_prestatario.setText(user.nombre)
             self.curso_prestatario.setText(user.curso)
+            self.curso_user = user.curso
             self.nombre_prestatario.setDisabled(True)
             self.curso_prestatario.setDisabled(True)
         else:
@@ -320,3 +332,4 @@ class PrestamoLibros(QWidget):
             self.curso_prestatario.setDisabled(False)
         if event == Qt.Unchecked:
             self.curso_prestatario.setDisabled(True)
+            self.curso_prestatario.setText(self.curso_user)

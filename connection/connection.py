@@ -191,6 +191,11 @@ def ingresar_impresiones(nombre_, curso_, rut_,cant_copias, cant_paginas, descri
         msg.setIcon(QMessageBox.Question)
         msg.exec()
         if msg.standardButton(msg.clickedButton()) == QMessageBox.Save:
+            msg_ok = QMessageBox()
+            msg_ok.setWindowTitle("Impresión Agregada")
+            msg_ok.setText("La impresión ha sido agregada con éxito.")
+            msg_ok.setIcon(QMessageBox.Information)
+            msg_ok.exec()
             session.add(impresion)
             session.commit()
 

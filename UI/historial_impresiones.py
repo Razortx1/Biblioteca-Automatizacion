@@ -237,7 +237,7 @@ class HistorialImpresiones(QWidget):
         if not selected_row:
             msg = QMessageBox()
             msg.setWindowTitle("Error de selección")
-            msg.setText("No se ha seleccionado una fila")
+            msg.setText("Se debe seleccionar por lo menos una impresión")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
         else:

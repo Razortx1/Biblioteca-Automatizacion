@@ -50,6 +50,9 @@ class AgregarImpresiones(QWidget):
         """
         super().__init__()
 
+        #Variable global para curso
+        self.curso_user = ""
+
         # Definición de Layouts
         main_layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
@@ -57,6 +60,7 @@ class AgregarImpresiones(QWidget):
         column1 = QVBoxLayout()
         column2 = QVBoxLayout()
         button_layout = QHBoxLayout()
+        curso_layout = QHBoxLayout()
 
         # Ajustar márgenes y espaciado para tener menos espacio entre los widgets
         main_layout.setContentsMargins(10, 10, 10, 10)  # Márgenes del layout principal
@@ -87,7 +91,7 @@ class AgregarImpresiones(QWidget):
 
         # Botones
         self.boton_agregar = QPushButton("Agregar Impresion")
-        self.boton_volver = QPushButton("Volver al menu de Impresiones")
+        self.boton_volver = QPushButton("Volver al Menú de Impresiones")
         self.boton_buscar_usuario = QPushButton("Buscar")
 
         # Organizar en Layouts
@@ -109,7 +113,9 @@ class AgregarImpresiones(QWidget):
         column1.addWidget(self.nombre)
         column1.addWidget(self.nombre_solicitante)
         column1.addWidget(self.curso)
-        column1.addWidget(self.cursos)
+        curso_layout.addWidget(self.cursos)
+        curso_layout.addWidget(self.cambiar_curso)
+        column1.addLayout(curso_layout)
         column1.addWidget(self.cantidad_c)
         column1.addWidget(self.cantidad_copias)
         horizontal_layout_column.addLayout(column1)
@@ -203,6 +209,7 @@ class AgregarImpresiones(QWidget):
             user = user[0][0]
             self.nombre_solicitante.setText(user.nombre)
             self.cursos.setText(user.curso)
+            self.curso_user = user.curso
             self.nombre_solicitante.setDisabled(True)
             self.cursos.setDisabled(True)
         else:
@@ -225,13 +232,6 @@ class AgregarImpresiones(QWidget):
         rut = self.rut_solicitante.text()
         descrip = self.descripcion.toPlainText()
         hoja = ""
-        if not copias.isdigit() or not paginas.isdigit():
-            msg = QMessageBox()
-            msg.setWindowTitle("Error de Entrada")
-            msg.setText("Por favor, ingrese números válidos en los campos de cantidad de copias y páginas.")
-            msg.setIcon(QMessageBox.Warning)
-            msg.exec()
-            return
         if self.combo_hoja.currentText() != "Selecciona el tipo de hoja a usar":
             hoja = self.combo_hoja.currentText()
         elif self.combo_hoja.currentText() == "Selecciona el tipo de hoja a usar":
@@ -243,12 +243,14 @@ class AgregarImpresiones(QWidget):
             msg.setIcon(QMessageBox.Warning)
             msg.exec()
             return
+        if not copias.isdigit() or not paginas.isdigit():
+            msg = QMessageBox()
+            msg.setWindowTitle("Error de Entrada")
+            msg.setText("Por favor, ingrese números válidos en los campos de cantidad de copias y páginas.")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec()
+            return
         ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip, hoja)
-        msg = QMessageBox()
-        msg.setWindowTitle("Impresión Agregada")
-        msg.setText("La impresión ha sido agregada con éxito.")
-        msg.setIcon(QMessageBox.Information)
-        msg.exec()
 
         # Limpiar campos después de agregar
         self.limpiar_campos()
@@ -266,6 +268,7 @@ class AgregarImpresiones(QWidget):
         self.cantidad_paginas.clear()
         self.descripcion.clear()
         self.cambiar_curso.setChecked(False)
+        self.curso_user = ""
 
     # Función para habilitar o deshabilitar el campo de curso
     def check_event(self, event):
@@ -281,3 +284,4 @@ class AgregarImpresiones(QWidget):
             self.cursos.setDisabled(False)
         if event == Qt.Unchecked:
             self.cursos.setDisabled(True)
+            self.cursos.setText(self.curso_user)
