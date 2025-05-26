@@ -34,7 +34,8 @@ import sys
 import os
 from PyQt5.QtWidgets import (QWidget, QStackedWidget,
                              QVBoxLayout, QHBoxLayout,
-                             QMainWindow, QApplication, QLabel)
+                             QMainWindow, QApplication, QLabel, QMenuBar, QAction,
+                             QFileDialog, QMessageBox)
 from PyQt5.QtCore import Qt, QLocale
 from PyQt5.QtGui import QIcon, QPixmap
 
@@ -46,7 +47,7 @@ from UI.menu_impresiones import MenuImpresiones
 from UI.historial_prestamos import HistorialPrestamos
 from UI.historial_impresiones import HistorialImpresiones
 from UI.agregar_impresiones import AgregarImpresiones
-from connection.backup import backups_database_rotation
+from connection.backup import backups_database_rotation, backups_restoration
 
 def resource_path(relative_path):
     """
@@ -102,8 +103,13 @@ class Window(QMainWindow):
             "historial_impresiones" : HistorialImpresiones(),
             "agregar_impresiones": AgregarImpresiones()
         }
-
+        # Implementacion de elementos para backup
         backups_database_rotation()
+        menubar = QMenuBar()
+        self.setMenuBar(menubar)
+        restaurar = QAction("Copia de Seguridad", self)
+        restaurar.triggered.connect(self.restauracion_backups)
+        menubar.addAction(restaurar)
 
         # Definición de los parámetros para la Ventana
         self.setWindowTitle("Sistema Biblioteca | PAGINA PRINCIPAL")
@@ -174,6 +180,46 @@ class Window(QMainWindow):
 
         # Asignar el widget principal a la ventana
         self.setCentralWidget(main_widget)
+    
+    def restauracion_backups(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Seleccionar archivo de backup",
+            resource_path("backups"),
+            "Base de datos (*.db)"
+        )
+        if not path:
+            # Usuario presionó cancelar en el diálogo de archivo
+            msg_cancel = QMessageBox()
+            msg_cancel.setWindowTitle("Acción cancelada")
+            msg_cancel.setText("No se seleccionó ningún archivo.")
+            msg_cancel.setIcon(QMessageBox.Information)
+            msg_cancel.exec()
+            return
+
+        # Mostrar confirmación solo si se seleccionó un archivo
+        msg = QMessageBox()
+        msg.setWindowTitle("Confirmación")
+        msg.setText(
+            "¿Está seguro de que desea restaurar esta copia de seguridad?\n"
+            "Se perderán los cambios hechos desde que se abrió el programa."
+        )
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        respuesta = msg.exec()
+
+        if respuesta == QMessageBox.Yes:
+            nombre_backup = os.path.basename(path)
+            if backups_restoration(nombre_backup):
+                QMessageBox.information(self, "Restauración exitosa", "Se restauró la base de datos correctamente.")
+            else:
+                QMessageBox.warning(self, "Error", "No se pudo restaurar la base de datos.")
+        else:
+            msg_cancel = QMessageBox()
+            msg_cancel.setWindowTitle("Acción cancelada")
+            msg_cancel.setText("Se canceló la restauración.")
+            msg_cancel.setIcon(QMessageBox.Information)
+            msg_cancel.exec()
 
     # Función para cambiar entre páginas
     def cambiar_pagina(self, nombre_pagina):
