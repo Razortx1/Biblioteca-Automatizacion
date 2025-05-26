@@ -344,7 +344,9 @@ with Session(engine) as session:
         try:
             prestamo_fecha = session.execute(select(Usuario.nombre, Libro.nombre_libro, Libro.editorial, Libro.autor,
                                                     Prestamos.fecha_inicio, Prestamos.fecha_termino,
-                                                    Estado_Libro.estado_libro, CopiasLibros.id_copia, Prestamos.id_prestamos)
+                                                    Estado_Libro.estado_libro, CopiasLibros.id_copia, Prestamos.id_prestamos,
+                                                    Estado_Prestamo.estado_prestamo)
+                                                    .join(Prestamos.estado_prestamo)
                                                     .join(Prestamos.copia)
                                                     .join(Prestamos.user)
                                                     .join_from(CopiasLibros, Libro, CopiasLibros.libro_id == Libro.id_libro)

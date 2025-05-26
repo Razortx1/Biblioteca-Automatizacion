@@ -118,7 +118,7 @@ class ActualizarPrestamos(QWidget):
 
         #Creacion de la tabla
         self.tabla_prestamos = QTableWidget()
-        self.tabla_prestamos.setColumnCount(9)
+        self.tabla_prestamos.setColumnCount(10)
 
         item = QTableWidgetItem()
         item.setText("Nombre Alumno")
@@ -142,11 +142,14 @@ class ActualizarPrestamos(QWidget):
         item.setText("Estado Libro")
         self.tabla_prestamos.setHorizontalHeaderItem(6, item)
         item = QTableWidgetItem()
-        item.setText("Id Interno")
+        item.setText("Estado Libro")
         self.tabla_prestamos.setHorizontalHeaderItem(7, item)
         item = QTableWidgetItem()
-        item.setText("Id Interno Prestamos")
+        item.setText("Id Interno")
         self.tabla_prestamos.setHorizontalHeaderItem(8, item)
+        item = QTableWidgetItem()
+        item.setText("Id Interno Prestamos")
+        self.tabla_prestamos.setHorizontalHeaderItem(9, item)
 
         self.tabla_prestamos.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_prestamos.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -163,6 +166,7 @@ class ActualizarPrestamos(QWidget):
         vertical_layout.addLayout(horizontal_layout_1)
         self.tabla_prestamos.setColumnHidden(7, True)
         self.tabla_prestamos.setColumnHidden(8, True)
+        self.tabla_prestamos.setColumnHidden(9, True)
 
         self.setLayout(vertical_layout)
 
@@ -188,10 +192,11 @@ class ActualizarPrestamos(QWidget):
         dado_baja = QColor("#ff6b6b")  # Dado de baja
         estado_regular = QColor("#ffe066")  # Estado regular
 
-        column_count = self.tabla_prestamos.columnCount()-3
+        column_count = self.tabla_prestamos.columnCount()-4
 
         if prestamos:
             for p in prestamos:
+                print(p)
                 row_position = self.tabla_prestamos.rowCount()
                 self.tabla_prestamos.insertRow(row_position)
                 self.tabla_prestamos.setItem(tablerow, 0, QTableWidgetItem(p.nombre))
@@ -201,8 +206,9 @@ class ActualizarPrestamos(QWidget):
                 self.tabla_prestamos.setItem(tablerow, 4, QTableWidgetItem(str(p.fecha_inicio)))
                 self.tabla_prestamos.setItem(tablerow, 5, QTableWidgetItem(str(p.fecha_termino)))
                 self.tabla_prestamos.setItem(tablerow, 6, QTableWidgetItem(p.estado_libro))
-                self.tabla_prestamos.setItem(tablerow, 7, QTableWidgetItem(str(p.id_copia)))
-                self.tabla_prestamos.setItem(tablerow, 8, QTableWidgetItem(str(p.id_prestamos)))
+                self.tabla_prestamos.setItem(tablerow, 7, QTableWidgetItem(p.estado_prestamo))
+                self.tabla_prestamos.setItem(tablerow, 8, QTableWidgetItem(str(p.id_copia)))
+                self.tabla_prestamos.setItem(tablerow, 9, QTableWidgetItem(str(p.id_prestamos)))
 
                 texto_tabla = self.tabla_prestamos.item(tablerow, column_count).text()
 
@@ -232,7 +238,6 @@ class ActualizarPrestamos(QWidget):
         else:
             self.camb_estado_pres_libro()
             self.cerrar_ventana.emit()
-            print("cambiando y cerrando")
             self.close()
 
     def traer_fecha(self, fecha_item):
@@ -276,18 +281,21 @@ class ActualizarPrestamos(QWidget):
             msg.exec()
         estado_id = self.estados.currentIndex() + 1
         for row in selected_rows:
-            id_copia = self.tabla_prestamos.item(row.row(), 7).text()
-            id_prestamos = self.tabla_prestamos.item(row.row(), 8).text()
+            estado_prestamo = self.tabla_prestamos.item(row.row(), 7).text()
+            id_copia = self.tabla_prestamos.item(row.row(), 8).text()
+            id_prestamos = self.tabla_prestamos.item(row.row(), 9).text()
             if estado_id != 3:
                 update_estado_prestamos(id_prestamos, estado_id)
+            if estado_prestamo == "Extraviado":
+                update_estado_prestamos(id_prestamos, estado_id)
+                update_estado_libro(id_copia, 1)
             elif estado_id == 3:
                 update_estado_prestamos(id_prestamos, estado_id)
                 update_estado_libro(id_copia, 4)
-            else:
-                msg = QMessageBox()
-                msg.setWindowTitle("Error de Logica")
-                msg.setText("Se cometio un error de logica dentro del programa. Favor de llamar a tecnico a cargo")
-                msg.setIcon(QMessageBox.Warning)
-                msg.exec()
+        msg_ok = QMessageBox()
+        msg_ok.setWindowTitle("Operación Exitosa")
+        msg_ok.setText("Se cambio con exito el estado del prestamo")
+        msg_ok.setIcon(QMessageBox.Information)
+        msg_ok.exec()
         self.rellenar_tabla()
         self.actualizar_datos.emit()

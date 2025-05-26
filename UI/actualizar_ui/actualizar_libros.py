@@ -273,6 +273,7 @@ class ActualizarLibros(QWidget):
             msg.setText("Debe seleccionar al menos un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
+            return
             
         estado_id = self.estado.currentIndex() + 1
 
@@ -281,6 +282,11 @@ class ActualizarLibros(QWidget):
             if id_item:
                 copia_id = int(id_item.text())
                 update_estado_libro(copia_id, estado_id)
+        msg_ok = QMessageBox()
+        msg_ok.setWindowTitle("Operacion Exitosa")
+        msg_ok.setText("Se ha actualizado correctamente el estado del libro")
+        msg_ok.setIcon(QMessageBox.Information)
+        msg_ok.exec()     
         self.rellenar_tabla()
         
     def closeEvent(self, a0):

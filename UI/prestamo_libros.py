@@ -156,7 +156,7 @@ class PrestamoLibros(QWidget):
 
         self.setLayout(vertical_layout_principal)
         header = self.tabla_libro_prestamo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         self.tabla_libro_prestamo.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_libro_prestamo.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -283,7 +283,7 @@ class PrestamoLibros(QWidget):
                     insert_prestamos(fecha,fecha_, rut, nombre, curso, id_interno)
             self.nombre_prestatario.clear()
             self.curso_prestatario.clear()
-            self.tabla_libro_prestamo.setRowCount(0)
+            self.rellenar_tablas()
             self.rut_.clear()
             msg_ok = QMessageBox()
             msg_ok.setWindowTitle("Accion ingresada correctamente")
