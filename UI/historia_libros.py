@@ -1,3 +1,20 @@
+"""
+    **Modulo historia_libros**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra revisar el historial de los libros que haya dentro del sistema\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la vista de los diversos libros\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    PyQt.QtGui -----> Usado para cambiar los colores de la ultima columna de la tabla
+
+    modulo session -----> Usado para poder obtener todos los estados del prestamo y los libros que 
+                            pertenezcan al prestamo
+
+"""
+
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTableWidgetItem, QTableWidget,
                              QAbstractItemView, QVBoxLayout, QHeaderView, QHBoxLayout,
                              QMessageBox, QComboBox, QLineEdit, QLabel)
@@ -8,11 +25,21 @@ from connection.session import (select_libros_available, select_estado_libro_all
 from .actualizar_ui.actualizar_libros import ActualizarLibros
 
 class HistorialLibros(QWidget):
+    """
+    **Clase HistorialLibros**\n
+    Permite el poder observar los distintos libros que se posee en la biblioteca,
+    esto a traves de filtros y paginaciones
+    """
     volver_principal = pyqtSignal()
     ir_prestamo_libro = pyqtSignal(str, str, str)
     pasar_datos = pyqtSignal(str, str, str)
 
     def __init__(self, parent = None):
+        """
+        **Funcion __ init __**\n
+        Permite la carga de todos y cada uno de los widgets que se utilizaran durante el ciclo
+        de vida de esta ventana
+        """
         super().__init__(parent)
 
         # Lista para filtros
@@ -71,8 +98,8 @@ class HistorialLibros(QWidget):
         self.tabla_libros.setColumnCount(8)
         headers = ["Nombre Libro", "Autor", "Editorial", "Fecha Entrada a Biblioteca","Area de Biblioteca", 
                    "Sector Estanteria" , "Stock de Libros", "Estado del Libro"]
-        self.tabla_libros.setMinimumHeight(300)
-        self.tabla_libros.setMaximumHeight(400)
+        self.tabla_libros.setMinimumHeight(339)
+        self.tabla_libros.setMaximumHeight(339)
         
         # Asignar encabezados de las columnas
         for i, header in enumerate(headers):
@@ -82,6 +109,8 @@ class HistorialLibros(QWidget):
         # Hacer que las columnas se ajusten al tamaño de la ventana
         header = self.tabla_libros.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        vertical_header = self.tabla_libros.verticalHeader()
+        vertical_header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Crear los botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
@@ -143,6 +172,10 @@ class HistorialLibros(QWidget):
 
     # Rellenado del combobox
     def rellenar_combobox(self):
+        """
+        **Funcion rellenar_combobox**\n
+        Permite el poder rellenar los combobox que se encuentran como filtros
+        """
         self.estado_filtro.clear()
         self.estado_filtro.addItem("Selecciona un estado")
         estado = select_estado_libro_all()
@@ -151,11 +184,23 @@ class HistorialLibros(QWidget):
 
     # Funcion Boton siguiente-anterior
     def anterior_funcion(self):
+        """
+        **Funcion anterior_funcion**\n
+        Permite poder manejar las paginaciones con los respectivos botones,
+        ademas del label utilizado para mostrar la pagina actual
+        Se usa normalmente para disminuir la cantidad de paginas
+        """
         if self.current_page > 0:
                 self.current_page -=1
                 self.pagina.setText(f"Pagina {self.current_page +1}")
                 self.rellenar_tabla(**self.filtros_actuales)
     def siguiente_funcion(self):
+        """
+        **Funcion siguiente_funcion**\n
+        Permite poder manejar las paginaciones con los respectivos botones,
+        ademas del label utilizado para mostrar la pagina actual.\n
+        Se usa normalmente para incrementar la cantidad de paginas
+        """
         self.current_page+=1
         self.pagina.setText(f"Pagina {self.current_page +1}")
         self.anterior.setDisabled(False)
@@ -164,20 +209,42 @@ class HistorialLibros(QWidget):
 
     def rellenar_tabla(self, nombre_=None, autor_=None,
                        no_editorial=None,estado=None, biblioteca_=None, estanteria_=None ):
+        """
+        **Funcion rellenar_tabla**\n
+        Es la encargada de traer todos los libros que actualmente hay en biblioteca, sin tomar en cuenta los que estan
+        prestamos, y que una vez tenga los datos, estos los carga en la tabla, ademas funciona tambien en base a 
+        filtros.
+
+        **Parametros**\n
+        - nombre: str | None\n
+        - autor: str | None\n
+        - no_editorial: str | None\n
+        - estado: str | None\n
+        - biblioteca: str | None\n
+        - estanteria: str | None\n
+        """
         offset = self.current_page * self.page_size
         libros = list(select_libros_available(nombre=nombre_,autor= autor_,Editorial=no_editorial, Estado_=estado,
                                          SectorBiblio=biblioteca_, SectorEstanteria=estanteria_ ,offset=offset, limit=self.page_size+1))
         if len(libros) > self.page_size:
-            self.anterior.setDisabled(True)
             self.siguiente.setDisabled(False)
             libros = libros[:self.page_size]
         else:
             self.siguiente.setDisabled(True)
+        if self.current_page == 0:
+            self.anterior.setDisabled(True)
+        else:
+            self.anterior.setDisabled(False)
         self.tabla(libros)
         
 
 
     def vaciar_filtrado(self):
+        """
+        **Funcion vaciar_filtrado**\n
+        Es la encargada de devolver todos los valores de los filtros a vacio, o en caso de ser un combobox,
+        se regresa a su indice 0, el cual esta establecido como 'Selecciona...'
+        """
         self.estado_filtro.setCurrentIndex(0)
         self.sector_biblioteca.clear()
         self.sector_estanteria.clear()
@@ -197,6 +264,11 @@ class HistorialLibros(QWidget):
         self.pagina.setText("Pagina 1")
 
     def aplicar_filtros(self):
+        """
+        **Funcion aplicar_filtros**\n
+        Se encarga de aplicar los filtros que el usuario propuso a traves de la barra de filtros para luego,
+        rellenar la tabla con dichos datos
+        """
         biblioteca = self.sector_biblioteca.text()
         estanteria = self.sector_estanteria.text()
         no_editorial = self.editorial.text()
@@ -221,6 +293,16 @@ class HistorialLibros(QWidget):
                                      estado=estado, biblioteca_=biblioteca, estanteria_=estanteria)
         
     def prestamo_ir(self):
+        """
+        **Funcion prestamo_ir**\n
+        Es la encargada de poder obtener los datos que fueron seleccionados desde la tabla para mandar dichos datos a traves de emisiones
+        de señales, estos datos son:\n
+
+        **Datos enviados como emision de señal**\n
+        - nombre: str\n
+        - autor: str\n
+        - editorial: str
+        """
         selected_rows = self.tabla_libros.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
@@ -236,6 +318,14 @@ class HistorialLibros(QWidget):
         self.ir_prestamo_libro.emit(nombre, autor, editorial)
 
     def tabla(self, libros):
+        """
+        **Funcion tabla**\n
+        Se encarga de poder rellenar la tabla con datos, ademas de asignarles los colores correspondientes a los estados
+        de la tabla\n
+
+        **Parametros**\n
+        - libros: List[Libro]
+        """
         self.tabla_libros.setRowCount(0)
         mal_estado = QColor("#ffd62e")  # Mal estado
         buen_estado = QColor("#b2f7b2")  # Buen estado
@@ -268,10 +358,14 @@ class HistorialLibros(QWidget):
                     self.tabla_libros.item(row_position, 7).setBackground(estado_regular)
                 elif estado_libro == "Dado de Baja":
                     self.tabla_libros.item(row_position, 7).setBackground(dado_baja)
-        else:
-            return
+        self.tabla_libros.resizeRowsToContents()
 
     def actualizar_estado(self):
+        """
+        **Funcion actualizar_estado**\n
+        Es la encargada de llamar a la ventana para actualizar los datos de los libros.\n
+        Esta envia los datos a traves de señales y una vez enviado los datos, llama a la ventana.\n
+        """
         selected_row = self.tabla_libros.selectionModel().selectedRows()
         if not selected_row:
             msg = QMessageBox()
@@ -294,6 +388,14 @@ class HistorialLibros(QWidget):
             self.w.cerrar_ventana.connect(self.cerrar_ventana)
 
     def cerrar_ventana(self):
+        """
+        **Funcion cerrar_ventana**\n
+        Es la encargada para poder comprobar si, existe o no existe una instancia de la ventana para
+        actualizar los libros, y en caso que si haya una, esta se sobreescribe por None, esto con el
+        fin de poder abrir nuevamente la ventana sin necesidad de cerrar la aplicacion donde ademas,
+        una vez cerrada la ventana, se vuelven a cargar los datos de la tabla, esto para mantener actualizado
+        lo mas posible los datos
+        """
         if self.w is not None:
             self.w = None
             self.rellenar_tabla()

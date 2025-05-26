@@ -1,14 +1,60 @@
+"""
+    **Modulo actualizar_prestamos**\n
+    Es el modulo que se encarga de la parte visual con la cual el usuario
+    podra hacer la actualizaciones con respecto a los estados de los prestamos\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la actualizacion del estado del prestamo\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    PyQt.QtGui -----> Usado para cambiar los colores de la ultima columna de la tabla
+
+    modulo connection ----> Usado para traer la funcion update_estado_libro y el
+                            update_estado_prestamos, esto con el fin
+                            de poder actualizar el estado del libro a la base de datos, tomando los datos
+                            encontrados en los widgets\n
+    modulo session -----> Usado para poder obtener todos los estados del prestamo y los libros que 
+                            pertenezcan al prestamo
+
+"""
+import sys, os
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout,
                              QMessageBox, QComboBox, QCheckBox,
                              QTableWidget, QTableWidgetItem,
                              QAbstractItemView, QPushButton,
                              QHeaderView)
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIcon
 
 from connection.session import (select_all_estado_prestamos,
                                 select_prestamo_by_fecha)
 from connection.connection import update_estado_libro, update_estado_prestamos
+
+def resource_path(relative_path):
+    """
+    **Funcion resource_path**\n
+    Permite obtener la url completa de los archivos del sistema, con el fin de
+    poder utilizarlos sin tener problemas con la implementacion de estos en otros
+    entornos que no sean el pc del programador.\n 
+    Estos archivos pueden ser imagenes, iconos o archivos de estilo como los .css\n
+
+    **Parametros**\n
+    - relative_path: str
+
+    **Retorna**\n
+    url: str
+
+    **Ejemplo:**\n
+    imagen = "image.png"\n
+    img = resource_path(imagen)\n
+    print(img) ------> c:/user/downloads/
+    """
+    if getattr(sys, 'frozen', False):
+        bundle_dir = sys._MEIPASS  # for --onefile
+    else:
+        bundle_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(bundle_dir, relative_path)
 
 style_sheet = """
 QWidget#ActualizarPrestamos {
@@ -56,15 +102,31 @@ QHeaderView::section {
 }
 """
 
+icon = resource_path("images/biblioteca.ico")
 class ActualizarPrestamos(QWidget):
+    """
+    **Clase ActualizarPrestamos**\n
+    Permite el poder actualizar los estados del prestamo de los diferentes libros que se encuentran
+    actualmente prestados, a traves una interfaz algo parecida a los formularios. Este formulario
+    cuenta con los siguientes campos:\n
+
+    - Datos pertenecientes a la tabla\n
+    - Estado del prestamo a partir de ComboBox
+    """
     actualizar_datos = pyqtSignal()
     cerrar_ventana = pyqtSignal()
     def __init__(self):
+        """
+        **Funcion __ init __**
+        Se encarga de cargar tanto los widgets como los datos correspondientes a estos,
+        donde a penas se detecta que el usuario presiono actualizar prestamos
+        """
         super().__init__()
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE PRESTAMOS")
         self.setObjectName("ActualizarPrestamos")
         self.setAutoFillBackground(True)
         self.setStyleSheet(style_sheet)
+        self.setWindowIcon(QIcon(icon))
         self.setGeometry(20,200,980,700)
 
         #Layouts
@@ -83,7 +145,7 @@ class ActualizarPrestamos(QWidget):
 
         #Creacion de la tabla
         self.tabla_prestamos = QTableWidget()
-        self.tabla_prestamos.setColumnCount(9)
+        self.tabla_prestamos.setColumnCount(10)
 
         item = QTableWidgetItem()
         item.setText("Nombre Alumno")
@@ -107,11 +169,14 @@ class ActualizarPrestamos(QWidget):
         item.setText("Estado Libro")
         self.tabla_prestamos.setHorizontalHeaderItem(6, item)
         item = QTableWidgetItem()
-        item.setText("Id Interno")
+        item.setText("Estado Libro")
         self.tabla_prestamos.setHorizontalHeaderItem(7, item)
         item = QTableWidgetItem()
-        item.setText("Id Interno Prestamos")
+        item.setText("Id Interno")
         self.tabla_prestamos.setHorizontalHeaderItem(8, item)
+        item = QTableWidgetItem()
+        item.setText("Id Interno Prestamos")
+        self.tabla_prestamos.setHorizontalHeaderItem(9, item)
 
         self.tabla_prestamos.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_prestamos.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -128,6 +193,7 @@ class ActualizarPrestamos(QWidget):
         vertical_layout.addLayout(horizontal_layout_1)
         self.tabla_prestamos.setColumnHidden(7, True)
         self.tabla_prestamos.setColumnHidden(8, True)
+        self.tabla_prestamos.setColumnHidden(9, True)
 
         self.setLayout(vertical_layout)
 
@@ -140,6 +206,10 @@ class ActualizarPrestamos(QWidget):
             self.estados.insertItem(es[0].id_estadoprestamo, es[0].estado_prestamo)
 
     def rellenar_tabla(self):
+        """
+        **Funcion rellenar_tabla**\n
+        Es la encargada de obtener todos los datos de los libros para luego cargalos a la tabla\n
+        """
         self.tabla_prestamos.setRowCount(0)
         prestamos = select_prestamo_by_fecha(self.fechas)
         tablerow = 0
@@ -149,10 +219,11 @@ class ActualizarPrestamos(QWidget):
         dado_baja = QColor("#ff6b6b")  # Dado de baja
         estado_regular = QColor("#ffe066")  # Estado regular
 
-        column_count = self.tabla_prestamos.columnCount()-3
+        column_count = self.tabla_prestamos.columnCount()-4
 
         if prestamos:
             for p in prestamos:
+                print(p)
                 row_position = self.tabla_prestamos.rowCount()
                 self.tabla_prestamos.insertRow(row_position)
                 self.tabla_prestamos.setItem(tablerow, 0, QTableWidgetItem(p.nombre))
@@ -162,8 +233,9 @@ class ActualizarPrestamos(QWidget):
                 self.tabla_prestamos.setItem(tablerow, 4, QTableWidgetItem(str(p.fecha_inicio)))
                 self.tabla_prestamos.setItem(tablerow, 5, QTableWidgetItem(str(p.fecha_termino)))
                 self.tabla_prestamos.setItem(tablerow, 6, QTableWidgetItem(p.estado_libro))
-                self.tabla_prestamos.setItem(tablerow, 7, QTableWidgetItem(str(p.id_copia)))
-                self.tabla_prestamos.setItem(tablerow, 8, QTableWidgetItem(str(p.id_prestamos)))
+                self.tabla_prestamos.setItem(tablerow, 7, QTableWidgetItem(p.estado_prestamo))
+                self.tabla_prestamos.setItem(tablerow, 8, QTableWidgetItem(str(p.id_copia)))
+                self.tabla_prestamos.setItem(tablerow, 9, QTableWidgetItem(str(p.id_prestamos)))
 
                 texto_tabla = self.tabla_prestamos.item(tablerow, column_count).text()
 
@@ -181,6 +253,11 @@ class ActualizarPrestamos(QWidget):
 
 
     def actualizar_estado(self):
+        """
+        **Funcion actualizar_estado**\n
+        Es la encargada de comprobar el estado actual del checkbox, esto con el fin de poder
+        cerrar o no cerrar la ventana si es que el usuario no lo desea
+        """
         is_true = self.validacion_usuario.isChecked()
         if is_true is not True:
             self.camb_estado_pres_libro()
@@ -188,40 +265,64 @@ class ActualizarPrestamos(QWidget):
         else:
             self.camb_estado_pres_libro()
             self.cerrar_ventana.emit()
-            print("cambiando y cerrando")
             self.close()
 
     def traer_fecha(self, fecha_item):
+        """
+        **Funcion traer_fecha**\n
+        Se encarga de traer los datos de los libros a traves de la señal propuesta por historial_prestamo
+
+        **Parametros**\n
+        - fecha_item: str | datetime
+
+        **Retorna**\n
+        fechas: str | datetime
+        """
         self.fechas = fecha_item
         self.rellenar_tabla()
         return self.fechas
     
     def closeEvent(self, a0):
+        """
+        **Funcion closeEvent**\n
+        Detecta si la ventana se cierra ya sea a traves de un boton o si se cierra
+        por el boton de la X. Esto permite que se pueda volver a abrir sin necesidad
+        de cerrar la aplicacion
+        """
         self.cerrar_ventana.emit()
         a0.accept()
 
     def camb_estado_pres_libro(self):
+        """
+        **Funcion camb_estado_pres_libro**\n
+        Permite la actualizacion de los prestamos con respecto a su estado, con
+        diversos validadores para poder comprobar si fue seleccionado un prestamo o no,
+        o si en caso que el usuario no desee actualizar ahora el prestamo
+        """
         selected_rows = self.tabla_prestamos.selectionModel().selectedRows()
         if not selected_rows:
             msg = QMessageBox()
             msg.setWindowTitle("Seleccion erronea")
-            msg.setText("No se ha seleccionado un libro")
+            msg.setText("Debe seleccionar al menos un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
         estado_id = self.estados.currentIndex() + 1
         for row in selected_rows:
-            id_copia = self.tabla_prestamos.item(row.row(), 7).text()
-            id_prestamos = self.tabla_prestamos.item(row.row(), 8).text()
+            estado_prestamo = self.tabla_prestamos.item(row.row(), 7).text()
+            id_copia = self.tabla_prestamos.item(row.row(), 8).text()
+            id_prestamos = self.tabla_prestamos.item(row.row(), 9).text()
             if estado_id != 3:
                 update_estado_prestamos(id_prestamos, estado_id)
+            if estado_prestamo == "Extraviado":
+                update_estado_prestamos(id_prestamos, estado_id)
+                update_estado_libro(id_copia, 1)
             elif estado_id == 3:
                 update_estado_prestamos(id_prestamos, estado_id)
                 update_estado_libro(id_copia, 4)
-            else:
-                msg = QMessageBox()
-                msg.setWindowTitle("Error de Logica")
-                msg.setText("Se cometio un error de logica dentro del programa. Favor de llamar a tecnico a cargo")
-                msg.setIcon(QMessageBox.Warning)
-                msg.exec()
+        msg_ok = QMessageBox()
+        msg_ok.setWindowTitle("Operación Exitosa")
+        msg_ok.setText("Se cambio con exito el estado del prestamo")
+        msg_ok.setIcon(QMessageBox.Information)
+        msg_ok.exec()
         self.rellenar_tabla()
         self.actualizar_datos.emit()

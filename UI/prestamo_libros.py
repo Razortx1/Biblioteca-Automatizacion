@@ -1,9 +1,27 @@
+"""
+    **Modulo prestamo_libros.py**\n
+    Es el modulo encarga de la parte visual con la cual el usuario
+    podra hacer el ingreso de las impresiones que deba realizar
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ----> Usado principalmente para obtener los widgets que serán
+                            usados durante la creacion del libro\n
+    PyQt5.QtCore ----> Usado para obtener, ya sean las señales, o algunas
+                        configuraciones adicionales para los widgets\n
+    datetime ----> Usado para obtener la fecha y la fecha con las horas, minutos y segundos\n
+    modulo connection ----> Usado para traer la funcion ingresar_impresiones, esto con el fin
+                            de poder ingresar la impresion a la base de datos, tomando los datos
+                            encontrados en los widgets\n
+    modulo session -----> Usado para poder obtener todos los usuario que pidio esa impresion
+                            y para obtener los libros del prestamo
+"""
+
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLineEdit,
                              QPushButton, QLabel, QDateEdit, QHBoxLayout,
                              QTableWidget, QTableWidgetItem, QMessageBox,
                              QCheckBox, QHeaderView, QAbstractItemView)
 
-from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtCore import Qt, QDate, QTimer
 from PyQt5.QtGui import QColor
 
 from datetime import datetime, date
@@ -14,10 +32,29 @@ from connection.session import (selected_user_by_rut, select_prestamo_libro)
 from connection.connection import insert_prestamos
 
 class PrestamoLibros(QWidget):
+    """
+    **Clase PrestamoLibros**\n
+    Permite el poder agregar los prestamos a la base de datos, a traves de una interfaz parecida a un formulario.
+    Este formulario cuenta con los siguientes campos:\n
+
+    - Rut del prestatario\n
+    - Nombre del prestatario\n
+    - Curso del Prestatario\n
+    - Fecha Maxima del pretamo\n
+    - Datos del libro a traves de la tabla
+    """
     volver_principal = pyqtSignal()
     actualizar_datos = pyqtSignal()
     def __init__(self, parent = None):
+        """
+        **Funcion __ init __**\n
+        Es la encargada de cargar tanto los widgets como sus datos correspondientes
+        los cuales se cargan apenas se detecta que el usuairo abrio el sistema\n
+        """
         super().__init__(parent)
+
+        #Variable global para curso
+        self.curso_user = ""
 
         #Definicion de layouts principal
         vertical_layout_principal = QVBoxLayout()
@@ -53,7 +90,7 @@ class PrestamoLibros(QWidget):
         self.curso = QLabel("Curso del Alumno/Profesor *")
 
         #Definicion de los botones
-        self.boton_volver = QPushButton("Ir al Historial de Libros")
+        self.boton_volver = QPushButton("Ir al Inventario de Libros")
         self.boton_buscar_rut = QPushButton("Buscar")
         self.boton_agregar_prestamo = QPushButton("Agregar Prestamo")
 
@@ -119,7 +156,7 @@ class PrestamoLibros(QWidget):
 
         self.setLayout(vertical_layout_principal)
         header = self.tabla_libro_prestamo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         self.tabla_libro_prestamo.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tabla_libro_prestamo.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -130,6 +167,13 @@ class PrestamoLibros(QWidget):
         self.boton_buscar_rut.clicked.connect(self.buscar_rut)
 
     def rellenar_tablas(self):
+        """
+        **Funcion rellenar_tablas**\n
+        Se encarga de obtener todos los datos de los libros para luego cargarlos a la tabla
+
+        **Excepcion**\n
+        Se implementa traceback para errores fantasmas ademas de imprimir el error por consola
+        """
         try:
             self.tabla_libro_prestamo.setRowCount(0)
             libros = select_prestamo_libro(self.nombre_libro, self.autor_libro, self.editorial_libro)
@@ -167,14 +211,27 @@ class PrestamoLibros(QWidget):
             import traceback
             traceback.print_exc()
             print(f"Error {e}")
-
+        # Función para buscar un usuario por su rut
     def buscar_rut(self):
+        """
+        **Funcion buscar_rut**\n
+        Se utiliza para poder buscar el usuario a traves del rut, a traves de un tiempo de carga\n
+        """
         rut = self.rut_.text()
+        # Espera 500 ms antes de ejecutar la búsqueda
+        QTimer.singleShot(500, lambda: self.buscar_usuario(rut))
+
+    def buscar_usuario(self, rut):
+        """
+        **Funcion buscar_rut**\n
+        Se utiliza para poder buscar y cargar los datos del usuario a traves del rut indicado por el usuario
+        """
         user = selected_user_by_rut(rut)
         if user:
             user = user[0][0]
             self.nombre_prestatario.setText(user.nombre)
             self.curso_prestatario.setText(user.curso)
+            self.curso_user = user.curso
             self.nombre_prestatario.setDisabled(True)
             self.curso_prestatario.setDisabled(True)
         else:
@@ -184,6 +241,11 @@ class PrestamoLibros(QWidget):
             self.curso_prestatario.clear()
     
     def insertar_prestamos(self):
+        """
+        **Funcion insertar_prestamos**\n
+        Permite el ingreso de los prestamos a la base de datos, con sus respectivos
+        validadores en caso que algunos datos esten vacios o si el usuario no desea ingresar dicho prestamo
+        """
         fecha = datetime.now()
         fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
         fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
@@ -192,20 +254,19 @@ class PrestamoLibros(QWidget):
         rut = self.rut_.text()
         if rut == "..-":
             rut = ""
-            return
         nombre = self.nombre_prestatario.text()
         curso = self.curso_prestatario.text()
         if not selected_rows:
             msg = QMessageBox()
             msg.setWindowTitle("Seleccion erronea")
-            msg.setText("No se ha seleccionado un libro")
+            msg.setText("Debe seleccionar al menos un libro")
             msg.setIcon(QMessageBox.Information)
             msg.exec()
             return
         if not nombre or not rut or not curso:
                 msg = QMessageBox()
                 msg.setWindowTitle("Usuario invalido")
-                msg.setText("No se especificado un usuario")
+                msg.setText("No se especificado un alumno o profesor")
                 msg.setIcon(QMessageBox.Information)
                 msg.exec()
                 return
@@ -222,7 +283,7 @@ class PrestamoLibros(QWidget):
                     insert_prestamos(fecha,fecha_, rut, nombre, curso, id_interno)
             self.nombre_prestatario.clear()
             self.curso_prestatario.clear()
-            self.tabla_libro_prestamo.setRowCount(0)
+            self.rellenar_tablas()
             self.rut_.clear()
             msg_ok = QMessageBox()
             msg_ok.setWindowTitle("Accion ingresada correctamente")
@@ -239,6 +300,20 @@ class PrestamoLibros(QWidget):
             return
 
     def traer_objeto(self, nombre, autor, editorial):
+        """
+        **Funcion traer_objeto**\n
+        Se encarga de traer los datos de los libros a traves de la señal propuesta por historial_libro
+
+        **Parametros**\n
+        - nombre: str\n
+        - autor: str\n
+        - editorial: str\n
+
+        **Retorna**\n
+        nombre_libro: str\n
+        autor_libro: str\n
+        editorial_libro: str\n
+        """
         if not nombre or not autor or not editorial:
             return
         self.nombre_libro = nombre
@@ -249,7 +324,12 @@ class PrestamoLibros(QWidget):
 
 
     def check_event(self, event):
+        """
+        **Funcion check_event**\n
+        Es la funcion que permite el poder cambiar el curso del alumno o profesor si es que el usuario asi lo permite
+        """
         if event == Qt.Checked:
             self.curso_prestatario.setDisabled(False)
         if event == Qt.Unchecked:
             self.curso_prestatario.setDisabled(True)
+            self.curso_prestatario.setText(self.curso_user)

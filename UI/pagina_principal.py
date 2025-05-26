@@ -1,3 +1,16 @@
+"""
+    **Modulo pagina_principal.py**\n
+    Corresponde a la primera ventana que se mostrará al usuario. Esta esta compuesta
+    por 4 botones que estan dirigidos hacia las diversas ventanas que estan presentes
+    en el sistema\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ---->  Usado para obtener los diversos widgets necesarios para una
+                            pagina principal\n
+    PyQt5.QtCore -----> Usado para obtener configuraciones adicionales, ademas de las señales
+                        se que usarán durante el ciclo de vida del sistema
+"""
+
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QLabel, QSpacerItem,
     QSizePolicy, QFrame, QHBoxLayout
@@ -6,6 +19,11 @@ from PyQt5.QtCore import Qt, pyqtSignal
 
 
 class PaginaPrincipal(QWidget):
+    """
+    **Clase PaginaPrincipal**\n
+    Es la primera vista que logra observar el usuario. Esta contiene 4 botones que redirigen
+    a las distintas vistas\n
+    """
     # Señales
     ir_a_agregar_libros = pyqtSignal()
     ir_a_historia_libros = pyqtSignal()
@@ -13,6 +31,10 @@ class PaginaPrincipal(QWidget):
     ir_a_historial_prestamo = pyqtSignal()
 
     def __init__(self):
+        """
+        **Funcion**\n
+        Es la funcion que realiza la carga a los widgets a la interfaz grafica
+        """
         super().__init__()
 
         # Layout principal
@@ -20,7 +42,7 @@ class PaginaPrincipal(QWidget):
         main_layout.setAlignment(Qt.AlignTop)
 
         # Título
-        titulo = QLabel("Sistema de Biblioteca")
+        titulo = QLabel("Bienvenido")
         titulo.setAlignment(Qt.AlignCenter)
         titulo.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
         main_layout.addWidget(titulo)

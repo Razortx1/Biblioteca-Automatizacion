@@ -1,13 +1,34 @@
+"""
+    **Modulo menu_impresiones.py**\n
+    Corresponde a la ventana la cual administrará las ventanas para las impresiones\n
+
+    **Importaciones del modulo**\n
+    PyQt5.QtWidgets ---->  Usado para obtener los diversos widgets necesarios para una
+                            pagina principal\n
+    PyQt5.QtCore -----> Usado para obtener configuraciones adicionales, ademas de las señales
+                        se que usarán durante el ciclo de vida del sistema
+"""
+
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QPushButton,
                              QFrame, QSpacerItem, QSizePolicy)
 from PyQt5.QtCore import (pyqtSignal, Qt)
 
 class MenuImpresiones(QWidget):
+    """
+    **Clase MenuImpresiones**\n
+    Es la clase que administra las ventanas para ingresar y para el historial del modulo
+    de impresiones
+    """
     volver_principal = pyqtSignal()
     ir_a_historial_impresiones = pyqtSignal()
     ir_a_agregar_impresiones = pyqtSignal()
 
     def __init__(self):
+        """
+        **Funcion __ init __**\n
+        Es la funcion que se encarga de cargar todos los widgets que serán usados durante el ciclo de vida
+        del programa
+        """
         super().__init__()
 
         #Definicion de Layout
