@@ -61,6 +61,7 @@ class AgregarImpresiones(QWidget):
         column2 = QVBoxLayout()
         button_layout = QHBoxLayout()
         curso_layout = QHBoxLayout()
+        doble_hoja_layout = QHBoxLayout()
 
         # Ajustar márgenes y espaciado para tener menos espacio entre los widgets
         main_layout.setContentsMargins(10, 10, 10, 10)  # Márgenes del layout principal
@@ -79,6 +80,7 @@ class AgregarImpresiones(QWidget):
 
         self.cambiar_curso = QCheckBox("Habilitar para cambiar departamento o curso")
         self.cambiar_curso.stateChanged.connect(self.check_event)
+        self.doble_hoja = QCheckBox("Impresión a 2 caras")
 
         self.cantidad_copias = self.crear_line_edit("Ingrese la cantidad de Copias", False)
         self.cantidad_paginas = self.crear_line_edit("Ingrese la cantidad de Paginas del documento", False)
@@ -121,7 +123,9 @@ class AgregarImpresiones(QWidget):
         horizontal_layout_column.addLayout(column1)
 
         column2.addWidget(self.cantidad_p)
-        column2.addWidget(self.cantidad_paginas)
+        doble_hoja_layout.addWidget(self.cantidad_paginas)
+        doble_hoja_layout.addWidget(self.doble_hoja)
+        column2.addLayout(doble_hoja_layout)
         column2.addWidget(self.hojas)
         column2.addWidget(self.combo_hoja)
         horizontal_layout_column.addLayout(column2)
@@ -226,7 +230,7 @@ class AgregarImpresiones(QWidget):
         empezar el proceso de creacion de las impresiones
         """
         copias = self.cantidad_copias.text()
-        paginas = self.cantidad_paginas.text()
+        pagina = self.cantidad_paginas.text()
         nombre = self.nombre_solicitante.text()
         curso = self.cursos.text()
         rut = self.rut_solicitante.text()
@@ -236,20 +240,31 @@ class AgregarImpresiones(QWidget):
             hoja = self.combo_hoja.currentText()
         elif self.combo_hoja.currentText() == "Selecciona el tipo de hoja a usar":
             hoja = ""
-        if not nombre or not curso or not descrip or not copias or not paginas or not hoja:
+        if not nombre or not curso or not descrip or not copias or not pagina or not hoja:
             msg = QMessageBox()
             msg.setWindowTitle("Error de Entrada")
             msg.setText("Por Favor, ingrese los datos necesarios para la impresion, estos estan marcados por un *")
             msg.setIcon(QMessageBox.Warning)
             msg.exec()
             return
-        if not copias.isdigit() or not paginas.isdigit():
+        if not copias.isdigit() or not pagina.isdigit():
             msg = QMessageBox()
             msg.setWindowTitle("Error de Entrada")
             msg.setText("Por favor, ingrese números válidos en los campos de cantidad de copias y páginas.")
             msg.setIcon(QMessageBox.Warning)
             msg.exec()
             return
+        paginas = int(pagina)
+        if self.doble_hoja.isChecked():
+            if paginas == 1:
+                msg = QMessageBox()
+                msg.setText("Una página no puede ser de doble cara.")
+                msg.setWindowTitle("Error por datos de Impresión")
+                msg.setIcon(QMessageBox.Warning)
+                msg.exec()
+                self.doble_hoja.setChecked(False)
+                return
+            paginas = (paginas + 1) // 2 
         ingresar_impresiones(nombre, curso, rut, copias, paginas, descrip, hoja)
 
         # Limpiar campos después de agregar
@@ -268,7 +283,9 @@ class AgregarImpresiones(QWidget):
         self.cantidad_paginas.clear()
         self.descripcion.clear()
         self.cambiar_curso.setChecked(False)
+        self.doble_hoja.setChecked(False)
         self.curso_user = ""
+        self.paginas = ""
 
     # Función para habilitar o deshabilitar el campo de curso
     def check_event(self, event):

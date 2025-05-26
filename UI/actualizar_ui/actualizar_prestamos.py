@@ -18,18 +18,43 @@
                             pertenezcan al prestamo
 
 """
-
+import sys, os
 from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout,
                              QMessageBox, QComboBox, QCheckBox,
                              QTableWidget, QTableWidgetItem,
                              QAbstractItemView, QPushButton,
                              QHeaderView)
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIcon
 
 from connection.session import (select_all_estado_prestamos,
                                 select_prestamo_by_fecha)
 from connection.connection import update_estado_libro, update_estado_prestamos
+
+def resource_path(relative_path):
+    """
+    **Funcion resource_path**\n
+    Permite obtener la url completa de los archivos del sistema, con el fin de
+    poder utilizarlos sin tener problemas con la implementacion de estos en otros
+    entornos que no sean el pc del programador.\n 
+    Estos archivos pueden ser imagenes, iconos o archivos de estilo como los .css\n
+
+    **Parametros**\n
+    - relative_path: str
+
+    **Retorna**\n
+    url: str
+
+    **Ejemplo:**\n
+    imagen = "image.png"\n
+    img = resource_path(imagen)\n
+    print(img) ------> c:/user/downloads/
+    """
+    if getattr(sys, 'frozen', False):
+        bundle_dir = sys._MEIPASS  # for --onefile
+    else:
+        bundle_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(bundle_dir, relative_path)
 
 style_sheet = """
 QWidget#ActualizarPrestamos {
@@ -77,6 +102,7 @@ QHeaderView::section {
 }
 """
 
+icon = resource_path("images/biblioteca.ico")
 class ActualizarPrestamos(QWidget):
     """
     **Clase ActualizarPrestamos**\n
@@ -100,6 +126,7 @@ class ActualizarPrestamos(QWidget):
         self.setObjectName("ActualizarPrestamos")
         self.setAutoFillBackground(True)
         self.setStyleSheet(style_sheet)
+        self.setWindowIcon(QIcon(icon))
         self.setGeometry(20,200,980,700)
 
         #Layouts

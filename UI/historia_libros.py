@@ -98,8 +98,8 @@ class HistorialLibros(QWidget):
         self.tabla_libros.setColumnCount(8)
         headers = ["Nombre Libro", "Autor", "Editorial", "Fecha Entrada a Biblioteca","Area de Biblioteca", 
                    "Sector Estanteria" , "Stock de Libros", "Estado del Libro"]
-        self.tabla_libros.setMinimumHeight(300)
-        self.tabla_libros.setMaximumHeight(400)
+        self.tabla_libros.setMinimumHeight(339)
+        self.tabla_libros.setMaximumHeight(339)
         
         # Asignar encabezados de las columnas
         for i, header in enumerate(headers):
@@ -109,6 +109,8 @@ class HistorialLibros(QWidget):
         # Hacer que las columnas se ajusten al tamaño de la ventana
         header = self.tabla_libros.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        vertical_header = self.tabla_libros.verticalHeader()
+        vertical_header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Crear los botones
         self.cambiar_estado = QPushButton("Cambiar Estado Libro")
@@ -356,8 +358,7 @@ class HistorialLibros(QWidget):
                     self.tabla_libros.item(row_position, 7).setBackground(estado_regular)
                 elif estado_libro == "Dado de Baja":
                     self.tabla_libros.item(row_position, 7).setBackground(dado_baja)
-        else:
-            return
+        self.tabla_libros.resizeRowsToContents()
 
     def actualizar_estado(self):
         """

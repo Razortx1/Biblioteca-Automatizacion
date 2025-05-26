@@ -17,18 +17,43 @@
                             pertenecen a dicho estado
 
 """
-
+import sys, os
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QPushButton, QTableWidget,
                              QComboBox, QHBoxLayout, QMessageBox, QTableWidgetItem,
                              QAbstractItemView, QCheckBox, QHeaderView)
 
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import pyqtSignal
 
 from connection.session import (select_estado_libro_all,
                                 select_prestamo_libro)
 from connection.connection import update_estado_libro
+
+def resource_path(relative_path):
+    """
+    **Funcion resource_path**\n
+    Permite obtener la url completa de los archivos del sistema, con el fin de
+    poder utilizarlos sin tener problemas con la implementacion de estos en otros
+    entornos que no sean el pc del programador.\n 
+    Estos archivos pueden ser imagenes, iconos o archivos de estilo como los .css\n
+
+    **Parametros**\n
+    - relative_path: str
+
+    **Retorna**\n
+    url: str
+
+    **Ejemplo:**\n
+    imagen = "image.png"\n
+    img = resource_path(imagen)\n
+    print(img) ------> c:/user/downloads/
+    """
+    if getattr(sys, 'frozen', False):
+        bundle_dir = sys._MEIPASS  # for --onefile
+    else:
+        bundle_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(bundle_dir, relative_path)
 
 style_sheet = """
 QWidget#ActualizarLibros {
@@ -75,6 +100,7 @@ QHeaderView::section {
     color: #54595F
 }"""
 
+icon = resource_path("images/biblioteca.ico")
 class ActualizarLibros(QWidget):
     """
     **Clase ActualizarLibros**\n
@@ -96,6 +122,7 @@ class ActualizarLibros(QWidget):
         self.setWindowTitle("Sistema Biblioteca | ACTUALIZACION ESTADO DE LIBROS")
         self.setObjectName("ActualizarLibros")
         self.setStyleSheet(style_sheet)
+        self.setWindowIcon(QIcon(icon))
         self.setGeometry(200,200,700,700)
 
         #Layout

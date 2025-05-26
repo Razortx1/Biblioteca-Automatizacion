@@ -136,8 +136,8 @@ class HistorialPrestamos(QWidget):
         # Tamaño Columnas
         header = self.tabla_historial.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.tabla_historial.setMinimumHeight(300)
-        self.tabla_historial.setMaximumHeight(300)
+        self.tabla_historial.setMinimumHeight(339)
+        self.tabla_historial.setMaximumHeight(339)
 
         self.page_size = 7
         self.current_page = 0
@@ -174,6 +174,8 @@ class HistorialPrestamos(QWidget):
 
         vertical_layout.addLayout(paginacion_layout)
         vertical_layout.addLayout(button_layout)
+
+        vertical_layout.addStretch(5)
 
         # Asignar el layout
         self.setLayout(vertical_layout)
@@ -328,8 +330,7 @@ class HistorialPrestamos(QWidget):
                     self.tabla_historial.item(tablerow, column_count-1).setBackground(extraviado)
                 tablerow+=1
                 columna+=1
-        else:
-            pass
+        self.tabla_historial.resizeRowsToContents()
 
     def filtrado_datos(self):
         """

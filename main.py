@@ -46,6 +46,7 @@ from UI.menu_impresiones import MenuImpresiones
 from UI.historial_prestamos import HistorialPrestamos
 from UI.historial_impresiones import HistorialImpresiones
 from UI.agregar_impresiones import AgregarImpresiones
+from connection.backup import backups_database_rotation
 
 def resource_path(relative_path):
     """
@@ -101,6 +102,8 @@ class Window(QMainWindow):
             "historial_impresiones" : HistorialImpresiones(),
             "agregar_impresiones": AgregarImpresiones()
         }
+
+        backups_database_rotation()
 
         # Definición de los parámetros para la Ventana
         self.setWindowTitle("Sistema Biblioteca | PAGINA PRINCIPAL")

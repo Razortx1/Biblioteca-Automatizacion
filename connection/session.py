@@ -16,8 +16,9 @@
 """
 
 import traceback
+from datetime import date
 from sqlalchemy.orm import Session, aliased
-from sqlalchemy import select, func, or_, distinct, update
+from sqlalchemy import select, func, or_, distinct, update, extract
 from sql.models import engine
 from sql.models import (Usuario, Libro, Estado_Libro,
                         Estado_Impresion, Estado_Prestamo, Prestamos,
@@ -547,6 +548,24 @@ with Session(engine) as session:
         try:
             biblioteca = session.execute(select(distinct(Libro.sector_biblioteca).label("sector_biblioteca")))
             return biblioteca
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error {e}")
+
+    def count_pages_printed_in_month():
+        """
+        **Funcion count_pages_printed_in_month**\n
+        Permite la posibilidad de contar la cantidad de pagina que han sido impresas durante
+        el mes actual\n
+
+        **Retorna**\n
+        cantidad: Objeto Impresion
+        """
+        try:
+            today_month = date.today().strftime("%m")
+            cantidad = session.execute(select(Impresiones.cantidad_copias, Impresiones.cantidad_paginas)
+                                       .where(extract("month", Impresiones.fecha_impresion) == today_month))
+            return cantidad
         except Exception as e:
             traceback.print_exc()
             print(f"Error {e}")

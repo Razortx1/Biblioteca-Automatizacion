@@ -27,7 +27,7 @@ from PyQt5.QtGui import QColor
 
 from connection.session import (select_impresion_all, select_all_estado_impresion,
                                 select_type_sheet,
-                                select_cursos_user)
+                                select_cursos_user, count_pages_printed_in_month)
 from connection.connection import update_estado_impresion
 
 
@@ -51,6 +51,7 @@ class HistorialImpresiones(QWidget):
         main_layout = QVBoxLayout()
         filter_layout = QHBoxLayout()
         button_layout = QHBoxLayout()
+        other_layout = QVBoxLayout()
 
         # Widgets para Filtros
         self.filtrar = QPushButton("Aplicar Filtro(s)")
@@ -70,6 +71,9 @@ class HistorialImpresiones(QWidget):
         self.siguiente = QPushButton("Pagina Siguiente")
         self.anterior.setDisabled(True)
 
+        # Label para cantidad de paginas
+        self.cantidad_paginas = QLabel()
+
         # Label para paginaciones
         self.pagina = QLabel("Pagina 1")
         self.pagina.setAlignment(Qt.AlignCenter)
@@ -77,14 +81,17 @@ class HistorialImpresiones(QWidget):
         # Crear la tabla de impresiones
         self.tabla_impresiones = QTableWidget()
         self.tabla_impresiones.setColumnCount(9)
-        self.tabla_impresiones.setMinimumHeight(300)
-        self.tabla_impresiones.setMaximumHeight(300)
+        self.tabla_impresiones.setMinimumHeight(339)
+        self.tabla_impresiones.setMaximumHeight(339)
         headers = ["Nombre Alumno/Profesor", "Curso/Departamento", "Cantidad de Páginas",
                    "Cantidad de Copias", "Hojas Usadas en Total", "Fecha de Impresión",
                    "Descripción","Tipo de Hoja" ,"Estado de la Impresión"]
         for i, header in enumerate(headers):
             item = QTableWidgetItem(header)
             self.tabla_impresiones.setHorizontalHeaderItem(i, item)
+
+        
+        self.tabla_impresiones.setWordWrap(True)
 
         # Tamaño de las columnas
         header = self.tabla_impresiones.horizontalHeader()
@@ -107,17 +114,20 @@ class HistorialImpresiones(QWidget):
         filter_layout.addWidget(self.filtrar)
         filter_layout.addWidget(self.borrar_filtro)
 
+        other_layout.addWidget(self.cantidad_paginas)
         paginacion_layout.addWidget(self.anterior)
         paginacion_layout.addWidget(self.pagina)
         paginacion_layout.addWidget(self.siguiente)
+        other_layout.addLayout(paginacion_layout)
 
         # Layout principal
         main_layout.addLayout(filter_layout)
         main_layout.addWidget(self.tabla_impresiones)
         button_layout.addWidget(self.cambiar_estado)
         button_layout.addWidget(self.volver_atras)
-        main_layout.addLayout(paginacion_layout)
+        main_layout.addLayout(other_layout)
         main_layout.addLayout(button_layout)
+        main_layout.addStretch(5)
 
         self.page_size = 7
         self.current_page = 0
@@ -134,6 +144,12 @@ class HistorialImpresiones(QWidget):
         self.anterior.clicked.connect(self.anterior_funcion)
         self.siguiente.clicked.connect(self.siguiente_funcion)
 
+    def actualizar_paginas(self):
+        self.cantidad_total = 0
+        contador = count_pages_printed_in_month()
+        for total in contador:
+            self.cantidad_total = (total[0] * total[1]) + self.cantidad_total
+        self.cantidad_paginas.setText(f"Cantidad de Paginas Impresas este mes: {self.cantidad_total}")
 
     def anterior_funcion(self):
         """
@@ -212,13 +228,14 @@ class HistorialImpresiones(QWidget):
         - papel: str | None\n
         - curso: str | None
         """
+        self.actualizar_paginas()
         offset = self.current_page * self.page_size
         impresiones = list(select_impresion_all(estado=estado_seleccionado, 
                                                    papel=papel,
                                                    departamento=curso,
                                                    limit=self.page_size+1, offset=offset))
         if len(impresiones) > self.page_size:
-            self.anterior.setDisabled(True)
+            self.siguiente.setDisabled(False)
             impresiones = impresiones[:self.page_size]
         else:
             self.siguiente.setDisabled(True)
@@ -322,3 +339,5 @@ class HistorialImpresiones(QWidget):
                 tablerow += 1
         else:
             pass
+        
+        self.tabla_impresiones.resizeRowsToContents()

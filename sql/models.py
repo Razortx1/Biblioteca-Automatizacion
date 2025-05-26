@@ -40,6 +40,9 @@ def resource_path(relative_path):
         **Funcion resource_path**\n
         if statement el cual necesita la libreria sys, 'frozen', el cual tiene como funcion de
         comprobar si es un archivo ejecutable o no, devolviendo True si no lo es, y False en caso que si sea
+
+        **Parametros**\n
+        relative_path: str
     """
     if getattr(sys, 'frozen', False):
         bundle_dir = sys._MEIPASS # for --onefile
@@ -304,6 +307,7 @@ Base.metadata.create_all(bind=engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
+session.close()
 
 try:
     estados = [{
