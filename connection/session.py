@@ -564,7 +564,9 @@ with Session(engine) as session:
         try:
             today_month = date.today().strftime("%m")
             cantidad = session.execute(select(Impresiones.cantidad_copias, Impresiones.cantidad_paginas)
-                                       .where(extract("month", Impresiones.fecha_impresion) == today_month))
+                                       .join(Impresiones.estado_impresion)
+                                       .where(extract("month", Impresiones.fecha_impresion) == today_month)
+                                       .where(Estado_Impresion.estado_impresion == "Ya Impreso"))
             return cantidad
         except Exception as e:
             traceback.print_exc()

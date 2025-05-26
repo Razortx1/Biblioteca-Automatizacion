@@ -56,9 +56,9 @@ def resource_path(relative_path):
     Se asigna dentro de una variable, la url de donde se encuentra el archivo
     a buscar, siendo en este caso la base de datos SQLite
 """
-base_datos = resource_path("biblioteca.db")
+base_datos = resource_path("sql/biblioteca.db")
 
-engine = create_engine(f"sqlite:///{base_datos}", echo=True)
+engine = create_engine(f"sqlite:///{base_datos}", echo=False)
 """
     **Variable engine**\n
 

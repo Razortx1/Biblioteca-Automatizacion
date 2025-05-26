@@ -211,9 +211,17 @@ class Window(QMainWindow):
         if respuesta == QMessageBox.Yes:
             nombre_backup = os.path.basename(path)
             if backups_restoration(nombre_backup):
-                QMessageBox.information(self, "Restauración exitosa", "Se restauró la base de datos correctamente.")
+                    msg = QMessageBox()
+                    msg.setWindowTitle("Restauracion Exitosa")
+                    msg.setText("Se restauró la base de datos correctamente.")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.exec()
             else:
-                QMessageBox.warning(self, "Error", "No se pudo restaurar la base de datos.")
+                    msg = QMessageBox()
+                    msg.setWindowTitle("Error ocurrido")
+                    msg.setText("No se pudo restaurar los datos a partir de la copia de seguridad")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.exec()
         else:
             msg_cancel = QMessageBox()
             msg_cancel.setWindowTitle("Acción cancelada")
