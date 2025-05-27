@@ -189,8 +189,8 @@ class HistorialImpresiones(QWidget):
             "papel": "",
             "curso": "" 
         }
-        self.rellenar_tabla()
         self.current_page = 0
+        self.rellenar_tabla(**self.filtros_actuales)
         self.pagina.setText("Pagina 1")
 
     # Rellenar ComboBox con los estados de impresión

@@ -259,8 +259,8 @@ class HistorialLibros(QWidget):
         "biblioteca_": "",
         "estanteria_": ""
         }
-        self.rellenar_tabla(**self.filtros_actuales)
         self.current_page = 0
+        self.rellenar_tabla(**self.filtros_actuales)
         self.pagina.setText("Pagina 1")
 
     def aplicar_filtros(self):
