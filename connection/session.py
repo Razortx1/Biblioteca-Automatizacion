@@ -113,8 +113,9 @@ with Session(engine) as session:
                 Libro.editorial,
                 Libro.sector_biblioteca,
                 Libro.sector_estanteria,
-                Estado_Libro.estado_libro
-            )
+                Estado_Libro.estado_libro,
+                extract('year', Libro.fecha_entrada)
+                )
 
             result = session.execute(query)
             return result
